@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "../ui/button";
 import { IoMdDocument } from "react-icons/io";
 import { MdOutlineChat, MdHistory } from "react-icons/md";
@@ -11,6 +11,8 @@ interface PropsType {
 const Header = (props: PropsType) => {
   const { title = " Sistem Informasi KRK Online Kota Bengkulu", children } =
     props;
+
+  const navigate = useNavigate();
 
   return (
     <div className="bg-[#3E6DCC] shadow-sm relative z-50">
@@ -25,7 +27,10 @@ const Header = (props: PropsType) => {
               <Button className="bg-[#009845]">
                 <MdOutlineChat /> Inbox
               </Button>
-              <Button className="bg-[#009845]">
+              <Button
+                onClick={() => navigate("/berkas")}
+                className="bg-[#009845]"
+              >
                 <IoMdDocument /> Berkas
               </Button>
             </div>

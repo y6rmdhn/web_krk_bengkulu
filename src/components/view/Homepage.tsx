@@ -5,12 +5,16 @@ import Header from "../widgets/Header";
 import MenuItem from "../widgets/MenuItem";
 const menuItems = [
   { title: "Layanan", icon: "/img/layanan.png", href: "#" },
-  { title: "Monitoring", icon: "/img/monitoring.png", href: "#" },
+  {
+    title: "Monitoring",
+    icon: "/img/monitoring.png",
+    href: "/monitoring-berkas",
+  },
   { title: "Peta", icon: "/img/peta.png", href: "#" },
-  { title: "FAQ", icon: "/img/faq.png", href: "#" },
-  { title: "Regulasi", icon: "/img/regulasi.png", href: "#" },
-  { title: "Persyaratan", icon: "/img/persyaratan.png", href: "#" },
-  { title: "Pengaduan", icon: "/img/pengaduan.png", href: "#" },
+  { title: "FAQ", icon: "/img/faq.png", href: "/faq" },
+  { title: "Regulasi", icon: "/img/regulasi.png", href: "/regulasi" },
+  { title: "Persyaratan", icon: "/img/persyaratan.png", href: "/prosedur" },
+  { title: "Pengaduan", icon: "/img/pengaduan.png", href: "/pengaduan" },
   { title: "Website Portal", icon: "/img/website-portal.png", href: "#" },
 ];
 
