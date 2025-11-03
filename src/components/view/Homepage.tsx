@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import Header from "../widgets/Header";
 import MenuItem from "../widgets/MenuItem";
 const menuItems = [
-  { title: "Layanan", icon: "/img/layanan.png", href: "#" },
+  { title: "Layanan", icon: "/img/layanan.png", href: "/layanan" },
   {
     title: "Monitoring",
     icon: "/img/monitoring.png",

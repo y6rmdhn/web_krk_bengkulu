@@ -4,7 +4,6 @@ import Navbar from "./components/features/Navbar";
 import Footer from "./components/features/Footer";
 import { useHydration } from "./hooks/useHydration";
 
-// Lazy import halaman
 const Homepage = lazy(() => import("./components/view/Homepage"));
 const LoginPage = lazy(() => import("./components/view/Auth/LoginPage"));
 const RegisterPage = lazy(() => import("./components/view/Auth/RegisterPage"));
