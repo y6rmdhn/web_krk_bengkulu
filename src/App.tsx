@@ -1,5 +1,5 @@
 import { Suspense, lazy } from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import Navbar from "./components/features/Navbar";
 import Footer from "./components/features/Footer";
 import { useHydration } from "./hooks/useHydration";
@@ -27,8 +27,21 @@ const RegulasiPage = lazy(() => import("./components/view/RegulasiPage"));
 const ProsedurPage = lazy(() => import("./components/view/ProsedurPage"));
 const PengaduanPage = lazy(() => import("./components/view/PengaduanPage"));
 
+// admin
+const DasboardAdmin = lazy(() => import("./components/view/Admin/Dasboard"));
+const PermohonanAdminPage = lazy(
+  () => import("./components/view/Admin/Permohonan")
+);
+const RiwayatPermohonanAdminPage = lazy(
+  () => import("./components/view/Admin/RiwayatPermohonan")
+);
+const DetailPermohonanAdminPage = lazy(
+  () => import("./components/view/Admin/PermohonanDetail")
+);
+
 function App() {
   const isHydrated = useHydration();
+  const location = useLocation();
 
   if (!isHydrated) {
     return (
@@ -40,7 +53,7 @@ function App() {
 
   return (
     <>
-      <Navbar />
+      {!location.pathname.startsWith("/admin") ? <Navbar /> : null}
 
       <Suspense
         fallback={
@@ -70,10 +83,23 @@ function App() {
           <Route path="/regulasi" element={<RegulasiPage />} />
           <Route path="/prosedur" element={<ProsedurPage />} />
           <Route path="/pengaduan" element={<PengaduanPage />} />
+
+          <Route path="admin">
+            <Route path="dasboard" element={<DasboardAdmin />} />
+            <Route path="permohonan-krk" element={<PermohonanAdminPage />} />
+            <Route
+              path="riwayat-permohonan-krk"
+              element={<RiwayatPermohonanAdminPage />}
+            />
+            <Route
+              path="permohonan/:id"
+              element={<DetailPermohonanAdminPage />}
+            />
+          </Route>
         </Routes>
       </Suspense>
 
-      <Footer />
+      {!location.pathname.startsWith("/admin") ? <Footer /> : null}
     </>
   );
 }
