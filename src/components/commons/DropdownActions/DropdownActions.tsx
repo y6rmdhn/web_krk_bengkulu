@@ -1,0 +1,48 @@
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { EllipsisVertical } from "lucide-react";
+import { type ReactNode } from "react";
+
+const DropdownActions = ({
+  menu,
+}: {
+  menu: {
+    label: string | ReactNode;
+    variant?: "destructive" | "default";
+    action?: () => void;
+    type?: "button" | "link";
+  }[];
+}) => {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="ghost"
+          className="text-muted-foreground size-8"
+          size="icon"
+        >
+          <EllipsisVertical />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-32">
+        {menu.map((item, index) => (
+          <DropdownMenuItem
+            key={`dropdown-action-${index}`}
+            variant={item.variant || "default"}
+            asChild={item.type === "link"}
+            onClick={item.action}
+          >
+            {item.label}
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+};
+
+export default DropdownActions;

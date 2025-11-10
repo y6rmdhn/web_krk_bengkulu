@@ -1,31 +1,46 @@
 import { Suspense, lazy } from "react";
-import { Routes, Route, useLocation } from "react-router-dom";
-import Navbar from "./components/features/Navbar";
-import Footer from "./components/features/Footer";
-import { useHydration } from "./hooks/useHydration";
+import { Routes, Route } from "react-router-dom";
+import { Toaster } from "sonner";
 
-const Homepage = lazy(() => import("./components/view/Homepage"));
-const LoginPage = lazy(() => import("./components/view/Auth/LoginPage"));
-const RegisterPage = lazy(() => import("./components/view/Auth/RegisterPage"));
-const KelengkapanBerkas = lazy(
-  () => import("./components/view/KelengkapanBerkasPage")
+const Homepage = lazy(() => import("./components/view/RegularUser/Homepage"));
+const LoginPage = lazy(() => import("./components/view/Auth/Login/Login"));
+const RegisterPage = lazy(
+  () => import("./components/view/Auth/Register/Register")
 );
-const LayananPage = lazy(() => import("./components/view/LayananPage"));
-const LayananKrkPage = lazy(() => import("./components/view/LayananKrkPage"));
-const KrkBuatBaruPage = lazy(() => import("./components/view/KrkBuatbaruPage"));
-const PermohonanVerifikasiPage = lazy(
-  () => import("./components/view/PermohonanVerifikasiPage")
+const KelengkapanBerkas = lazy(
+  () => import("./components/view/RegularUser/Berkas")
+);
+const LayananPage = lazy(
+  () => import("./components/view/RegularUser/Layanan/Layanan")
+);
+const PanduanPengajuan = lazy(
+  () => import("./components/view/RegularUser/PanduanPengajuan")
+);
+const PermohonanKrk = lazy(
+  () => import("./components/view/RegularUser/PermohonanKrk")
 );
 const BerhasilBuatBaruPage = lazy(
-  () => import("./components/view/BerhasilBuatBaruPage")
+  () => import("./components/view/RegularUser/SuccessPage")
 );
 const MonitoringBerkasPage = lazy(
-  () => import("./components/view/MonitoringBerkas")
+  () => import("./components/view/RegularUser/MonitoringBerkas")
 );
-const FAQPage = lazy(() => import("./components/view/FaqPage"));
-const RegulasiPage = lazy(() => import("./components/view/RegulasiPage"));
-const ProsedurPage = lazy(() => import("./components/view/ProsedurPage"));
-const PengaduanPage = lazy(() => import("./components/view/PengaduanPage"));
+const FAQPage = lazy(() => import("./components/view/RegularUser/Faq"));
+const RegulasiPage = lazy(
+  () => import("./components/view/RegularUser/Regulasi")
+);
+const ProsedurPage = lazy(
+  () => import("./components/view/RegularUser/Prosedur")
+);
+const PengaduanPage = lazy(
+  () => import("./components/view/RegularUser/Pengaduan")
+);
+const LayananKrkPage = lazy(
+  () => import("./components/view/RegularUser/LayananKrk")
+);
+const RiwayatPermohonanPage = lazy(
+  () => import("./components/view/RegularUser/RiwayatPermohonan")
+);
 
 // admin
 const DasboardAdmin = lazy(() => import("./components/view/Admin/Dasboard"));
@@ -40,20 +55,9 @@ const DetailPermohonanAdminPage = lazy(
 );
 
 function App() {
-  const isHydrated = useHydration();
-  const location = useLocation();
-
-  if (!isHydrated) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        Loading...
-      </div>
-    );
-  }
-
   return (
     <>
-      {!location.pathname.startsWith("/admin") ? <Navbar /> : null}
+      <Toaster position="top-right" />
 
       <Suspense
         fallback={
@@ -69,15 +73,13 @@ function App() {
           <Route path="/berkas" element={<KelengkapanBerkas />} />
           <Route path="/layanan" element={<LayananPage />} />
           <Route path="/layanan-krk" element={<LayananKrkPage />} />
-          <Route path="/flowchart-krk" element={<KrkBuatBaruPage />} />
+          <Route path="/alur-pengajuan" element={<PanduanPengajuan />} />
+          <Route path="/permohonan-krk" element={<PermohonanKrk />} />
           <Route
-            path="/permohonan-verifikasi"
-            element={<PermohonanVerifikasiPage />}
+            path="/riwayat-permohonan"
+            element={<RiwayatPermohonanPage />}
           />
-          <Route
-            path="/berhasil-buat-baru"
-            element={<BerhasilBuatBaruPage />}
-          />
+          <Route path="/success" element={<BerhasilBuatBaruPage />} />
           <Route path="/monitoring-berkas" element={<MonitoringBerkasPage />} />
           <Route path="/faq" element={<FAQPage />} />
           <Route path="/regulasi" element={<RegulasiPage />} />
@@ -98,8 +100,6 @@ function App() {
           </Route>
         </Routes>
       </Suspense>
-
-      {!location.pathname.startsWith("/admin") ? <Footer /> : null}
     </>
   );
 }

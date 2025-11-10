@@ -9,7 +9,6 @@ export function useHydration() {
       setIsHydrated(true);
     });
 
-    // Kalau store sudah terhydrate sejak awal
     if (useAuthStore.persist.hasHydrated()) {
       setIsHydrated(true);
     }
