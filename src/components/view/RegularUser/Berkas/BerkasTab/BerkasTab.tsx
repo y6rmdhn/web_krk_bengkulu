@@ -6,46 +6,42 @@ import useBerkasTab from "./useBerkastab";
 import { Label } from "@/components/ui/label";
 import DataTable from "@/components/commons/DataTable";
 import DropdownActions from "@/components/commons/DropdownActions";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { Pencil, Trash2 } from "lucide-react";
-import { useSearchParams } from "react-router-dom";
+import useDataTable from "@/hooks/useDataTable";
+
+const dummyData = [
+  { no: "1", keterangan: "KTP - Kartu Tanda Penduduk" },
+  { no: "2", keterangan: "NPWP - Nomor Pokok Wajib Pajak" },
+  { no: "3", keterangan: "SIM - Surat Izin Mengemudi" },
+  { no: "4", keterangan: "Passport" },
+  { no: "5", keterangan: "Ijazah Terakhir" },
+  { no: "6", keterangan: "Transkrip Nilai" },
+  { no: "7", keterangan: "Sertifikat Keahlian" },
+  { no: "8", keterangan: "Sertifikat Bahasa Inggris" },
+  { no: "9", keterangan: "Sertifikat Komputer" },
+  { no: "10", keterangan: "Surat Pengalaman Kerja" },
+  { no: "11", keterangan: "Rekomendasi dari Atasan" },
+  { no: "12", keterangan: "Sertifikat Training" },
+  { no: "13", keterangan: "Portfolio Projek" },
+  { no: "14", keterangan: "Sertifikat Profesional" },
+  { no: "15", keterangan: "Lisensi Keahlian" },
+  { no: "16", keterangan: "Sertifikat Vendor" },
+  { no: "17", keterangan: "Dokumen Kontrak" },
+  { no: "18", keterangan: "Surat Keterangan Sehat" },
+  { no: "19", keterangan: "Rekomendasi Pribadi" },
+  { no: "20", keterangan: "Sertifikat Award" },
+  { no: "21", keterangan: "Dokumen Asuransi" },
+  { no: "22", keterangan: "Buku Nikah" },
+  { no: "23", keterangan: "Akta Kelahiran" },
+  { no: "24", keterangan: "Kartu Keluarga" },
+  { no: "25", keterangan: "Surat Keterangan Domisili" },
+];
 
 const BerkasTab = () => {
   const { berkasForm, handleFileUpload, previewFile } = useBerkasTab();
-
-  // State untuk pagination
-  const [currentLimit, setCurrentLimit] = useState(10);
-  const [searchParams, setSearchParams] = useSearchParams();
-  const currentPage = Number(searchParams.get("page")) || 1;
-
-  // Dummy data yang lebih lengkap
-  const dummyData = [
-    { no: "1", keterangan: "KTP - Kartu Tanda Penduduk" },
-    { no: "2", keterangan: "NPWP - Nomor Pokok Wajib Pajak" },
-    { no: "3", keterangan: "SIM - Surat Izin Mengemudi" },
-    { no: "4", keterangan: "Passport" },
-    { no: "5", keterangan: "Ijazah Terakhir" },
-    { no: "6", keterangan: "Transkrip Nilai" },
-    { no: "7", keterangan: "Sertifikat Keahlian" },
-    { no: "8", keterangan: "Sertifikat Bahasa Inggris" },
-    { no: "9", keterangan: "Sertifikat Komputer" },
-    { no: "10", keterangan: "Surat Pengalaman Kerja" },
-    { no: "11", keterangan: "Rekomendasi dari Atasan" },
-    { no: "12", keterangan: "Sertifikat Training" },
-    { no: "13", keterangan: "Portfolio Projek" },
-    { no: "14", keterangan: "Sertifikat Profesional" },
-    { no: "15", keterangan: "Lisensi Keahlian" },
-    { no: "16", keterangan: "Sertifikat Vendor" },
-    { no: "17", keterangan: "Dokumen Kontrak" },
-    { no: "18", keterangan: "Surat Keterangan Sehat" },
-    { no: "19", keterangan: "Rekomendasi Pribadi" },
-    { no: "20", keterangan: "Sertifikat Award" },
-    { no: "21", keterangan: "Dokumen Asuransi" },
-    { no: "22", keterangan: "Buku Nikah" },
-    { no: "23", keterangan: "Akta Kelahiran" },
-    { no: "24", keterangan: "Kartu Keluarga" },
-    { no: "25", keterangan: "Surat Keterangan Domisili" },
-  ];
+  const { currentPage, currentLimit, handleChangePage, handleLimitChange } =
+    useDataTable();
 
   // Filter data berdasarkan pagination
   const filteredData = useMemo(() => {
@@ -93,21 +89,6 @@ const BerkasTab = () => {
   }, [dummyData, currentPage, currentLimit]);
 
   const totalPages = Math.ceil(dummyData.length / currentLimit);
-
-  // Handler untuk ganti page
-  const handleChangePage = (page: number) => {
-    setSearchParams({ page: String(page) });
-  };
-
-  const handleLimitChange = (limit: number) => {
-    setCurrentLimit(limit);
-
-    const params = new URLSearchParams(searchParams);
-
-    params.set("page", "1");
-
-    setSearchParams(params);
-  };
 
   return (
     <Card className="rounded-t-none border-t-0">

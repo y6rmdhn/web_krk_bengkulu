@@ -1,8 +1,8 @@
 import SectionTitle from "../SectionTitle";
 import InputField from "@/components/commons/InputField";
-import { Input } from "@/components/ui/input";
 import type { UseFormReturn } from "react-hook-form";
 import type { PermohonanFormValues } from "../usePermohohanKrk";
+import SearchableMap from "@/components/commons/SearchableMap";
 
 type PropTypes = {
   form: UseFormReturn<PermohonanFormValues>;
@@ -10,6 +10,40 @@ type PropTypes = {
 
 const WilayahForm = (props: PropTypes) => {
   const { form } = props;
+
+  // Get current coordinate values from form
+  const currentKoordinat = form.watch("koordinat");
+
+  // Handle when coordinate is selected from map
+  const handleCoordinateSelect = (
+    lat: number,
+    lng: number,
+    address: string
+  ) => {
+    // Format: "lat, lng"
+    const coordinateString = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+
+    // Update the coordinate field
+    form.setValue("koordinat", coordinateString);
+
+    // You can also update other fields if needed
+    // For example, if you have separate lat/lng fields:
+    // form.setValue("latitude", lat.toString());
+    // form.setValue("longitude", lng.toString());
+  };
+
+  // Optional: Parse existing coordinate and set initial map position
+  const getInitialPosition = (): [number, number] => {
+    if (currentKoordinat) {
+      const [lat, lng] = currentKoordinat
+        .split(",")
+        .map((coord) => parseFloat(coord.trim()));
+      if (!isNaN(lat) && !isNaN(lng)) {
+        return [lat, lng];
+      }
+    }
+    return [-6.2088, 106.8456]; // Default Jakarta position
+  };
 
   return (
     <div className="space-y-6">
@@ -33,16 +67,21 @@ const WilayahForm = (props: PropTypes) => {
       <div className="pt-6">
         <SectionTitle title="Pilih Lokasi Persil Peta" />
       </div>
-      <Input id="search-maps" placeholder="Search Google Maps" />
-      {/* Placeholder untuk Peta Google */}
-      <div className="w-full h-80 rounded-md border-2 border-dashed bg-gray-100 flex items-center justify-center">
-        <p className="text-gray-500">Google Maps Component Placeholder</p>
+
+      {/* Searchable Map Component */}
+      <div className="w-full rounded-md border-2 border-dashed bg-gray-100 p-4">
+        <SearchableMap
+          onCoordinateSelect={handleCoordinateSelect}
+          initialPosition={getInitialPosition()}
+        />
       </div>
+
       <InputField
         id="koordinat"
         label="Koordinat"
         form={form}
         name="koordinat"
+        placeholder="Koordinat akan terisi otomatis ketika memilih lokasi di peta"
       />
     </div>
   );

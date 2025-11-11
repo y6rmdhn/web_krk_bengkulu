@@ -23,8 +23,8 @@ const PaginationDataTable = ({
         <PaginationItem>
           <PaginationPrevious
             onClick={() => {
-              if (currentPage < 1) {
-                onChangePage(currentPage + 1);
+              if (currentPage > 1) {
+                onChangePage(currentPage - 1);
               } else {
                 onChangePage(1);
               }
