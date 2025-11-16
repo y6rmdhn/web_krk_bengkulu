@@ -20,8 +20,6 @@ const MainLayoutNavbar = (props: PropTypes) => {
   const { isAuth } = props;
   const { dataProfile, handleLogout } = useMainLayoutNavbar();
 
-  console.log(dataProfile);
-
   return (
     <nav className="bg-gradient-to-r from-[#2451AB] via-[#2C5AA0] to-[#1E4A9C] text-white shadow-lg border-b border-white/10">
       <div className="container mx-auto px-4 py-3">

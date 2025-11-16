@@ -3,12 +3,10 @@ import type { ILogout } from "@/types/auth";
 import session from "@/utils/session";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { AxiosError } from "axios";
-import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 const useMainLayoutNavbar = () => {
   const isAuth = session.getSession();
-  const navigate = useNavigate();
 
   const getProfile = async () => {
     const { data } = await authServices.getProfile();
@@ -40,7 +38,7 @@ const useMainLayoutNavbar = () => {
     },
     onSuccess: () => {
       session.clearSession();
-      navigate("/");
+      window.location.href = "/";
     },
   });
 
