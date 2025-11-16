@@ -4,6 +4,7 @@ import MainLayoutNavbar from "./MainLayoutNavbar";
 import MainLayoutFooter from "./MainLayoutFooter";
 import MainLayoutSubHeader from "./MainLayoutSubHeader/MainLayoutSubHeader";
 import { cn } from "@/lib/utils";
+import session from "@/utils/session";
 
 interface PropsType {
   title: string;
@@ -15,15 +16,17 @@ interface PropsType {
 const MainLayout = (props: PropsType) => {
   const { title, children, isBgGray, isPaddingY } = props;
 
+  const isAuthenticated = session.getSession();
+
   return (
     <Fragment>
       <PageHead title={title} />
-      <MainLayoutNavbar />
-      <MainLayoutSubHeader children={true} />
+      <MainLayoutNavbar isAuth={isAuthenticated} />
+      <MainLayoutSubHeader children={true} isAuth={isAuthenticated} />
       <div
         className={cn("3xl:container max-w-screen", {
           "bg-gray-100": isBgGray,
-          "py-10": isPaddingY
+          "py-10": isPaddingY,
         })}
       >
         {children}

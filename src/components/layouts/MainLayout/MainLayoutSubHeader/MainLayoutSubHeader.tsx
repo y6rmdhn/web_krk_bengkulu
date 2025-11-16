@@ -8,11 +8,13 @@ import { MAIN_LAYOUT_SUB_HEADER_MENU_BTN } from "./MainlayoutSubHeader.constant"
 interface PropsType {
   title?: string;
   children?: boolean;
+  isAuth: string | null;
 }
 
 const MainLayoutSubHeader = ({
   title = "Sistem Informasi KRK Online Kota Bengkulu",
   children,
+  isAuth,
 }: PropsType) => {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
@@ -27,7 +29,7 @@ const MainLayoutSubHeader = ({
           </p>
         </div>
 
-        {children && (
+        {children && isAuth && (
           <>
             {/* Desktop Menu */}
             <div className="hidden md:flex gap-2">
