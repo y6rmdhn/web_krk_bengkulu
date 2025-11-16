@@ -1,33 +1,32 @@
 import axios from "axios";
 import environment from "@/config/environment";
-import { useAuthStore } from "@/store/useAuthStore";
-
-const headers = {
-  "Content-type": "application/json",
-};
+import session from "@/utils/session";
 
 const axiosInstance = axios.create({
   baseURL: environment.API_URL,
-  headers,
-  timeout: 60 * 1000,
 });
 
 axiosInstance.interceptors.request.use(
   (config) => {
-    const accessToken = useAuthStore.getState().accessToken;
-    if (accessToken) {
-      config.headers.Authorization = `Bearer ${accessToken}`;
+    const token = session.getSession();
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => {
+    return Promise.reject(error);
+  }
 );
 
 axiosInstance.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    return response;
+  },
   (error) => {
-    if (error.response?.status === 401) {
-      useAuthStore.getState().clearAuth();
+    if (error.response && error.response.status === 401) {
+      session.clearSession();
+
       window.location.href = "/login";
     }
     return Promise.reject(error);

@@ -13,9 +13,10 @@ import AuthLayouts from "@/components/layouts/AuthLayout/AuthLayout";
 import useLogin from "./useLogin";
 import FormInput from "@/components/commons/FormInput";
 import { usePasswordToggle } from "@/hooks/usePasswordToggle";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function LoginPage() {
-  const { form, isLoading, onSubmit } = useLogin();
+  const { form, handleLogin, isPendingLogin } = useLogin();
   const { showPassword, togglePassword } = usePasswordToggle();
 
   return (
@@ -66,15 +67,15 @@ export default function LoginPage() {
                   <CardContent>
                     <Form {...form}>
                       <form
-                        onSubmit={form.handleSubmit(onSubmit)}
+                        onSubmit={form.handleSubmit(handleLogin)}
                         className="space-y-6"
                       >
                         <FormInput
                           form={form}
-                          label="Username"
-                          name="username"
-                          placeholder="Masukan username anda"
-                          type="text"
+                          label="Email"
+                          name="email"
+                          placeholder="Masukan Email anda"
+                          type="email"
                         />
 
                         <FormInput
@@ -89,14 +90,14 @@ export default function LoginPage() {
 
                         <Button
                           type="submit"
-                          disabled={isLoading}
+                          disabled={isPendingLogin}
                           className="w-full h-12 bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-lg font-semibold rounded-xl shadow-lg transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50"
                         >
-                          {isLoading ? (
-                            <div className="flex items-center gap-2">
-                              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                              Memproses...
-                            </div>
+                          {isPendingLogin ? (
+                            <>
+                              <Spinner />
+                              Loading..
+                            </>
                           ) : (
                             "Masuk"
                           )}

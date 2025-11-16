@@ -1,37 +1,54 @@
+import authServices from "@/services/api/auth.services";
+import type { ILogin } from "@/types/auth";
+import session from "@/utils/session";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import z from "zod";
 
 const loginSchema = z.object({
-  username: z.string().min(1, "Username harus diisi"),
+  email: z.email(),
   password: z.string().min(1, "Password harus diisi"),
 });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 
 const useLogin = () => {
-  const [isLoading, setIsLoading] = useState(false);
-
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      username: "",
+      email: "",
       password: "",
     },
   });
 
-  async function onSubmit(data: LoginFormValues) {
-    setIsLoading(true);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    console.log(data);
-    setIsLoading(false);
-  }
+  const loginServices = async (payload: ILogin) => {
+    const result = await authServices.login(payload);
+
+    return result;
+  };
+
+  const { mutate: mutateLogin, isPending: isPendingLogin } = useMutation({
+    mutationFn: loginServices,
+    onError(error) {
+      toast.error(error.message);
+      console.log(error.message);
+    },
+    onSuccess: (data) => {
+      toast.success("Login Success");
+      session.setSession(data?.data?.accessToken);
+    },
+  });
+
+  const handleLogin = (values: ILogin) => {
+    mutateLogin(values);
+    console.log(values);
+  };
 
   return {
-    onSubmit,
-    isLoading,
+    handleLogin,
+    isPendingLogin,
     form,
   };
 };

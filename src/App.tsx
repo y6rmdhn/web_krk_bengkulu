@@ -1,6 +1,7 @@
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { Suspense, lazy } from "react";
-import { Routes, Route } from "react-router-dom";
 import { Toaster } from "sonner";
+import authLoader from "./components/layouts/AuthLayout/AuthLayout.loader";
 
 const Homepage = lazy(() => import("./components/view/RegularUser/Homepage"));
 const LoginPage = lazy(() => import("./components/view/Auth/Login/Login"));
@@ -54,51 +55,97 @@ const DetailPermohonanAdminPage = lazy(
   () => import("./components/view/Admin/PermohonanDetail")
 );
 
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <Homepage />,
+  },
+  {
+    path: "/login",
+    loader: authLoader,
+    element: <LoginPage />,
+  },
+  {
+    path: "/register",
+    element: <RegisterPage />,
+  },
+  {
+    path: "/berkas",
+    element: <KelengkapanBerkas />,
+  },
+  {
+    path: "/layanan",
+    element: <LayananPage />,
+  },
+  {
+    path: "/layanan-krk",
+    element: <LayananKrkPage />,
+  },
+  {
+    path: "/alur-pengajuan",
+    element: <PanduanPengajuan />,
+  },
+  {
+    path: "/permohonan-krk",
+    element: <PermohonanKrk />,
+  },
+  {
+    path: "/riwayat-permohonan",
+    element: <RiwayatPermohonanPage />,
+  },
+  {
+    path: "/success",
+    element: <BerhasilBuatBaruPage />,
+  },
+  {
+    path: "/monitoring-berkas",
+    element: <MonitoringBerkasPage />,
+  },
+  {
+    path: "/faq",
+    element: <FAQPage />,
+  },
+  {
+    path: "/regulasi",
+    element: <RegulasiPage />,
+  },
+  {
+    path: "/prosedur",
+    element: <ProsedurPage />,
+  },
+  {
+    path: "/pengaduan",
+    element: <PengaduanPage />,
+  },
+  {
+    path: "/admin",
+    children: [
+      {
+        path: "dasboard",
+        element: <DasboardAdmin />,
+      },
+      {
+        path: "permohonan-krk",
+        element: <PermohonanAdminPage />,
+      },
+      {
+        path: "riwayat-permohonan-krk",
+        element: <RiwayatPermohonanAdminPage />,
+      },
+      {
+        path: "permohonan/:id",
+        element: <DetailPermohonanAdminPage />,
+      },
+    ],
+  },
+]);
+
 function App() {
   return (
     <>
       <Toaster position="top-right" />
-
-      <Suspense
-        fallback={
-          <div className="flex justify-center items-center h-screen">
-            Loading...
-          </div>
-        }
-      >
-        <Routes>
-          <Route path="/" element={<Homepage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route path="/berkas" element={<KelengkapanBerkas />} />
-          <Route path="/layanan" element={<LayananPage />} />
-          <Route path="/layanan-krk" element={<LayananKrkPage />} />
-          <Route path="/alur-pengajuan" element={<PanduanPengajuan />} />
-          <Route path="/permohonan-krk" element={<PermohonanKrk />} />
-          <Route
-            path="/riwayat-permohonan"
-            element={<RiwayatPermohonanPage />}
-          />
-          <Route path="/success" element={<BerhasilBuatBaruPage />} />
-          <Route path="/monitoring-berkas" element={<MonitoringBerkasPage />} />
-          <Route path="/faq" element={<FAQPage />} />
-          <Route path="/regulasi" element={<RegulasiPage />} />
-          <Route path="/prosedur" element={<ProsedurPage />} />
-          <Route path="/pengaduan" element={<PengaduanPage />} />
-
-          <Route path="admin">
-            <Route path="dasboard" element={<DasboardAdmin />} />
-            <Route path="permohonan-krk" element={<PermohonanAdminPage />} />
-            <Route
-              path="riwayat-permohonan-krk"
-              element={<RiwayatPermohonanAdminPage />}
-            />
-            <Route
-              path="permohonan/:id"
-              element={<DetailPermohonanAdminPage />}
-            />
-          </Route>
-        </Routes>
+      <Suspense>
+        <RouterProvider router={router} />
       </Suspense>
     </>
   );
