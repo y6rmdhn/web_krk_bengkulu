@@ -42,6 +42,12 @@ const LayananKrkPage = lazy(
 const RiwayatPermohonanPage = lazy(
   () => import("./components/view/RegularUser/RiwayatPermohonan")
 );
+const SuccessRegisterPage = lazy(
+  () => import("./components/view/SuccessRegister")
+);
+const SuccessVerificationEmailPage = lazy(
+  () => import("./components/view/VerificationEmailSuccess")
+);
 
 // admin
 const DasboardAdmin = lazy(() => import("./components/view/Admin/Dasboard"));
@@ -53,6 +59,38 @@ const RiwayatPermohonanAdminPage = lazy(
 );
 const DetailPermohonanAdminPage = lazy(
   () => import("./components/view/Admin/PermohonanDetail")
+);
+const PermohonanDiprosesAdminPage = lazy(
+  () => import("./components/view/Admin/PermohonanDiproses")
+);
+const PermohonanDikembalikanAdminPage = lazy(
+  () => import("./components/view/Admin/PermohonanDiKembalikan")
+);
+const PermohonanDitolakAdminPage = lazy(
+  () => import("./components/view/Admin/PermohonanDiolak")
+);
+const PermohonanSelesaiAdminPage = lazy(
+  () => import("./components/view/Admin/PermohonanSelesai")
+);
+
+// JF
+const DisposisiSurveiMasuk = lazy(
+  () => import("./components/view/JF/DisposisiSurveiMasuk")
+);
+const SurveiDiProses = lazy(
+  () => import("./components/view/JF/SurveiDiproses")
+);
+const SurveiSelesai = lazy(() => import("./components/view/JF/SurveiSelesai"));
+
+// Kepala Dinas
+const PermohonanSkTTE = lazy(
+  () => import("./components/view/KepalaDinas/PermohonanSKTTE")
+);
+const TteSkSelesai = lazy(
+  () => import("./components/view/KepalaDinas/TTESKSelesai")
+);
+const TteSkDitolak = lazy(
+  () => import("./components/view/KepalaDinas/TTESKDitolak")
 );
 
 const router = createBrowserRouter([
@@ -68,6 +106,14 @@ const router = createBrowserRouter([
   {
     path: "/register",
     element: <RegisterPage />,
+  },
+  {
+    path: "/success-register",
+    element: <SuccessRegisterPage />,
+  },
+  {
+    path: "/api/auth/verify",
+    element: <SuccessVerificationEmailPage />,
   },
   {
     path: "/berkas",
@@ -133,8 +179,58 @@ const router = createBrowserRouter([
         element: <RiwayatPermohonanAdminPage />,
       },
       {
+        path: "permohonan-diproses",
+        element: <PermohonanDiprosesAdminPage />,
+      },
+      {
+        path: "permohonan-dikembalikan",
+        element: <PermohonanDikembalikanAdminPage />,
+      },
+      {
+        path: "permohonan-ditolak",
+        element: <PermohonanDitolakAdminPage />,
+      },
+      {
+        path: "permohonan-selesai",
+        element: <PermohonanSelesaiAdminPage />,
+      },
+      {
         path: "permohonan/:id",
         element: <DetailPermohonanAdminPage />,
+      },
+    ],
+  },
+  {
+    path: "/jf",
+    children: [
+      {
+        path: "disposisi-survei-masuk",
+        element: <DisposisiSurveiMasuk />,
+      },
+      {
+        path: "survei-diproses",
+        element: <SurveiDiProses />,
+      },
+      {
+        path: "survei-selesai",
+        element: <SurveiSelesai />,
+      },
+    ],
+  },
+  {
+    path: "/kepala-dinas",
+    children: [
+      {
+        path: "permohonan-sk-tte",
+        element: <PermohonanSkTTE />,
+      },
+      {
+        path: "tte-sk-selesai",
+        element: <TteSkSelesai />,
+      },
+      {
+        path: "tte-sk-ditolak",
+        element: <TteSkDitolak />,
       },
     ],
   },

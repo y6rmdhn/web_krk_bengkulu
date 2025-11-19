@@ -106,8 +106,8 @@ const TABLE_DATA = [
 const Permohonan = () => {
   return (
     <AdminLayout
-      title="Admin Permohonan Masuk | KRK Kota Bengkulu"
-      desc="Permohonan Masuk"
+      title="Admin Permohonan Ditolak | KRK Kota Bengkulu"
+      desc="Permohonan Ditolak"
     >
       <div className="mt-10 flex flex-col gap-6">
         {/* Filter Section */}
@@ -176,10 +176,10 @@ const Permohonan = () => {
                           item.status === "Menunggu Verifikasi"
                             ? "bg-yellow-100 text-yellow-800"
                             : item.status === "Ditolak"
-                            ? "bg-red-100 text-red-800"
-                            : item.status === "Selesai"
-                            ? "bg-green-100 text-green-800"
-                            : "bg-blue-100 text-blue-800"
+                              ? "bg-red-100 text-red-800"
+                              : item.status === "Selesai"
+                                ? "bg-green-100 text-green-800"
+                                : "bg-blue-100 text-blue-800"
                         }`}
                       >
                         {item.status}

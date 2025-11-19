@@ -1,29 +1,30 @@
+import authServices from "@/services/api/auth.services";
+import type { IResgister } from "@/types/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
+import { AxiosError } from "axios";
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import z from "zod";
 
 const registerSchema = z
   .object({
-    noKtp: z
+    nik: z
       .string()
       .min(1, "No. KTP harus diisi")
       .min(16, "No. KTP harus 16 digit")
       .max(16, "No. KTP harus 16 digit")
       .regex(/^\d+$/, "No. KTP harus berupa angka"),
-    username: z
+    name: z
       .string()
-      .min(1, "Username harus diisi")
-      .min(3, "Username minimal 3 karakter")
-      .regex(
-        /^[a-zA-Z0-9_]+$/,
-        "Username hanya boleh mengandung huruf, angka, dan underscore"
-      ),
+      .min(1, "Name harus diisi")
+      .min(3, "Name minimal 3 karakter"),
     email: z
       .string()
       .min(1, "Email harus diisi")
       .email("Format email tidak valid"),
-    telp: z
+    phone: z
       .string()
       .min(1, "No. Telepon harus diisi")
       .min(10, "No. Telepon minimal 10 digit")
@@ -36,7 +37,7 @@ const registerSchema = z
         /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
         "Password harus mengandung huruf besar, huruf kecil, dan angka"
       ),
-    confirmPassword: z.string().min(1, "Konfirmasi password harus diisi"),
+    confirmPassword: z.string().optional(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Password dan konfirmasi password tidak sama",
@@ -46,31 +47,52 @@ const registerSchema = z
 type RegisterFormValues = z.infer<typeof registerSchema>;
 
 const useRegister = () => {
-  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
   const form = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
-      noKtp: "",
-      username: "",
+      nik: "",
+      name: "",
       email: "",
-      telp: "",
+      phone: "",
       password: "",
       confirmPassword: "",
     },
   });
 
-  async function onSubmit(data: RegisterFormValues) {
-    setIsLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    console.log(data);
-    setIsLoading(false);
-  }
+  const register = async (payload: IResgister) => {
+    const result = await authServices.register(payload);
+
+    return result;
+  };
+
+  const { mutate: mutateRegister, isPending: isPendingRegister } = useMutation({
+    mutationFn: register,
+    onError(error) {
+      if (error instanceof AxiosError) {
+        const message = error.response?.data?.message;
+        toast.error(message);
+      } else {
+        toast.error(error.message);
+      }
+    },
+    onSuccess: () => {
+      localStorage.setItem("email", form.getValues("email"));
+      form.reset();
+      toast.success("Registrasi berhasil");
+      navigate("/success-register");
+    },
+  });
+
+  const handleRegister = (values: IResgister) => {
+    mutateRegister(values);
+  };
 
   return {
     form,
-    onSubmit,
-    isLoading,
+    isPendingRegister,
+    handleRegister,
   };
 };
 

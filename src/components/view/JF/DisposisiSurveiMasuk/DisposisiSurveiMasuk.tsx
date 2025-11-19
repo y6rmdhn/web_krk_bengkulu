@@ -1,4 +1,3 @@
-import AdminLayout from "@/components/layouts/AdminLayout";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import {
   Table,
@@ -19,6 +18,7 @@ import {
 } from "@/components/ui/select";
 import { Search } from "lucide-react";
 import { HiMiniEllipsisHorizontal } from "react-icons/hi2";
+import JFLayout from "@/components/layouts/JFLayout";
 
 const TABLE_DATA = [
   {
@@ -103,11 +103,11 @@ const TABLE_DATA = [
   },
 ];
 
-const Permohonan = () => {
+const DisposisiSurveiMasuk = () => {
   return (
-    <AdminLayout
-      title="Admin Permohonan Masuk | KRK Kota Bengkulu"
-      desc="Permohonan Masuk"
+    <JFLayout
+      title="JF Disposisi Survei Masuk | KRK Kota Bengkulu"
+      desc="Disposisi Survei Masuk"
     >
       <div className="mt-10 flex flex-col gap-6">
         {/* Filter Section */}
@@ -140,7 +140,7 @@ const Permohonan = () => {
         <Card className="flex-1">
           <CardHeader>
             <div className="flex justify-between items-center">
-              <h1 className="text-lg font-semibold">Daftar Permohonan KRK</h1>
+              <h1 className="text-lg font-semibold">Disposisi Survei Masuk</h1>
             </div>
           </CardHeader>
           <CardContent>
@@ -176,10 +176,10 @@ const Permohonan = () => {
                           item.status === "Menunggu Verifikasi"
                             ? "bg-yellow-100 text-yellow-800"
                             : item.status === "Ditolak"
-                            ? "bg-red-100 text-red-800"
-                            : item.status === "Selesai"
-                            ? "bg-green-100 text-green-800"
-                            : "bg-blue-100 text-blue-800"
+                              ? "bg-red-100 text-red-800"
+                              : item.status === "Selesai"
+                                ? "bg-green-100 text-green-800"
+                                : "bg-blue-100 text-blue-800"
                         }`}
                       >
                         {item.status}
@@ -204,8 +204,8 @@ const Permohonan = () => {
           </CardContent>
         </Card>
       </div>
-    </AdminLayout>
+    </JFLayout>
   );
 };
 
-export default Permohonan;
+export default DisposisiSurveiMasuk;

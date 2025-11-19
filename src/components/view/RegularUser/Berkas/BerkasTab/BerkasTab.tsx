@@ -1,41 +1,86 @@
-import InputField from "@/components/commons/InputField";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Form } from "@/components/ui/form";
 import useBerkasTab from "./useBerkastab";
-import { Label } from "@/components/ui/label";
 import DataTable from "@/components/commons/DataTable";
 import DropdownActions from "@/components/commons/DropdownActions";
 import { useMemo } from "react";
 import { Pencil, Trash2 } from "lucide-react";
 import useDataTable from "@/hooks/useDataTable";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 
 const dummyData = [
-  { no: "1", keterangan: "KTP - Kartu Tanda Penduduk" },
-  { no: "2", keterangan: "NPWP - Nomor Pokok Wajib Pajak" },
-  { no: "3", keterangan: "SIM - Surat Izin Mengemudi" },
-  { no: "4", keterangan: "Passport" },
-  { no: "5", keterangan: "Ijazah Terakhir" },
-  { no: "6", keterangan: "Transkrip Nilai" },
-  { no: "7", keterangan: "Sertifikat Keahlian" },
-  { no: "8", keterangan: "Sertifikat Bahasa Inggris" },
-  { no: "9", keterangan: "Sertifikat Komputer" },
-  { no: "10", keterangan: "Surat Pengalaman Kerja" },
-  { no: "11", keterangan: "Rekomendasi dari Atasan" },
-  { no: "12", keterangan: "Sertifikat Training" },
-  { no: "13", keterangan: "Portfolio Projek" },
-  { no: "14", keterangan: "Sertifikat Profesional" },
-  { no: "15", keterangan: "Lisensi Keahlian" },
-  { no: "16", keterangan: "Sertifikat Vendor" },
-  { no: "17", keterangan: "Dokumen Kontrak" },
-  { no: "18", keterangan: "Surat Keterangan Sehat" },
-  { no: "19", keterangan: "Rekomendasi Pribadi" },
-  { no: "20", keterangan: "Sertifikat Award" },
-  { no: "21", keterangan: "Dokumen Asuransi" },
-  { no: "22", keterangan: "Buku Nikah" },
-  { no: "23", keterangan: "Akta Kelahiran" },
-  { no: "24", keterangan: "Kartu Keluarga" },
-  { no: "25", keterangan: "Surat Keterangan Domisili" },
+  {
+    no: "1",
+    keterangan: "Surat Permohonan Pengajuan KRK",
+    status: "belum diupload",
+    uploadBerkas: <Input type="file" />,
+  },
+  {
+    no: "2",
+    keterangan: "Fotokopi Kartu Tanda Penduduk (KTP) Pemohon",
+    status: "belum diupload",
+    uploadBerkas: <Input type="file" />,
+  },
+  {
+    no: "3",
+    keterangan: "Fotokopi Kartu Tanda Penduduk (KTP) Pemohon",
+    status: "belum diupload",
+    uploadBerkas: <Input type="file" />,
+  },
+  {
+    no: "4",
+    keterangan:
+      "Fotokopi bukti kepemilikan hak atas tanah (Sertifikat Tanah, Girik/Letter C yang dilengkapi Peta Bidang dari BPN, atau surat tanah lainnya yang sah",
+    status: "sudah diupload",
+    uploadBerkas: <Input type="file" />,
+  },
+  {
+    no: "5",
+    keterangan: "Fotokopi Pajak Bumi dan Bangunan (PBB) tahun berjalan",
+    status: "belum diupload",
+    uploadBerkas: <Input type="file" />,
+  },
+  {
+    no: "6",
+    keterangan:
+      "Surat Pernyataan Pemohon bahwa tanah tidak dalam sengketa dan akan mengikuti persyaratan KRK yang ditetapkan, ditandatangani di atas metera",
+    status: "belum diupload",
+    uploadBerkas: <Input type="file" />,
+  },
+  {
+    no: "7",
+    keterangan: "Sketsa Lokasi/Peta Situasi yang dimohon",
+    status: "belum diupload",
+    uploadBerkas: <Input type="file" />,
+  },
+  {
+    no: "8",
+    keterangan:
+      "Nomor Induk Berusaha (NIB) jika kegiatan yang dimohon termasuk kegiatan berusaha",
+    status: "belum diupload",
+    uploadBerkas: <Input type="file" />,
+  },
+  {
+    no: "9",
+    keterangan:
+      "Surat Kuasa di atas meterai dan dilengkapi fotokopi KTP yang diberi kuasa (jika permohonan diwakilkan oleh pihak ketiga",
+    status: "belum diupload",
+    uploadBerkas: <Input type="file" />,
+  },
+  {
+    no: "10",
+    keterangan:
+      "Untuk permohonan perubahan/perluasan, melampirkan fotokopi KRK/IPPT lama (jika ada)",
+    status: "belum diupload",
+    uploadBerkas: <Input type="file" />,
+  },
+  {
+    no: "11",
+    keterangan: "Bukti Pembayaran Pajak Bumi dan Bangunan (PBB) Tahun Berjalan",
+    status: "belum diupload",
+    uploadBerkas: <Input type="file" />,
+  },
 ];
 
 const BerkasTab = () => {
@@ -53,6 +98,12 @@ const BerkasTab = () => {
       return [
         item.no,
         item.keterangan,
+        <Badge
+          variant={item.status === "sudah diupload" ? "outline" : "destructive"}
+        >
+          {item.status}
+        </Badge>,
+        item.uploadBerkas,
         <DropdownActions
           key={`action-${item.no}`}
           menu={[
@@ -94,75 +145,14 @@ const BerkasTab = () => {
     <Card className="rounded-t-none border-t-0">
       <CardContent className="p-6 space-y-8">
         <Form {...berkasForm}>
-          <form onSubmit={berkasForm.handleSubmit((data) => console.log(data))}>
-            {/* Bagian Form Upload */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              <div className="space-y-6">
-                <InputField
-                  id="jenisBerkas"
-                  label="Jenis Berkas"
-                  form={berkasForm}
-                  name="jenisBerkas"
-                  placeholder="Contoh: KTP, NPWP, Ijazah"
-                />
-                <InputField
-                  id="keterangan"
-                  label="Keterangan"
-                  form={berkasForm}
-                  name="keterangan"
-                  placeholder="Deskripsi lengkap berkas"
-                />
-                <div className="flex items-center space-x-4">
-                  <Button
-                    type="button"
-                    className="bg-[#2451AA] hover:bg-[#1e4090]"
-                    onClick={() =>
-                      document.getElementById("file-upload")?.click()
-                    }
-                  >
-                    Upload File
-                  </Button>
-                  <input
-                    id="file-upload"
-                    type="file"
-                    className="hidden"
-                    onChange={handleFileUpload}
-                    accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
-                  />
-                  <Button
-                    type="submit"
-                    className="bg-green-600 hover:bg-green-700"
-                  >
-                    Simpan
-                  </Button>
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label>Preview</Label>
-                <div className="w-full h-48 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center text-gray-400">
-                  {previewFile ? (
-                    <img
-                      src={previewFile}
-                      alt="Preview"
-                      className="w-full h-full object-contain"
-                    />
-                  ) : (
-                    <div className="text-center">
-                      <p className="mb-2">File preview akan muncul di sini</p>
-                      <p className="text-sm text-gray-500">
-                        Format: PDF, JPG, PNG, DOC (Max: 5MB)
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          </form>
+          <form
+            onSubmit={berkasForm.handleSubmit((data) => console.log(data))}
+          ></form>
         </Form>
 
         {/* Bagian Tabel Berkas */}
         <DataTable
-          header={["No", "Keterangan", "Aksi"]}
+          header={["No", "Keterangan", "Status", "Upload Berkas", "Aksi"]}
           isLoading={false}
           data={filteredData}
           totalPages={totalPages}

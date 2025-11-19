@@ -16,7 +16,7 @@ import FormInput from "@/components/commons/FormInput";
 import { usePasswordToggle } from "@/hooks/usePasswordToggle";
 
 export default function RegisterPage() {
-  const { form, isLoading, onSubmit } = useRegister();
+  const { form, isPendingRegister, handleRegister } = useRegister();
 
   const {
     showConfirmPassword,
@@ -72,13 +72,13 @@ export default function RegisterPage() {
                   <CardContent>
                     <Form {...form}>
                       <form
-                        onSubmit={form.handleSubmit(onSubmit)}
+                        onSubmit={form.handleSubmit(handleRegister)}
                         className="space-y-4"
                       >
                         <div className="grid grid-cols-1 gap-4">
                           <FormInput
                             form={form}
-                            name="noKtp"
+                            name="nik"
                             label="No. KTP"
                             placeholder="Masukkan No KTP Anda (16 digit)"
                             labelIcon={<IdCard size={16} />}
@@ -87,9 +87,9 @@ export default function RegisterPage() {
 
                           <FormInput
                             form={form}
-                            name="username"
-                            label="Username"
-                            placeholder="Masukkan username Anda"
+                            name="name"
+                            label="Name"
+                            placeholder="Masukkan Name Anda"
                             labelIcon={<User size={16} />}
                             inputClassName="h-11 rounded-xl border-gray-300 focus:border-green-500 focus:ring-green-500 transition-all duration-200"
                           />
@@ -106,7 +106,7 @@ export default function RegisterPage() {
 
                           <FormInput
                             form={form}
-                            name="telp"
+                            name="phone"
                             label="No. Telepon"
                             placeholder="Masukkan nomor telepon Anda"
                             labelIcon={<Phone size={16} />}
@@ -136,10 +136,10 @@ export default function RegisterPage() {
 
                         <Button
                           type="submit"
-                          disabled={isLoading}
+                          disabled={isPendingRegister}
                           className="w-full h-12 bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-lg font-semibold rounded-xl shadow-lg transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:hover:scale-100 mt-6"
                         >
-                          {isLoading ? (
+                          {isPendingRegister ? (
                             <div className="flex items-center gap-2">
                               <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                               Membuat Akun...

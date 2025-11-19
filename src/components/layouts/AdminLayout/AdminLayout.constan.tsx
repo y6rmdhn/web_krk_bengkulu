@@ -1,4 +1,10 @@
-import { FaUpload } from "react-icons/fa";
+import {
+  FaCheckCircle,
+  FaInbox,
+  FaSpinner,
+  FaTimesCircle,
+  FaUndo,
+} from "react-icons/fa";
 import { IoLayers } from "react-icons/io5";
 import { FaChartPie } from "react-icons/fa";
 
@@ -10,14 +16,38 @@ const SIDEBAR_ADMIN = [
     icon: <FaChartPie />,
   },
   {
-    key: "permohonanKrk",
-    label: "Permohonan Krk",
+    key: "permohonan Masuk",
+    label: "Permohonan Masuk",
     href: "/admin/permohonan-krk",
-    icon: <FaUpload />,
+    icon: <FaInbox />,
   },
   {
-    key: "riwayatPermohonanKrk",
-    label: "Riwayat Permohonan KRK",
+    key: "permohonan DiProses",
+    label: "Permohonan diproses",
+    href: "/admin/permohonan-diproses",
+    icon: <FaSpinner />,
+  },
+  {
+    key: "permohonan DiKembalikan",
+    label: "Permohonan dikembalikan",
+    href: "/admin/permohonan-dikembalikan",
+    icon: <FaUndo />,
+  },
+  {
+    key: "permohonan Ditolak",
+    label: "Permohonan ditolak",
+    href: "/admin/permohonan-ditolak",
+    icon: <FaTimesCircle />,
+  },
+  {
+    key: "permohonan Selesai",
+    label: "Permohonan selesai",
+    href: "/admin/permohonan-selesai",
+    icon: <FaCheckCircle />,
+  },
+  {
+    key: "trackingPermohonan",
+    label: "Tracking permohonan",
     href: "/admin/riwayat-permohonan-krk",
     icon: <IoLayers />,
   },

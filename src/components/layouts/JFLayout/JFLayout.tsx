@@ -1,7 +1,7 @@
 import PageHead from "@/components/commons/PageHead";
 import { useState, type ReactNode } from "react";
-import AdminLayoutSidebar from "./AdminLayoutSidebar";
-import { SIDEBAR_ADMIN } from "./AdminLayout.constan";
+import AdminLayoutSidebar from "./JFLayoutSidebar";
+import { SIDEBAR_ADMIN } from "./JFLayout.constan";
 
 interface PropsType {
   title?: string;
@@ -10,7 +10,7 @@ interface PropsType {
   desc?: string;
 }
 
-const AdminLayout = (props: PropsType) => {
+const JFLayout = (props: PropsType) => {
   const { title, desc, children } = props;
 
   const [open, setOpen] = useState(false);
@@ -37,8 +37,8 @@ const AdminLayout = (props: PropsType) => {
           <div className="flex justify-between items-center">
             <h1 className="text-2xl font-semibold">{desc}</h1>
             <div className="flex flex-col justify-center">
-              <h3 className="text-sm font-semibold">Operator</h3>
-              <p className="text-sm text-muted-foreground">Operator Role</p>
+              <h3 className="text-sm font-semibold">JF</h3>
+              <p className="text-sm text-muted-foreground">Role</p>
             </div>
           </div>
           {children}
@@ -48,4 +48,4 @@ const AdminLayout = (props: PropsType) => {
   );
 };
 
-export default AdminLayout;
+export default JFLayout;

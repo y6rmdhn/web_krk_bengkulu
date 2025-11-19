@@ -1,4 +1,3 @@
-import AdminLayout from "@/components/layouts/AdminLayout";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import {
   Table,
@@ -19,6 +18,7 @@ import {
 } from "@/components/ui/select";
 import { Search } from "lucide-react";
 import { HiMiniEllipsisHorizontal } from "react-icons/hi2";
+import KepalaDinasLayout from "@/components/layouts/KepalaDinas";
 
 const TABLE_DATA = [
   {
@@ -103,11 +103,11 @@ const TABLE_DATA = [
   },
 ];
 
-const Permohonan = () => {
+const PermohonanSkTTE = () => {
   return (
-    <AdminLayout
-      title="Admin Permohonan Masuk | KRK Kota Bengkulu"
-      desc="Permohonan Masuk"
+    <KepalaDinasLayout
+      title="Kepala Dinas Permohonan SK TTE | KRK Kota Bengkulu"
+      desc="Permohonan SK TTE"
     >
       <div className="mt-10 flex flex-col gap-6">
         {/* Filter Section */}
@@ -176,10 +176,10 @@ const Permohonan = () => {
                           item.status === "Menunggu Verifikasi"
                             ? "bg-yellow-100 text-yellow-800"
                             : item.status === "Ditolak"
-                            ? "bg-red-100 text-red-800"
-                            : item.status === "Selesai"
-                            ? "bg-green-100 text-green-800"
-                            : "bg-blue-100 text-blue-800"
+                              ? "bg-red-100 text-red-800"
+                              : item.status === "Selesai"
+                                ? "bg-green-100 text-green-800"
+                                : "bg-blue-100 text-blue-800"
                         }`}
                       >
                         {item.status}
@@ -204,8 +204,8 @@ const Permohonan = () => {
           </CardContent>
         </Card>
       </div>
-    </AdminLayout>
+    </KepalaDinasLayout>
   );
 };
 
-export default Permohonan;
+export default PermohonanSkTTE;
