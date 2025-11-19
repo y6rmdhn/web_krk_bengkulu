@@ -38,6 +38,7 @@ const useMainLayoutNavbar = () => {
     },
     onSuccess: () => {
       session.clearSession();
+      toast.success("Logout successful");
       window.location.href = "/";
     },
   });
