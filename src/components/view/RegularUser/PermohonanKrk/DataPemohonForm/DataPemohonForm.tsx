@@ -1,15 +1,9 @@
 import SectionTitle from "../SectionTitle";
 import InputField from "@/components/commons/InputField";
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import type { UseFormReturn } from "react-hook-form";
 import type { PermohonanFormValues } from "../usePermohohanKrk";
+import InputFile from "@/components/commons/InputFile";
+import { useState } from "react";
 
 type PropTypes = {
   form: UseFormReturn<PermohonanFormValues>;
@@ -17,6 +11,7 @@ type PropTypes = {
 
 const DataPemohonForm = (props: PropTypes) => {
   const { form } = props;
+  const [fileDoc, setFileDoc] = useState<File | null>(null);
 
   return (
     <div className="space-y-6">
@@ -83,18 +78,13 @@ const DataPemohonForm = (props: PropTypes) => {
         name="kelurahanPemohon"
       />
       {/* Di aplikasi nyata, ini adalah komponen upload file */}
-      <FormField
-        control={form.control}
+      <InputFile
+        form={form}
+        label="Upload KTP"
         name="pemohonPemilik"
-        render={({ field }) => (
-          <FormItem className="space-y-2">
-            <FormLabel>Upload KTP</FormLabel>
-            <FormControl>
-              <Input type="file" {...field} />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
+        accept=".pdf" // Batasi hanya PDF
+        selectedFile={fileDoc} // Pass state
+        setSelectedFile={setFileDoc} // Pass setter
       />
       <InputField
         id="pemohon-pemilik"
