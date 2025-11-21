@@ -105,14 +105,17 @@ const router = createBrowserRouter([
   },
   {
     path: "/register",
+    loader: authLoader,
     element: <RegisterPage />,
   },
   {
     path: "/success-register",
+    loader: authLoader,
     element: <SuccessRegisterPage />,
   },
   {
     path: "/api/auth/verify",
+    loader: authLoader,
     element: <SuccessVerificationEmailPage />,
   },
   {

@@ -1,7 +1,11 @@
 import SectionTitle from "../SectionTitle";
 import type { UseFormReturn } from "react-hook-form";
 import type { PermohonanFormValues } from "../usePermohohanKrk";
-import InputField from "@/components/commons/InputField";
+import InputFile from "@/components/commons/InputFile";
+import FormInput from "@/components/commons/FormInput";
+import { useState } from "react";
+import FormFieldSelect from "@/components/commons/FormFieldSelect";
+import useDataLocation from "./useDataLocation";
 
 type PropTypes = {
   form: UseFormReturn<PermohonanFormValues>;
@@ -10,104 +14,141 @@ type PropTypes = {
 const DataLokasi = (props: PropTypes) => {
   const { form } = props;
 
+  // State untuk file preview (opsional, tergantung implementasi InputFile kamu)
+  const [simbFile, setSimbFile] = useState<File | null>(null);
+  const [sertifikatFile, setSertifikatFile] = useState<File | null>(null);
+  const [PpbFile, setPpbFile] = useState<File | null>(null);
+  const { dataJenisBangunan, isLoadingDataBangunan } = useDataLocation();
+
   return (
     <div className="space-y-6">
       <SectionTitle title="Data Lokasi" />
       <p className="text-red-600 text-sm">
         Data harus sesuai dengan sertifikat
       </p>
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-12 gap-y-6">
         {/* KOLOM KIRI */}
         <div className="space-y-6">
-          <InputField
-            id="alamat-bangunan"
-            label="Alamat Bangunan"
+          <FormInput
             form={form}
-            name="alamatBangunan"
+            label="Alamat Bangunan"
+            name="alamat_bangunan"
+            placeholder="Masukan alamat bangunan"
+            type="text"
           />
+
           <div className="grid grid-cols-3 gap-4">
-            <InputField
-              id="no-bangunan"
+            <FormInput
+              form={form}
               label="No"
-              form={form}
-              name="noBangunan"
+              name="no_lokasi"
+              placeholder="No"
             />
-            <InputField
-              id="rt-bangunan"
+            <FormInput
+              form={form}
               label="RT"
-              form={form}
-              name="rtBangunan"
+              name="rt_lokasi"
+              placeholder="00"
             />
-            <InputField
-              id="rw-bangunan"
-              label="RW"
+            <FormInput
               form={form}
-              name="rwBangunan"
+              label="RW"
+              name="rw_lokasi"
+              placeholder="00"
             />
           </div>
-          <InputField
-            id="luas-tanah"
-            label="Luas Tanah"
+
+          <FormInput
             form={form}
-            name="luasTanah"
+            label="Luas Tanah (m²)"
+            name="luas_tanah_m2"
+            type="number"
+            placeholder="0"
           />
-          <InputField
-            id="letak-antar-jalan"
-            label="Letak Antar Jalan"
+
+          <FormInput
             form={form}
-            name="letakAntarJalan"
+            label="Letak Jalan Utama"
+            name="letak_jalan_utama"
+            placeholder="Nama Jalan Utama"
           />
-          <InputField
-            id="sd-jalan"
-            label="s/d jalan"
+
+          <FormInput
             form={form}
-            name="sdJalan"
+            label="Letak Jalan Sekunder"
+            name="letak_jalan_sekunder"
+            placeholder="Nama Jalan Sekunder (s/d Jalan)"
           />
-          <InputField
-            id="fungsi-bangunan"
-            label="Fungsi Bangunan"
+
+          <FormFieldSelect
             form={form}
-            name="fungsiBangunan"
+            name="fungsi_bangunan_id"
+            label="Jenis Bangunan"
+            placeholder={
+              isLoadingDataBangunan ? "Memuat..." : "--Pilih Fungsi Bangunan--"
+            }
+            options={
+              dataJenisBangunan?.map((item: { nama: string; id: string }) => ({
+                label: item.nama,
+                value: item.id,
+              })) || []
+            }
           />
-          <InputField
-            id="simb-lama"
-            label="SIMB Lama"
+
+          <InputFile
             form={form}
-            name="simbLama"
+            label="Upload SIMB"
+            name="SIMB"
+            accept=".pdf"
+            selectedFile={simbFile}
+            setSelectedFile={setSimbFile}
           />
-          <InputField
-            id="dipersimpangan"
+
+          <FormFieldSelect
+            form={form}
+            name="persimpangan_jalan"
             label="Dipersimpangan Jalan?"
-            form={form}
-            name="dipersimpangan"
+            placeholder="--Pilih Fungsi Bangunan--"
+            options={[
+              { label: "Ya", value: "Ya" },
+              { label: "Tidak", value: "Tidak" },
+            ]}
           />
         </div>
+
         {/* KOLOM KANAN */}
         <div className="space-y-6">
-          <InputField
-            id="no-sertifikat-tanah"
+          <FormInput
+            form={form}
             label="No Sertifikat Tanah"
-            form={form}
-            name="noSertifikatTanah"
+            name="no_sertifikat_tanah"
+            placeholder="Masukan No Sertifikat"
           />
-          <InputField
-            id="sertifikat-surat"
+
+          <InputFile
+            form={form}
             label="Sertifikat/Surat Tanah"
-            form={form}
-            name="sertifikatSurat"
+            name="file_sertifikat_tanah"
+            accept=".pdf"
+            selectedFile={sertifikatFile}
+            setSelectedFile={setSertifikatFile}
           />
-          <InputField id="pbb" label="PBB" form={form} name="pbb" />
-          <InputField
-            id="hasil-ukur"
+
+          <InputFile
+            form={form}
+            label="Upload PBB"
+            name="PBB"
+            accept=".pdf"
+            selectedFile={PpbFile}
+            setSelectedFile={setPpbFile}
+          />
+
+          <FormInput
+            form={form}
             label="Hasil Ukur"
-            form={form}
-            name="hasilUkur"
-          />
-          <InputField
-            id="lain-lain"
-            label="Lain-lain"
-            form={form}
-            name="lainLain"
+            name="hasil_ukur"
+            placeholder="Masukan Hasil Ukur"
           />
         </div>
       </div>

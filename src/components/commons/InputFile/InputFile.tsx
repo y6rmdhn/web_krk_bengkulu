@@ -19,7 +19,7 @@ export default function InputFile({
 }: {
   label: string;
   form: any;
-  name: any;
+  name: string; // Ganti any jadi string biar aman
   accept?: string;
   selectedFile?: File | null;
   setSelectedFile?: (file: File | null) => void;
@@ -39,6 +39,7 @@ export default function InputFile({
                     <FileText className="h-5 w-5 text-muted-foreground" />
                   </div>
 
+                  {/* INPUT FILE */}
                   <Input
                     {...fieldProps}
                     type="file"
@@ -46,8 +47,8 @@ export default function InputFile({
                     onChange={(event) => {
                       const file = event.target.files && event.target.files[0];
                       if (file) {
-                        onChange(event);
-                        setSelectedFile?.(file);
+                        onChange(file);
+                        setSelectedFile?.(file); // Update state preview lokal
                       }
                     }}
                   />
@@ -75,8 +76,8 @@ export default function InputFile({
                     size="sm"
                     className="text-red-500 hover:text-red-600 hover:bg-red-100"
                     onClick={() => {
-                      onChange("");
-                      setSelectedFile?.(null);
+                      onChange(undefined); // PERBAIKAN: Reset form value jadi undefined/null
+                      setSelectedFile?.(null); // Reset preview lokal
                     }}
                   >
                     <X className="h-4 w-4" />

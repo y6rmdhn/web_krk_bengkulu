@@ -49,18 +49,6 @@ const Captcha = (props: PropTypes) => {
           </FormItem>
         )}
       />
-
-      <div className="flex justify-end items-center gap-4 pt-4">
-        <Button type="button" variant="destructive" className="px-8 py-5">
-          Batal
-        </Button>
-        <Button
-          type="submit"
-          className="bg-blue-600 hover:bg-blue-700 px-8 py-5"
-        >
-          Simpan
-        </Button>
-      </div>
     </div>
   );
 };
