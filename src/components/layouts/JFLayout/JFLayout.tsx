@@ -37,8 +37,10 @@ const JFLayout = (props: PropsType) => {
           <div className="flex justify-between items-center">
             <h1 className="text-2xl font-semibold">{desc}</h1>
             <div className="flex flex-col justify-center">
-              <h3 className="text-sm font-semibold">JF</h3>
-              <p className="text-sm text-muted-foreground">Role</p>
+              <h3 className="text-sm font-semibold">Surveyor Lapangan</h3>
+              <p className="text-sm text-muted-foreground">
+                Role Surveyor Lapangan
+              </p>
             </div>
           </div>
           {children}

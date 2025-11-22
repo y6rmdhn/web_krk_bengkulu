@@ -27,7 +27,7 @@ axiosInstance.interceptors.response.use(
     if (error.response && error.response.status === 403) {
       session.clearSession();
 
-      window.location.href = "/login";
+      window.location.href = "/";
     }
     return Promise.reject(error);
   }

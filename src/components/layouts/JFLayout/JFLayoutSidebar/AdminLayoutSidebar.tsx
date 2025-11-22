@@ -38,7 +38,7 @@ const AdminLayoutSidebar = (props: PropsType) => {
             onClick={() => navigate("/")}
             className="cursor-pointer"
           />
-          <p className="text-lg font-bold">JF</p>
+          <p className="text-lg font-bold">Surveyor Lapangan</p>
         </div>
 
         {/* Menu List */}

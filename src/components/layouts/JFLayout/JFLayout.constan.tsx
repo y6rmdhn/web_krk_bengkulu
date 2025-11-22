@@ -1,6 +1,4 @@
 import { FaInbox } from "react-icons/fa";
-import { FaSpinner } from "react-icons/fa";
-import { FaCheckCircle } from "react-icons/fa";
 
 const SIDEBAR_ADMIN = [
   {
@@ -9,18 +7,18 @@ const SIDEBAR_ADMIN = [
     href: "/jf/disposisi-survei-masuk",
     icon: <FaInbox />,
   },
-  {
-    key: "surveiDiproses",
-    label: "Survei Diproses",
-    href: "/jf/survei-diproses",
-    icon: <FaSpinner />,
-  },
-  {
-    key: "surveiSelesai",
-    label: "Survei Selesai",
-    href: "/jf/survei-selesai",
-    icon: <FaCheckCircle />,
-  },
+  // {
+  //   key: "surveiDiproses",
+  //   label: "Survei Diproses",
+  //   href: "/jf/survei-diproses",
+  //   icon: <FaSpinner />,
+  // },
+  // {
+  //   key: "surveiSelesai",
+  //   label: "Survei Selesai",
+  //   href: "/jf/survei-selesai",
+  //   icon: <FaCheckCircle />,
+  // },
 ];
 
 export { SIDEBAR_ADMIN };

@@ -1,13 +1,4 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -16,98 +7,95 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search } from "lucide-react";
-import { HiMiniEllipsisHorizontal } from "react-icons/hi2";
+import { Eye, Search } from "lucide-react";
+import useDataTable from "@/hooks/useDataTable";
+import { useMemo } from "react";
+import DropdownActions from "@/components/commons/DropdownActions";
+import { Badge } from "@/components/ui/badge";
+import DataTable from "@/components/commons/DataTable";
+import { useNavigate } from "react-router-dom";
+import usePermohonanSkTTE from "./usePermohonanSkTTE";
 import KepalaDinasLayout from "@/components/layouts/KepalaDinas";
 
-const TABLE_DATA = [
-  {
-    id: 1,
-    noPengajuan: "001/KRK/2019",
-    namaPengurus: "tian",
-    namaPemohon: "tian",
-    tanggal: "07-12-2019",
-    kategori: "Baru",
-    tipe: "-",
-    status: "Menunggu Verifikasi",
-  },
-  {
-    id: 2,
-    noPengajuan: "008/KRK/2019",
-    namaPengurus: "Aditya Ardionsyah",
-    namaPemohon: "Aditya Ardionsyah",
-    tanggal: "06-12-2019",
-    kategori: "Baru",
-    tipe: "-",
-    status: "Ditolak",
-  },
-  {
-    id: 3,
-    noPengajuan: "007/KRK/2019",
-    namaPengurus: "Aditya Ardionsyah",
-    namaPemohon: "Aditya Ardionsyah",
-    tanggal: "05-12-2019",
-    kategori: "Baru",
-    tipe: "-",
-    status: "Selesai",
-  },
-  {
-    id: 4,
-    noPengajuan: "006/KRK/2019",
-    namaPengurus: "INDRA PURNAMA PUTRA",
-    namaPemohon: "INDRA PURNAMA PUTRA",
-    tanggal: "05-12-2019",
-    kategori: "Perluasan",
-    tipe: "-",
-    status: "Menunggu Verifikasi",
-  },
-  {
-    id: 5,
-    noPengajuan: "005/KRK/2019",
-    namaPengurus: "Naufal Nibros",
-    namaPemohon: "Naufal Nibros",
-    tanggal: "05-12-2019",
-    kategori: "Baru",
-    tipe: "-",
-    status: "Menunggu Verifikasi",
-  },
-  {
-    id: 6,
-    noPengajuan: "003/KRK/2019",
-    namaPengurus: "INDRA PURNAMA PUTRA",
-    namaPemohon: "ARDY PURNAMA PUTRA",
-    tanggal: "05-12-2019",
-    kategori: "Baru",
-    tipe: "-",
-    status: "Menunggu Verifikasi",
-  },
-  {
-    id: 7,
-    noPengajuan: "002/KRK/2019",
-    namaPengurus: "Aditya Ardionsyah",
-    namaPemohon: "Aditya Ardionsyah",
-    tanggal: "05-12-2019",
-    kategori: "Baru",
-    tipe: "-",
-    status: "Menunggu Verifikasi",
-  },
-  {
-    id: 8,
-    noPengajuan: "001/KRK/2019",
-    namaPengurus: "Aditya Ardionsyah",
-    namaPemohon: "Aditya Ardionsyah",
-    tanggal: "05-12-2019",
-    kategori: "Baru",
-    tipe: "-",
-    status: "Menunggu Verifikasi",
-  },
-];
-
 const PermohonanSkTTE = () => {
+  const { currentPage, currentLimit, handleChangePage, handleLimitChange } =
+    useDataTable();
+  const { dataListPermohonanKrk, isLoadingListPermohonanKrk } =
+    usePermohonanSkTTE();
+  const navigate = useNavigate();
+
+  const filteredData = useMemo(() => {
+    const startIndex = (currentPage - 1) * currentLimit;
+    const endIndex = startIndex + currentLimit;
+    const paginatedData = (dataListPermohonanKrk || []).slice(
+      startIndex,
+      endIndex
+    );
+
+    return paginatedData.map((item: any, index: number) => {
+      const isPending = item.status === "PENDING_OPERATOR";
+
+      return [
+        startIndex + index + 1,
+
+        item.nomor_permohonan,
+
+        new Date(item.submitted_at).toLocaleDateString("id-ID", {
+          day: "2-digit",
+
+          month: "short",
+
+          year: "numeric",
+
+          hour: "2-digit",
+
+          minute: "2-digit",
+        }),
+
+        item.nama_pemilik || item.user?.name || "-",
+
+        item.jenisLayanan?.nama || "-",
+
+        <Badge
+          key={`badge-${item.id}`}
+          variant="outline"
+          className={
+            isPending
+              ? "bg-yellow-100 text-yellow-700 border-yellow-200 hover:bg-yellow-200"
+              : "bg-gray-100 text-gray-700"
+          }
+        >
+          {item.current_step_name}
+        </Badge>,
+
+        <DropdownActions
+          key={`action-${item.id}`}
+          menu={[
+            {
+              label: (
+                <span className="flex items-center gap-2">
+                  <Eye size={16} />
+                  Detail / Verifikasi
+                </span>
+              ),
+              action: () => {
+                navigate(`/kepala-dinas/permohonan-sk-tte/detail/${item.id}`);
+              },
+            },
+          ]}
+        />,
+      ];
+    });
+  }, [dataListPermohonanKrk, currentPage, currentLimit]);
+
+  const totalPages = Math.ceil(
+    (dataListPermohonanKrk?.length || 0) / currentLimit
+  );
+
   return (
     <KepalaDinasLayout
-      title="Kepala Dinas Permohonan SK TTE | KRK Kota Bengkulu"
-      desc="Permohonan SK TTE"
+      title="Admin Permohonan Masuk | KRK Kota Bengkulu"
+      desc="Permohonan Masuk"
     >
       <div className="mt-10 flex flex-col gap-6">
         {/* Filter Section */}
@@ -115,22 +103,23 @@ const PermohonanSkTTE = () => {
           <div className="flex flex-col lg:flex-row gap-4 w-full lg:w-auto">
             <div className="relative w-full lg:w-[300px]">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-              <Input placeholder="Pencarian..." className="pl-10" />
+              <Input
+                placeholder="Cari pemohon / no pengajuan..."
+                className="pl-10"
+              />
             </div>
 
             <Select>
               <SelectTrigger className="w-full lg:w-[180px]">
-                <SelectValue placeholder="Nomor Pengajuan" />
+                <SelectValue placeholder="Filter Status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Semua</SelectItem>
-                <SelectItem value="001">001/KRK/2019</SelectItem>
-                <SelectItem value="002">002/KRK/2019</SelectItem>
-                <SelectItem value="003">003/KRK/2019</SelectItem>
-                <SelectItem value="005">005/KRK/2019</SelectItem>
-                <SelectItem value="006">006/KRK/2019</SelectItem>
-                <SelectItem value="007">007/KRK/2019</SelectItem>
-                <SelectItem value="008">008/KRK/2019</SelectItem>
+                <SelectItem value="all">Semua Status</SelectItem>
+                <SelectItem value="PENDING_OPERATOR">
+                  Menunggu Verifikasi
+                </SelectItem>
+                <SelectItem value="APPROVED">Disetujui</SelectItem>
+                <SelectItem value="REJECTED">Ditolak</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -144,63 +133,24 @@ const PermohonanSkTTE = () => {
             </div>
           </CardHeader>
           <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow className="text-center">
-                  <TableHead>No</TableHead>
-                  <TableHead>No. Pengajuan</TableHead>
-                  <TableHead>Nama Pengurus</TableHead>
-                  <TableHead>Nama Pemohon</TableHead>
-                  <TableHead>Tanggal</TableHead>
-                  <TableHead>Kategori</TableHead>
-                  <TableHead>Tipe</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Aksi</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {TABLE_DATA.map((item, index) => (
-                  <TableRow key={item.id}>
-                    <TableCell>{index + 1}</TableCell>
-                    <TableCell className="font-medium">
-                      {item.noPengajuan}
-                    </TableCell>
-                    <TableCell>{item.namaPengurus}</TableCell>
-                    <TableCell>{item.namaPemohon}</TableCell>
-                    <TableCell>{item.tanggal}</TableCell>
-                    <TableCell>{item.tipe}</TableCell>
-                    <TableCell>{item.kategori}</TableCell>
-                    <TableCell>
-                      <span
-                        className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          item.status === "Menunggu Verifikasi"
-                            ? "bg-yellow-100 text-yellow-800"
-                            : item.status === "Ditolak"
-                              ? "bg-red-100 text-red-800"
-                              : item.status === "Selesai"
-                                ? "bg-green-100 text-green-800"
-                                : "bg-blue-100 text-blue-800"
-                        }`}
-                      >
-                        {item.status}
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex justify-start gap-2">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-8 w-8 p-0 hover:bg-blue-50"
-                          title="Lihat Detail"
-                        >
-                          <HiMiniEllipsisHorizontal className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+            <DataTable
+              header={[
+                "No",
+                "No. Pengajuan",
+                "Tanggal Masuk",
+                "Nama Pemohon",
+                "Jenis Layanan",
+                "Status",
+                "Aksi",
+              ]}
+              isLoading={isLoadingListPermohonanKrk}
+              data={filteredData}
+              totalPages={totalPages}
+              currentPage={currentPage}
+              currentLimit={currentLimit}
+              onChangePage={handleChangePage}
+              onChangeLimit={handleLimitChange}
+            />
           </CardContent>
         </Card>
       </div>

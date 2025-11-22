@@ -2,6 +2,9 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { Suspense, lazy } from "react";
 import { Toaster } from "sonner";
 import authLoader from "./components/layouts/AuthLayout/AuthLayout.loader";
+import adminLoader from "./components/layouts/AdminLayout/AdminLayout.loader";
+import jfLoader from "./components/layouts/JFLayout/JfLayout.loader";
+import kepalaDinasLoader from "./components/layouts/KepalaDinas/KepalaDinasLayout.loader";
 
 const Homepage = lazy(() => import("./components/view/RegularUser/Homepage"));
 const LoginPage = lazy(() => import("./components/view/Auth/Login/Login"));
@@ -54,44 +57,50 @@ const DasboardAdmin = lazy(() => import("./components/view/Admin/Dasboard"));
 const PermohonanAdminPage = lazy(
   () => import("./components/view/Admin/Permohonan")
 );
-const RiwayatPermohonanAdminPage = lazy(
-  () => import("./components/view/Admin/RiwayatPermohonan")
-);
 const DetailPermohonanAdminPage = lazy(
   () => import("./components/view/Admin/PermohonanDetail")
 );
-const PermohonanDiprosesAdminPage = lazy(
-  () => import("./components/view/Admin/PermohonanDiproses")
+const RiwayatPermohonanAdminPage = lazy(
+  () => import("./components/view/Admin/RiwayatPermohonan")
 );
-const PermohonanDikembalikanAdminPage = lazy(
-  () => import("./components/view/Admin/PermohonanDiKembalikan")
-);
-const PermohonanDitolakAdminPage = lazy(
-  () => import("./components/view/Admin/PermohonanDiolak")
-);
-const PermohonanSelesaiAdminPage = lazy(
-  () => import("./components/view/Admin/PermohonanSelesai")
-);
+// const PermohonanDiprosesAdminPage = lazy(
+//   () => import("./components/view/Admin/PermohonanDiproses")
+// );
+// const PermohonanDikembalikanAdminPage = lazy(
+//   () => import("./components/view/Admin/PermohonanDiKembalikan")
+// );
+// const PermohonanDitolakAdminPage = lazy(
+//   () => import("./components/view/Admin/PermohonanDiolak")
+// );
+// const PermohonanSelesaiAdminPage = lazy(
+//   () => import("./components/view/Admin/PermohonanSelesai")
+// );
 
 // JF
 const DisposisiSurveiMasuk = lazy(
   () => import("./components/view/JF/DisposisiSurveiMasuk")
 );
-const SurveiDiProses = lazy(
-  () => import("./components/view/JF/SurveiDiproses")
+const DisposisiSurveiMasukDetail = lazy(
+  () => import("./components/view/JF/PermohonanDetail")
 );
-const SurveiSelesai = lazy(() => import("./components/view/JF/SurveiSelesai"));
+// const SurveiDiProses = lazy(
+//   () => import("./components/view/JF/SurveiDiproses")
+// );
+// const SurveiSelesai = lazy(() => import("./components/view/JF/SurveiSelesai"));
 
 // Kepala Dinas
 const PermohonanSkTTE = lazy(
   () => import("./components/view/KepalaDinas/PermohonanSKTTE")
 );
-const TteSkSelesai = lazy(
-  () => import("./components/view/KepalaDinas/TTESKSelesai")
+const PermohonanSkTTEDetail = lazy(
+  () => import("./components/view/KepalaDinas/PermohonanDetail")
 );
-const TteSkDitolak = lazy(
-  () => import("./components/view/KepalaDinas/TTESKDitolak")
-);
+// const TteSkSelesai = lazy(
+//   () => import("./components/view/KepalaDinas/TTESKSelesai")
+// );
+// const TteSkDitolak = lazy(
+//   () => import("./components/view/KepalaDinas/TTESKDitolak")
+// );
 
 const router = createBrowserRouter([
   {
@@ -120,6 +129,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/berkas",
+    loader: adminLoader,
     element: <KelengkapanBerkas />,
   },
   {
@@ -136,6 +146,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/permohonan-krk",
+    loader: adminLoader,
     element: <PermohonanKrk />,
   },
   {
@@ -167,38 +178,42 @@ const router = createBrowserRouter([
     element: <PengaduanPage />,
   },
   {
-    path: "/admin",
+    path: "/operator",
     children: [
       {
-        path: "dasboard",
+        path: "dashboard",
+        loader: adminLoader,
         element: <DasboardAdmin />,
       },
       {
         path: "permohonan-krk",
+        loader: adminLoader,
         element: <PermohonanAdminPage />,
       },
       {
         path: "riwayat-permohonan-krk",
+        loader: adminLoader,
         element: <RiwayatPermohonanAdminPage />,
       },
+      // {
+      //   path: "permohonan-diproses",
+      //   element: <PermohonanDiprosesAdminPage />,
+      // },
+      // {
+      //   path: "permohonan-dikembalikan",
+      //   element: <PermohonanDikembalikanAdminPage />,
+      // },
+      // {
+      //   path: "permohonan-ditolak",
+      //   element: <PermohonanDitolakAdminPage />,
+      // },
+      // {
+      //   path: "permohonan-selesai",
+      //   element: <PermohonanSelesaiAdminPage />,
+      // },
       {
-        path: "permohonan-diproses",
-        element: <PermohonanDiprosesAdminPage />,
-      },
-      {
-        path: "permohonan-dikembalikan",
-        element: <PermohonanDikembalikanAdminPage />,
-      },
-      {
-        path: "permohonan-ditolak",
-        element: <PermohonanDitolakAdminPage />,
-      },
-      {
-        path: "permohonan-selesai",
-        element: <PermohonanSelesaiAdminPage />,
-      },
-      {
-        path: "permohonan/:id",
+        path: "detail/:id",
+        loader: adminLoader,
         element: <DetailPermohonanAdminPage />,
       },
     ],
@@ -208,16 +223,22 @@ const router = createBrowserRouter([
     children: [
       {
         path: "disposisi-survei-masuk",
+        loader: jfLoader,
         element: <DisposisiSurveiMasuk />,
       },
       {
-        path: "survei-diproses",
-        element: <SurveiDiProses />,
+        path: "detail/:id",
+        loader: jfLoader,
+        element: <DisposisiSurveiMasukDetail />,
       },
-      {
-        path: "survei-selesai",
-        element: <SurveiSelesai />,
-      },
+      // {
+      //   path: "survei-diproses",
+      //   element: <SurveiDiProses />,
+      // },
+      // {
+      //   path: "survei-selesai",
+      //   element: <SurveiSelesai />,
+      // },
     ],
   },
   {
@@ -225,16 +246,22 @@ const router = createBrowserRouter([
     children: [
       {
         path: "permohonan-sk-tte",
+        loader: kepalaDinasLoader,
         element: <PermohonanSkTTE />,
       },
       {
-        path: "tte-sk-selesai",
-        element: <TteSkSelesai />,
+        path: "permohonan-sk-tte/detail/:id",
+        loader: kepalaDinasLoader,
+        element: <PermohonanSkTTEDetail />,
       },
-      {
-        path: "tte-sk-ditolak",
-        element: <TteSkDitolak />,
-      },
+      // {
+      //   path: "tte-sk-selesai",
+      //   element: <TteSkSelesai />,
+      // },
+      // {
+      //   path: "tte-sk-ditolak",
+      //   element: <TteSkDitolak />,
+      // },
     ],
   },
 ]);
