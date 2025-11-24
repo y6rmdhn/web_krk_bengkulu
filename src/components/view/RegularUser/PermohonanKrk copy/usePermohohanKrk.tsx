@@ -1,34 +1,46 @@
 import permohonanKrkServices from "@/services/api/permohonanKrk";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { AxiosError } from "axios";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import z from "zod";
 
-const fileSchema = z
+// File schema untuk create (required)
+const fileSchemaRequired = z
   .instanceof(File, { message: "File wajib diunggah" })
-  .refine((file) => file.size <= 5 * 1024 * 1024, "Ukuran file maksimal 5MB") // Limit 5MB
+  .refine((file) => file.size <= 5 * 1024 * 1024, "Ukuran file maksimal 5MB")
   .refine(
     (file) =>
       ["application/pdf", "image/jpeg", "image/png"].includes(file.type),
     "Format file harus PDF, JPG, atau PNG"
   );
 
-const permohonanSchema = z.object({
-  // Seksi 1: Pilih Wilayah & Peta
+// File schema untuk edit (optional)
+const fileSchemaOptional = z
+  .instanceof(File)
+  .refine((file) => file.size <= 5 * 1024 * 1024, "Ukuran file maksimal 5MB")
+  .refine(
+    (file) =>
+      ["application/pdf", "image/jpeg", "image/png"].includes(file.type),
+    "Format file harus PDF, JPG, atau PNG"
+  )
+  .optional();
+
+// Base schema fields (tanpa file)
+const baseSchemaFields = {
   jenis_layanan_id: z.string().min(1, "Layanan harus diisi"),
   latitude: z.string().min(1, "Koordinat harus diisi"),
   longitude: z.string().min(1, "Koordinat harus diisi"),
 
-  // Seksi 2: Data Pemohon
   no_ktp_pemohon: z
     .string()
     .min(16, "No KTP harus 16 digit")
     .max(16, "No KTP harus 16 digit")
     .regex(/^\d+$/, "No KTP harus berupa angka"),
-  nama_pemohon: z.string().min(1, "Nama pemohon harus diisi"), // Fixed typo: pemomohon -> pemohon
+  nama_pemohon: z.string().min(1, "Nama pemohon harus diisi"),
   email_pemohon: z.string().email("Format email tidak valid"),
   no_hp_pemohon: z
     .string()
@@ -43,10 +55,6 @@ const permohonanSchema = z.object({
   kecamatan_pemohon: z.string().min(1, "Kecamatan pemohon harus diisi"),
   kelurahan_pemohon: z.string().min(1, "Kelurahan pemohon harus diisi"),
 
-  // FILE 1: KTP PEMOHON (Sesuai Gambar: KTP-Pemohon)
-  file_ktp_pemohon: fileSchema,
-
-  // Seksi 2: Data Pemilik
   no_ktp_pemilik: z
     .string()
     .min(16, "No KTP harus 16 digit")
@@ -66,7 +74,6 @@ const permohonanSchema = z.object({
   kecamatan_pemilik: z.string().min(1, "Kecamatan pemilik harus diisi"),
   kelurahan_pemilik: z.string().min(1, "Kelurahan pemilik harus diisi"),
 
-  // Seksi 3: Data Lokasi
   alamat_bangunan: z.string().min(1, "Alamat bangunan harus diisi"),
   no_lokasi: z.string().min(1, "No bangunan harus diisi"),
   rt_lokasi: z.string().regex(/^\d+$/, "RT harus angka"),
@@ -78,25 +85,45 @@ const permohonanSchema = z.object({
   persimpangan_jalan: z.string().min(1, "Field ini harus diisi"),
   no_sertifikat_tanah: z.string().min(1, "No sertifikat tanah harus diisi"),
   hasil_ukur: z.string().min(1, "Hasil ukur harus diisi"),
+};
 
-  // FILE 2, 3, 4 (Sesuai Gambar)
-  SIMB: fileSchema, // Untuk Key: SIMB
-  file_sertifikat_tanah: fileSchema, // Untuk Key: Sertifikat-Tanah
-  PBB: fileSchema, // Untuk Key: PBB
+// Schema untuk create (file required)
+const permohonanSchemaCreate = z.object({
+  ...baseSchemaFields,
+  file_ktp_pemohon: fileSchemaRequired,
+  SIMB: fileSchemaRequired,
+  file_sertifikat_tanah: fileSchemaRequired,
+  PBB: fileSchemaRequired,
 });
 
-export type PermohonanFormValues = z.infer<typeof permohonanSchema>;
+// Schema untuk edit (file optional)
+const permohonanSchemaEdit = z.object({
+  ...baseSchemaFields,
+  file_ktp_pemohon: fileSchemaOptional,
+  SIMB: fileSchemaOptional,
+  file_sertifikat_tanah: fileSchemaOptional,
+  PBB: fileSchemaOptional,
+});
 
-const usePermohohanKrk = () => {
-  const form = useForm<PermohonanFormValues>({
-    resolver: zodResolver(permohonanSchema),
+// Helper function untuk get schema
+const createPermohonanSchema = (isEdit: boolean) => {
+  return isEdit ? permohonanSchemaEdit : permohonanSchemaCreate;
+};
+
+// ✅ Type definition dengan file fields optional (untuk compatibility dengan edit mode)
+
+const usePermohonanKrk = (id?: string) => {
+  const isEdit = !!id;
+
+  const form = useForm({
+    // ✅ Cast resolver untuk mengatasi type mismatch
+    resolver: zodResolver(createPermohonanSchema(isEdit)),
     defaultValues: {
       jenis_layanan_id: "",
       latitude: "",
       longitude: "",
-
       no_ktp_pemohon: "",
-      nama_pemohon: "", // Fixed
+      nama_pemohon: "",
       email_pemohon: "",
       no_hp_pemohon: "",
       alamat_pemohon: "",
@@ -107,8 +134,6 @@ const usePermohohanKrk = () => {
       kota_pemohon: "",
       kecamatan_pemohon: "",
       kelurahan_pemohon: "",
-      // File defaultnya undefined/null, tidak perlu string kosong
-
       no_ktp_pemilik: "",
       email_pemilik: "",
       no_hp_pemilik: "",
@@ -120,7 +145,6 @@ const usePermohohanKrk = () => {
       kota_pemilik: "",
       kecamatan_pemilik: "",
       kelurahan_pemilik: "",
-
       alamat_bangunan: "",
       no_lokasi: "",
       rt_lokasi: "",
@@ -137,8 +161,101 @@ const usePermohohanKrk = () => {
 
   const navigate = useNavigate();
 
+  const getById = async (id: string) => {
+    const result = await permohonanKrkServices.getDetailPermohonanKrk(id);
+    return result.data.data;
+  };
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["permohonan-krk", id],
+    queryFn: () => getById(id!),
+    enabled: !!id,
+  });
+
+  useEffect(() => {
+    if (data && isEdit) {
+      console.log("📍 Mulai set data form...");
+
+      const textFields = [
+        "jenis_layanan_id",
+        "latitude",
+        "longitude",
+        "no_ktp_pemohon",
+        "nama_pemohon",
+        "email_pemohon",
+        "no_hp_pemohon",
+        "alamat_pemohon",
+        "no_lokasi_pemohon",
+        "rt_lokasi_pemohon",
+        "rw_lokasi_pemohon",
+        "no_ktp_pemilik",
+        "email_pemilik",
+        "no_hp_pemilik",
+        "alamat_pemilik",
+        "no_lokasi_pemilik",
+        "rt_lokasi_pemilik",
+        "rw_lokasi_pemilik",
+        "alamat_bangunan",
+        "no_lokasi",
+        "rt_lokasi",
+        "rw_lokasi",
+        "luas_tanah_m2",
+        "letak_jalan_utama",
+        "letak_jalan_sekunder",
+        "fungsi_bangunan_id",
+        "persimpangan_jalan",
+        "no_sertifikat_tanah",
+        "hasil_ukur",
+      ];
+
+      textFields.forEach((field) => {
+        // @ts-ignore - ignore type check for dynamic loop
+        form.setValue(field, data[field]?.toString() || "");
+      });
+
+      form.setValue(
+        "provinsi_pemohon",
+        data.provinsi_pemohon?.toString() || ""
+      );
+      form.setValue(
+        "provinsi_pemilik",
+        data.provinsi_pemilik?.toString() || ""
+      );
+
+      setTimeout(() => {
+        console.log("⏰ Set Kota...");
+        form.setValue("kota_pemohon", data.kota_pemohon?.toString() || "");
+        form.setValue("kota_pemilik", data.kota_pemilik?.toString() || "");
+      }, 1000);
+
+      setTimeout(() => {
+        console.log("⏰ Set Kecamatan...");
+        form.setValue(
+          "kecamatan_pemohon",
+          data.kecamatan_pemohon?.toString() || ""
+        );
+        form.setValue(
+          "kecamatan_pemilik",
+          data.kecamatan_pemilik?.toString() || ""
+        );
+      }, 2000);
+
+      setTimeout(() => {
+        console.log("⏰ Set Kelurahan...");
+        form.setValue(
+          "kelurahan_pemohon",
+          data.kelurahan_pemohon?.toString() || ""
+        );
+        form.setValue(
+          "kelurahan_pemilik",
+          data.kelurahan_pemilik?.toString() || ""
+        );
+      }, 3000);
+    }
+  }, [data, isEdit, form]);
+
   const permohonan = async (payload: FormData) => {
-    const result = await permohonanKrkServices.permohonan(payload);
+    const result = await permohonanKrkServices.editPermohonan(id!, payload);
     return result;
   };
 
@@ -153,21 +270,20 @@ const usePermohohanKrk = () => {
       }
     },
     onSuccess: () => {
-      form.reset();
-      toast.success("Berhasil mengajukan permohonan KRK");
+      toast.success("Berhasil mengupdate permohonan KRK");
       navigate("/riwayat-permohonan");
     },
   });
 
-  const handleCreatePermohonan = (values: PermohonanFormValues) => {
+  const handleCreatePermohonan = (values: any) => {
     const formData = new FormData();
 
     Object.entries(values).forEach(([key, value]) => {
       if (
         key !== "file_ktp_pemohon" &&
-        key !== "file_pbb" &&
+        key !== "PBB" &&
         key !== "file_sertifikat_tanah" &&
-        key !== "file_simb" &&
+        key !== "SIMB" &&
         value !== undefined &&
         value !== null
       ) {
@@ -175,16 +291,16 @@ const usePermohohanKrk = () => {
       }
     });
 
-    if (values.file_ktp_pemohon) {
+    if (values.file_ktp_pemohon instanceof File) {
       formData.append("KTP-Pemohon", values.file_ktp_pemohon);
     }
-    if (values.PBB) {
+    if (values.PBB instanceof File) {
       formData.append("PBB", values.PBB);
     }
-    if (values.file_sertifikat_tanah) {
+    if (values.file_sertifikat_tanah instanceof File) {
       formData.append("Sertifikat-Tanah", values.file_sertifikat_tanah);
     }
-    if (values.SIMB) {
+    if (values.SIMB instanceof File) {
       formData.append("SIMB", values.SIMB);
     }
 
@@ -200,7 +316,10 @@ const usePermohohanKrk = () => {
     onSubmit: handleCreatePermohonan,
     handleRefreshCaptcha,
     isPending,
+    data,
+    isLoading,
+    isEdit,
   };
 };
 
-export default usePermohohanKrk;
+export default usePermohonanKrk;

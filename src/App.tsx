@@ -23,6 +23,9 @@ const PanduanPengajuan = lazy(
 const PermohonanKrk = lazy(
   () => import("./components/view/RegularUser/PermohonanKrk")
 );
+const PermohonanKrkEdit = lazy(
+  () => import("./components/view/RegularUser/PermohonanKrk copy")
+);
 const BerhasilBuatBaruPage = lazy(
   () => import("./components/view/RegularUser/SuccessPage")
 );
@@ -44,6 +47,10 @@ const LayananKrkPage = lazy(
 );
 const RiwayatPermohonanPage = lazy(
   () => import("./components/view/RegularUser/RiwayatPermohonan")
+);
+const RiwayatPermohonanDetailPage = lazy(
+  () =>
+    import("./components/view/RegularUser/RiwayatPermohonan/PermohonanDetail")
 );
 const SuccessRegisterPage = lazy(
   () => import("./components/view/SuccessRegister")
@@ -150,8 +157,17 @@ const router = createBrowserRouter([
     element: <PermohonanKrk />,
   },
   {
+    path: "/permohonan-krk/edit/:id",
+    loader: adminLoader,
+    element: <PermohonanKrkEdit />,
+  },
+  {
     path: "/riwayat-permohonan",
     element: <RiwayatPermohonanPage />,
+  },
+  {
+    path: "/riwayat-permohonan/detail/:id",
+    element: <RiwayatPermohonanDetailPage />,
   },
   {
     path: "/success",

@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/select";
 import { Eye, Search } from "lucide-react";
 import useDataTable from "@/hooks/useDataTable";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import usePermohonan from "./usePermohonan";
 import DropdownActions from "@/components/commons/DropdownActions";
 import { Badge } from "@/components/ui/badge";
@@ -18,21 +18,59 @@ import DataTable from "@/components/commons/DataTable";
 import { useNavigate } from "react-router-dom";
 
 const Permohonan = () => {
-  const { currentPage, currentLimit, handleChangePage, handleLimitChange } =
-    useDataTable();
   const { dataListPermohonanKrk, isLoadingListPermohonanKrk } = usePermohonan();
   const navigate = useNavigate();
+  const { currentPage, currentLimit, handleChangePage, handleLimitChange } =
+    useDataTable();
 
-  const filteredData = useMemo(() => {
+  // 1. State untuk Filter & Search
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+
+  // 2. Logic Filtering (Dilakukan SEBELUM Pagination)
+  const filteredResult = useMemo(() => {
+    const data = dataListPermohonanKrk || [];
+
+    return data.filter((item: any) => {
+      // Filter Search: Cari Nomor Permohonan, Nama Pemilik, atau Nama User
+      const term = searchTerm.toLowerCase();
+      const matchesSearch =
+        (item.nomor_permohonan &&
+          item.nomor_permohonan.toLowerCase().includes(term)) ||
+        (item.nama_pemilik && item.nama_pemilik.toLowerCase().includes(term)) ||
+        (item.user?.name && item.user.name.toLowerCase().includes(term));
+
+      // Filter Status
+      const matchesStatus =
+        statusFilter === "all" || item.status === statusFilter;
+
+      return matchesSearch && matchesStatus;
+    });
+  }, [dataListPermohonanKrk, searchTerm, statusFilter]);
+
+  // 3. Hitung Total Halaman dari data yang sudah difilter
+  const totalPages = Math.ceil(filteredResult.length / currentLimit);
+
+  // 4. Logic Pagination & Mapping ke Tampilan Tabel
+  const tableRows = useMemo(() => {
     const startIndex = (currentPage - 1) * currentLimit;
     const endIndex = startIndex + currentLimit;
-    const paginatedData = (dataListPermohonanKrk || []).slice(
-      startIndex,
-      endIndex
-    );
+
+    // Slice data hasil filter
+    const paginatedData = filteredResult.slice(startIndex, endIndex);
 
     return paginatedData.map((item: any, index: number) => {
-      const isPending = item.status === "PENDING_OPERATOR";
+      // Logic Badge Color
+      let badgeColor = "bg-gray-100 text-gray-700";
+      if (item.status === "PENDING_OPERATOR") {
+        badgeColor =
+          "bg-yellow-100 text-yellow-700 border-yellow-200 hover:bg-yellow-200";
+      } else if (item.status === "APPROVED") {
+        badgeColor =
+          "bg-green-100 text-green-700 border-green-200 hover:bg-green-200";
+      } else if (item.status === "REJECTED") {
+        badgeColor = "bg-red-100 text-red-700 border-red-200 hover:bg-red-200";
+      }
 
       return [
         startIndex + index + 1,
@@ -41,13 +79,9 @@ const Permohonan = () => {
 
         new Date(item.submitted_at).toLocaleDateString("id-ID", {
           day: "2-digit",
-
           month: "short",
-
           year: "numeric",
-
           hour: "2-digit",
-
           minute: "2-digit",
         }),
 
@@ -58,13 +92,9 @@ const Permohonan = () => {
         <Badge
           key={`badge-${item.id}`}
           variant="outline"
-          className={
-            isPending
-              ? "bg-yellow-100 text-yellow-700 border-yellow-200 hover:bg-yellow-200"
-              : "bg-gray-100 text-gray-700"
-          }
+          className={badgeColor}
         >
-          {item.current_step_name}
+          {item.current_step_name || item.status}
         </Badge>,
 
         <DropdownActions
@@ -85,11 +115,7 @@ const Permohonan = () => {
         />,
       ];
     });
-  }, [dataListPermohonanKrk, currentPage, currentLimit]);
-
-  const totalPages = Math.ceil(
-    (dataListPermohonanKrk?.length || 0) / currentLimit
-  );
+  }, [filteredResult, currentPage, currentLimit, navigate]);
 
   return (
     <AdminLayout
@@ -100,15 +126,28 @@ const Permohonan = () => {
         {/* Filter Section */}
         <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-start">
           <div className="flex flex-col lg:flex-row gap-4 w-full lg:w-auto">
+            {/* Search Input */}
             <div className="relative w-full lg:w-[300px]">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <Input
                 placeholder="Cari pemohon / no pengajuan..."
                 className="pl-10"
+                value={searchTerm}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  handleChangePage(1); // Reset ke halaman 1 saat ketik
+                }}
               />
             </div>
 
-            <Select>
+            {/* Status Select */}
+            <Select
+              value={statusFilter}
+              onValueChange={(val) => {
+                setStatusFilter(val);
+                handleChangePage(1); // Reset ke halaman 1 saat filter berubah
+              }}
+            >
               <SelectTrigger className="w-full lg:w-[180px]">
                 <SelectValue placeholder="Filter Status" />
               </SelectTrigger>
@@ -128,7 +167,9 @@ const Permohonan = () => {
         <Card className="flex-1">
           <CardHeader>
             <div className="flex justify-between items-center">
-              <h1 className="text-lg font-semibold">Daftar Permohonan KRK</h1>
+              <h1 className="text-lg font-semibold">
+                Daftar Permohonan KRK ({filteredResult.length})
+              </h1>
             </div>
           </CardHeader>
           <CardContent>
@@ -143,7 +184,7 @@ const Permohonan = () => {
                 "Aksi",
               ]}
               isLoading={isLoadingListPermohonanKrk}
-              data={filteredData}
+              data={tableRows} // Gunakan data yang sudah di-mapping
               totalPages={totalPages}
               currentPage={currentPage}
               currentLimit={currentLimit}

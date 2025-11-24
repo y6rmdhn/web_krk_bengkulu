@@ -1,16 +1,7 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import {
   Select,
   SelectContent,
@@ -18,121 +9,131 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Search,
-  Filter,
-  Eye,
-  Calendar,
-  FileText,
-  MapPin,
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react";
+import { Search, Filter, Eye, FileText, Pencil } from "lucide-react";
 import MainLayout from "@/components/layouts/MainLayout/MainLayout";
-
-// Mock data untuk riwayat permohonan
-const riwayatData = [
-  {
-    id: "KRK/2024/00123",
-    tanggal: "2024-01-15",
-    jenis: "Perumahan",
-    lokasi: "Jl. Merdeka No. 123, Bengkulu",
-    status: "selesai",
-    statusText: "Selesai",
-    berkas: "lengkap",
-    lastUpdate: "2024-01-20 14:30",
-  },
-  {
-    id: "KRK/2024/00124",
-    tanggal: "2024-01-16",
-    jenis: "Komersial",
-    lokasi: "Jl. Sudirman No. 45, Bengkulu",
-    status: "ditolak",
-    statusText: "Ditolak",
-    berkas: "tidak-lengkap",
-    lastUpdate: "2024-01-18 10:15",
-  },
-  {
-    id: "KRK/2024/00125",
-    tanggal: "2024-01-17",
-    jenis: "Industri",
-    lokasi: "Jl. Gatot Subroto No. 67, Bengkulu",
-    status: "proses",
-    statusText: "Dalam Proses",
-    berkas: "lengkap",
-    lastUpdate: "2024-01-19 09:45",
-  },
-  {
-    id: "KRK/2024/00126",
-    tanggal: "2024-01-18",
-    jenis: "Perumahan",
-    lokasi: "Jl. Pahlawan No. 89, Bengkulu",
-    status: "selesai",
-    statusText: "Selesai",
-    berkas: "lengkap",
-    lastUpdate: "2024-01-22 16:20",
-  },
-  {
-    id: "KRK/2024/00127",
-    tanggal: "2024-01-19",
-    jenis: "Komersial",
-    lokasi: "Jl. Veteran No. 34, Bengkulu",
-    status: "proses",
-    statusText: "Dalam Proses",
-    berkas: "perbaikan",
-    lastUpdate: "2024-01-21 11:30",
-  },
-];
-
-const statusConfig = {
-  selesai: { color: "bg-green-100 text-green-800 border-green-200" },
-  ditolak: { color: "bg-red-100 text-red-800 border-red-200" },
-  proses: { color: "bg-blue-100 text-blue-800 border-blue-200" },
-};
-
-const berkasConfig = {
-  lengkap: {
-    color: "bg-emerald-100 text-emerald-800 border-emerald-200",
-    text: "Lengkap",
-  },
-  "tidak-lengkap": {
-    color: "bg-red-100 text-red-800 border-red-200",
-    text: "Tidak Lengkap",
-  },
-  perbaikan: {
-    color: "bg-yellow-100 text-yellow-800 border-yellow-200",
-    text: "Perlu Perbaikan",
-  },
-};
+import useDataTable from "@/hooks/useDataTable";
+import { useNavigate } from "react-router-dom";
+import useRiwayatPermohonan from "./useRiwayatPermohonan";
+import DropdownActions from "@/components/commons/DropdownActions";
+import DataTable from "@/components/commons/DataTable";
 
 export default function RiwayatPermohonan() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("semua");
   const [jenisFilter, setJenisFilter] = useState("semua");
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
 
-  // Filter data
-  const filteredData = riwayatData.filter((item) => {
-    const matchesSearch =
-      item.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.lokasi.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus =
-      statusFilter === "semua" || item.status === statusFilter;
-    const matchesJenis = jenisFilter === "semua" || item.jenis === jenisFilter;
+  const navigate = useNavigate();
+  const { dataListPermohonanKrk, isLoadingListPermohonanKrk } =
+    useRiwayatPermohonan();
+  const { currentPage, currentLimit, handleChangePage, handleLimitChange } =
+    useDataTable();
 
-    return matchesSearch && matchesStatus && matchesJenis;
-  });
+  // --- 1. PROSES FILTERING DATA MENTAH ---
+  const filteredResult = useMemo(() => {
+    const data = dataListPermohonanKrk || [];
 
-  // Pagination
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const currentData = filteredData.slice(startIndex, startIndex + itemsPerPage);
+    return data.filter((item: any) => {
+      // Filter Search (Cari Nomor Permohonan atau Nama Pemilik)
+      const term = searchTerm.toLowerCase();
+      const matchesSearch =
+        (item.nomor_permohonan &&
+          item.nomor_permohonan.toLowerCase().includes(term)) ||
+        (item.nama_pemilik && item.nama_pemilik.toLowerCase().includes(term)) ||
+        (item.user?.name && item.user.name.toLowerCase().includes(term));
 
-  const handleViewDetail = (id: string) => {
-    console.log(`View detail: ${id}`);
-    // Implement view detail logic here
-  };
+      // Filter Status
+      // Sesuaikan value status dengan data dari backend kamu
+      const matchesStatus =
+        statusFilter === "semua" || item.status === statusFilter;
+
+      // Filter Jenis
+      const matchesJenis =
+        jenisFilter === "semua" || item.jenisLayanan?.nama === jenisFilter;
+
+      return matchesSearch && matchesStatus && matchesJenis;
+    });
+  }, [dataListPermohonanKrk, searchTerm, statusFilter, jenisFilter]);
+
+  // --- 2. HITUNG TOTAL PAGE BERDASARKAN HASIL FILTER ---
+  const totalPages = Math.ceil(filteredResult.length / currentLimit);
+
+  // --- 3. PROSES PAGINATION & MAPPING KE TAMPILAN TABEL ---
+  const tableRows = useMemo(() => {
+    const startIndex = (currentPage - 1) * currentLimit;
+    const endIndex = startIndex + currentLimit;
+
+    // Slice data yang sudah difilter
+    const paginatedData = filteredResult.slice(startIndex, endIndex);
+
+    return paginatedData.map((item: any, index: number) => {
+      // Logic Badge Status (Bisa disesuaikan warnanya)
+      let badgeColor = "bg-gray-100 text-gray-700";
+      if (item.status === "PENDING_OPERATOR")
+        badgeColor = "bg-yellow-100 text-yellow-700 border-yellow-200";
+      else if (item.status === "APPROVED")
+        badgeColor = "bg-green-100 text-green-700 border-green-200";
+      else if (item.status === "REJECTED")
+        badgeColor = "bg-red-100 text-red-700 border-red-200";
+
+      return [
+        startIndex + index + 1, // Nomor urut
+
+        item.nomor_permohonan || "-",
+
+        item.submitted_at
+          ? new Date(item.submitted_at).toLocaleDateString("id-ID", {
+              day: "2-digit",
+              month: "short",
+              year: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            })
+          : "-",
+
+        item.nama_pemilik || item.user?.name || "-",
+
+        item.jenisLayanan?.nama || "-",
+
+        // Kolom Status / Step
+        <Badge
+          key={`badge-${item.id}`}
+          variant="outline"
+          className={badgeColor}
+        >
+          {item.current_step_name || item.status}
+        </Badge>,
+
+        // Kolom Aksi
+        <DropdownActions
+          key={`action-${item.id}`}
+          menu={[
+            {
+              label: (
+                <span className="flex items-center gap-2">
+                  <Eye size={16} />
+                  Detail / Verifikasi
+                </span>
+              ),
+              action: () => {
+                navigate(`/riwayat-permohonan/detail/${item.id}`);
+              },
+            },
+            {
+              label: (
+                <span className="flex items-center gap-2">
+                  <Pencil size={16} />
+                  Edit Permohonan
+                </span>
+              ),
+              action: () => {
+                navigate(`/permohonan-krk/edit/${item.id}`);
+              },
+            },
+          ]}
+        />,
+      ];
+    });
+  }, [filteredResult, currentPage, currentLimit, navigate]);
 
   return (
     <MainLayout title="Riwayat Permohonan | KRK Bengkulu" isBgGray isPaddingY>
@@ -151,7 +152,7 @@ export default function RiwayatPermohonan() {
             <div className="flex items-center gap-2 bg-white/80 backdrop-blur-sm rounded-2xl px-4 py-2 shadow-lg border border-white/20">
               <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
               <span className="text-sm font-medium text-gray-700">
-                Total {filteredData.length} Permohonan
+                Total {filteredResult.length} Permohonan
               </span>
             </div>
           </div>
@@ -169,9 +170,12 @@ export default function RiwayatPermohonan() {
                     size={20}
                   />
                   <Input
-                    placeholder="Cari ID Permohonan atau Lokasi..."
+                    placeholder="Cari No. Permohonan atau Nama Pemohon..."
                     value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onChange={(e) => {
+                      setSearchTerm(e.target.value);
+                      handleChangePage(1); // Reset ke halaman 1 saat mencari
+                    }}
                     className="pl-10 rounded-xl border-gray-300 focus:border-green-500 focus:ring-green-500"
                   />
                 </div>
@@ -179,7 +183,13 @@ export default function RiwayatPermohonan() {
 
               {/* Status Filter */}
               <div>
-                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <Select
+                  value={statusFilter}
+                  onValueChange={(val) => {
+                    setStatusFilter(val);
+                    handleChangePage(1); // Reset ke halaman 1 saat filter berubah
+                  }}
+                >
                   <SelectTrigger className="rounded-xl border-gray-300 focus:border-green-500 focus:ring-green-500">
                     <div className="flex items-center gap-2">
                       <Filter size={16} />
@@ -188,16 +198,25 @@ export default function RiwayatPermohonan() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="semua">Semua Status</SelectItem>
-                    <SelectItem value="selesai">Selesai</SelectItem>
-                    <SelectItem value="proses">Dalam Proses</SelectItem>
-                    <SelectItem value="ditolak">Ditolak</SelectItem>
+                    {/* Pastikan value ini match dengan data backend */}
+                    <SelectItem value="APPROVED">Selesai (Approved)</SelectItem>
+                    <SelectItem value="PENDING_OPERATOR">
+                      Proses Operator
+                    </SelectItem>
+                    <SelectItem value="REJECTED">Ditolak</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               {/* Jenis Filter */}
               <div>
-                <Select value={jenisFilter} onValueChange={setJenisFilter}>
+                <Select
+                  value={jenisFilter}
+                  onValueChange={(val) => {
+                    setJenisFilter(val);
+                    handleChangePage(1); // Reset ke halaman 1 saat filter berubah
+                  }}
+                >
                   <SelectTrigger className="rounded-xl border-gray-300 focus:border-green-500 focus:ring-green-500">
                     <div className="flex items-center gap-2">
                       <FileText size={16} />
@@ -219,258 +238,26 @@ export default function RiwayatPermohonan() {
         {/* Table Section */}
         <Card className="border-0 shadow-lg bg-white/90 backdrop-blur-sm rounded-2xl overflow-hidden">
           <CardContent className="p-5">
-            <Table>
-              <TableHeader className="bg-gray-50/80">
-                <TableRow>
-                  <TableHead className="font-semibold text-gray-900">
-                    <div className="flex items-center gap-2">
-                      <FileText size={16} />
-                      ID Permohonan
-                    </div>
-                  </TableHead>
-                  <TableHead className="font-semibold text-gray-900">
-                    <div className="flex items-center gap-2">
-                      <Calendar size={16} />
-                      Tanggal
-                    </div>
-                  </TableHead>
-                  <TableHead className="font-semibold text-gray-900">
-                    Jenis
-                  </TableHead>
-                  <TableHead className="font-semibold text-gray-900">
-                    <div className="flex items-center gap-2">
-                      <MapPin size={16} />
-                      Lokasi
-                    </div>
-                  </TableHead>
-                  <TableHead className="font-semibold text-gray-900">
-                    Status Berkas
-                  </TableHead>
-                  <TableHead className="font-semibold text-gray-900">
-                    Status
-                  </TableHead>
-                  <TableHead className="font-semibold text-gray-900 text-right">
-                    Aksi
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {currentData.length > 0 ? (
-                  currentData.map((item) => (
-                    <TableRow
-                      key={item.id}
-                      className="hover:bg-gray-50/50 transition-colors"
-                    >
-                      <TableCell className="font-medium text-gray-900">
-                        <div className="flex items-center gap-2">
-                          <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                          {item.id}
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-gray-700">
-                        <div className="flex items-center gap-2">
-                          <Calendar size={14} className="text-gray-400" />
-                          {new Date(item.tanggal).toLocaleDateString("id-ID")}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge
-                          variant="outline"
-                          className="bg-blue-50 text-blue-700 border-blue-200"
-                        >
-                          {item.jenis}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-gray-700 max-w-xs truncate">
-                        {item.lokasi}
-                      </TableCell>
-                      <TableCell>
-                        <Badge
-                          variant="outline"
-                          className={`${
-                            berkasConfig[
-                              item.berkas as keyof typeof berkasConfig
-                            ].color
-                          } border`}
-                        >
-                          {
-                            berkasConfig[
-                              item.berkas as keyof typeof berkasConfig
-                            ].text
-                          }
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Badge
-                          variant="outline"
-                          className={`${
-                            statusConfig[
-                              item.status as keyof typeof statusConfig
-                            ].color
-                          } border font-medium`}
-                        >
-                          {item.statusText}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex justify-end gap-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleViewDetail(item.id)}
-                            className="rounded-lg border-gray-300 hover:bg-gray-50"
-                          >
-                            <Eye size={16} />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell
-                      colSpan={7}
-                      className="text-center py-8 text-gray-500"
-                    >
-                      <div className="flex flex-col items-center gap-2">
-                        <FileText size={48} className="text-gray-300" />
-                        <p>Tidak ada data permohonan yang ditemukan</p>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
+            <DataTable
+              header={[
+                "No",
+                "No. Pengajuan",
+                "Tanggal Masuk",
+                "Nama Pemohon",
+                "Jenis Layanan",
+                "Status",
+                "Aksi",
+              ]}
+              isLoading={isLoadingListPermohonanKrk}
+              data={tableRows}
+              totalPages={totalPages}
+              currentPage={currentPage}
+              currentLimit={currentLimit}
+              onChangePage={handleChangePage}
+              onChangeLimit={handleLimitChange}
+            />
           </CardContent>
         </Card>
-
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="flex items-center justify-between mt-6">
-            <div className="text-sm text-gray-600">
-              Menampilkan {startIndex + 1}-
-              {Math.min(startIndex + itemsPerPage, filteredData.length)} dari{" "}
-              {filteredData.length} permohonan
-            </div>
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                disabled={currentPage === 1}
-                className="rounded-lg border-gray-300"
-              >
-                <ChevronLeft size={16} />
-              </Button>
-
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                (page) => (
-                  <Button
-                    key={page}
-                    variant={currentPage === page ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setCurrentPage(page)}
-                    className={`rounded-lg ${
-                      currentPage === page
-                        ? "bg-green-600 hover:bg-green-700 text-white"
-                        : "border-gray-300"
-                    }`}
-                  >
-                    {page}
-                  </Button>
-                )
-              )}
-
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() =>
-                  setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-                }
-                disabled={currentPage === totalPages}
-                className="rounded-lg border-gray-300"
-              >
-                <ChevronRight size={16} />
-              </Button>
-            </div>
-          </div>
-        )}
-
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mt-8">
-          <Card className="border-0 shadow-lg bg-white/90 backdrop-blur-sm rounded-2xl">
-            <CardContent className="p-6">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-green-100 rounded-2xl flex items-center justify-center">
-                  <FileText className="text-green-600" size={24} />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-gray-900">
-                    {riwayatData.length}
-                  </p>
-                  <p className="text-sm text-gray-600">Total Permohonan</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-0 shadow-lg bg-white/90 backdrop-blur-sm rounded-2xl">
-            <CardContent className="p-6">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-blue-100 rounded-2xl flex items-center justify-center">
-                  <Calendar className="text-blue-600" size={24} />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-gray-900">
-                    {
-                      riwayatData.filter((item) => item.status === "selesai")
-                        .length
-                    }
-                  </p>
-                  <p className="text-sm text-gray-600">Selesai</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-0 shadow-lg bg-white/90 backdrop-blur-sm rounded-2xl">
-            <CardContent className="p-6">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-yellow-100 rounded-2xl flex items-center justify-center">
-                  <Eye className="text-yellow-600" size={24} />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-gray-900">
-                    {
-                      riwayatData.filter((item) => item.status === "proses")
-                        .length
-                    }
-                  </p>
-                  <p className="text-sm text-gray-600">Dalam Proses</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-0 shadow-lg bg-white/90 backdrop-blur-sm rounded-2xl">
-            <CardContent className="p-6">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-red-100 rounded-2xl flex items-center justify-center">
-                  <MapPin className="text-red-600" size={24} />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-gray-900">
-                    {
-                      riwayatData.filter((item) => item.status === "ditolak")
-                        .length
-                    }
-                  </p>
-                  <p className="text-sm text-gray-600">Ditolak</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
       </div>
     </MainLayout>
   );
