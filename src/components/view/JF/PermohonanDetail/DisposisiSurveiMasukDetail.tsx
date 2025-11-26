@@ -1,6 +1,15 @@
+import { useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate, useParams } from "react-router-dom";
 import useDisposisiSurveiMasukDetail from "./useDisposisiSurveiMasukDetail";
+
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 import HeaderSection from "./HeaderSection";
 import DataPemohonCard from "./DataPemohonCard";
@@ -12,18 +21,32 @@ import ActionButtons from "./ActionButton";
 import { getStatusColor, getStatusText } from "@/utils/statusUtils";
 import { formatAlamat } from "@/utils/formatUtils";
 import JFLayout from "@/components/layouts/JFLayout";
+import { Eye, Loader2 } from "lucide-react";
 
 const DisposisiSurveiMasukDetail = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-  const { data, isLoading, dataDetailHistory } = useDisposisiSurveiMasukDetail(
-    id!
-  );
+  const { data, isLoading, dataDetailHistory, dataSk, isLoadingSk } =
+    useDisposisiSurveiMasukDetail(id!);
+
+  // --- LOGIC BUAT URL PDF ---
+  const pdfUrl = useMemo(() => {
+    if (!dataSk) return null;
+
+    if (dataSk.type === "application/json") {
+      console.error("Data SK ternyata JSON (Mungkin Error Backend):", dataSk);
+      return null;
+    }
+
+    const blob = new Blob([dataSk], { type: "application/pdf" });
+    return window.URL.createObjectURL(blob);
+  }, [dataSk]);
 
   if (isLoading) {
     return (
       <JFLayout title="Loading..." desc="Memuat detail permohonan">
         <div className="flex justify-center items-center h-64">
+          <Loader2 className="animate-spin mr-2" />
           <p>Memuat data...</p>
         </div>
       </JFLayout>
@@ -47,13 +70,57 @@ const DisposisiSurveiMasukDetail = () => {
       desc={`Detail permohonan KRK ${data.nomor_permohonan}`}
     >
       <div className="mt-10 flex flex-col gap-6">
-        {/* Header */}
-        <HeaderSection
-          data={data}
-          onBack={() => navigate(-1)}
-          getStatusColor={getStatusColor}
-          getStatusText={getStatusText}
-        />
+        {/* Header Section + Tombol Dialog */}
+        <div className="flex flex-col md:flex-row justify-between md:items-start gap-4">
+          <HeaderSection
+            data={data}
+            onBack={() => navigate(-1)}
+            getStatusColor={getStatusColor}
+            getStatusText={getStatusText}
+          />
+
+          {/* Logic Tombol Lihat SK (Jika ada dataSk) */}
+          {dataSk && (
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="gap-2 border-blue-500 text-blue-600 hover:bg-blue-50"
+                >
+                  <Eye className="w-4 h-4" />
+                  Lihat Surat SK
+                </Button>
+              </DialogTrigger>
+
+              {/* MODAL CONTENT dengan ukuran LEBAR (!max-w-[90vw]) */}
+              <DialogContent className="!max-w-[90vw] w-full h-[90vh] flex flex-col p-0 gap-0">
+                <DialogHeader className="p-4 border-b">
+                  <DialogTitle>Preview Surat Keputusan (SK)</DialogTitle>
+                </DialogHeader>
+
+                {/* AREA PDF MENGGUNAKAN IFRAME */}
+                <div className="flex-1 bg-slate-100 w-full h-full relative">
+                  {isLoadingSk ? (
+                    <div className="flex items-center justify-center h-full gap-2">
+                      <Loader2 className="animate-spin" /> Memuat Dokumen...
+                    </div>
+                  ) : pdfUrl ? (
+                    <iframe
+                      src={pdfUrl}
+                      className="w-full h-full"
+                      title="Preview SK"
+                      style={{ border: "none" }}
+                    />
+                  ) : (
+                    <div className="flex items-center justify-center h-full text-red-500">
+                      Gagal memuat preview. File mungkin rusak.
+                    </div>
+                  )}
+                </div>
+              </DialogContent>
+            </Dialog>
+          )}
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Kolom Kiri - Data Permohonan */}

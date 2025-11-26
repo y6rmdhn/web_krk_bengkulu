@@ -27,11 +27,24 @@ const useDetailPermohonan = (id: string) => {
       enabled: !!id,
     });
 
+  const getSk = async (id: string) => {
+    const result = await permohonanKrkServices.getSuratSk(id);
+    return result.data;
+  };
+
+  const { data: dataSk, isLoading: isLoadingSk } = useQuery({
+    queryKey: ["detail-sk-preview", id],
+    queryFn: () => getSk(id),
+    enabled: !!id,
+  });
+
   return {
     data,
     isLoading,
     dataDetailHistory,
     isLoadingDetailHistory,
+    dataSk,
+    isLoadingSk,
   };
 };
 

@@ -11,6 +11,11 @@ const permohonanKrkServices = {
     axiosInstance.get(`${endpoint.PEMOHON}/permohonan/${id}`),
   getDetailPermohonanHistory: (id: string) =>
     axiosInstance.get(`${endpoint.PEMOHON}/permohonan/${id}/history`),
+  getSuratSk: (id: string) => {
+    return axiosInstance.get(`/pemohon/permohonan/${id}/preview`, {
+      responseType: "blob",
+    });
+  },
 };
 
 export default permohonanKrkServices;

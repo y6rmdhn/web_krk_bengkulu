@@ -28,12 +28,10 @@ export default function RiwayatPermohonan() {
   const { currentPage, currentLimit, handleChangePage, handleLimitChange } =
     useDataTable();
 
-  // --- 1. PROSES FILTERING DATA MENTAH ---
   const filteredResult = useMemo(() => {
     const data = dataListPermohonanKrk || [];
 
     return data.filter((item: any) => {
-      // Filter Search (Cari Nomor Permohonan atau Nama Pemilik)
       const term = searchTerm.toLowerCase();
       const matchesSearch =
         (item.nomor_permohonan &&
@@ -41,12 +39,9 @@ export default function RiwayatPermohonan() {
         (item.nama_pemilik && item.nama_pemilik.toLowerCase().includes(term)) ||
         (item.user?.name && item.user.name.toLowerCase().includes(term));
 
-      // Filter Status
-      // Sesuaikan value status dengan data dari backend kamu
       const matchesStatus =
         statusFilter === "semua" || item.status === statusFilter;
 
-      // Filter Jenis
       const matchesJenis =
         jenisFilter === "semua" || item.jenisLayanan?.nama === jenisFilter;
 
@@ -54,19 +49,15 @@ export default function RiwayatPermohonan() {
     });
   }, [dataListPermohonanKrk, searchTerm, statusFilter, jenisFilter]);
 
-  // --- 2. HITUNG TOTAL PAGE BERDASARKAN HASIL FILTER ---
   const totalPages = Math.ceil(filteredResult.length / currentLimit);
 
-  // --- 3. PROSES PAGINATION & MAPPING KE TAMPILAN TABEL ---
   const tableRows = useMemo(() => {
     const startIndex = (currentPage - 1) * currentLimit;
     const endIndex = startIndex + currentLimit;
 
-    // Slice data yang sudah difilter
     const paginatedData = filteredResult.slice(startIndex, endIndex);
 
     return paginatedData.map((item: any, index: number) => {
-      // Logic Badge Status (Bisa disesuaikan warnanya)
       let badgeColor = "bg-gray-100 text-gray-700";
       if (item.status === "PENDING_OPERATOR")
         badgeColor = "bg-yellow-100 text-yellow-700 border-yellow-200";
@@ -76,7 +67,7 @@ export default function RiwayatPermohonan() {
         badgeColor = "bg-red-100 text-red-700 border-red-200";
 
       return [
-        startIndex + index + 1, // Nomor urut
+        startIndex + index + 1,
 
         item.nomor_permohonan || "-",
 
@@ -94,7 +85,6 @@ export default function RiwayatPermohonan() {
 
         item.jenisLayanan?.nama || "-",
 
-        // Kolom Status / Step
         <Badge
           key={`badge-${item.id}`}
           variant="outline"
@@ -103,7 +93,6 @@ export default function RiwayatPermohonan() {
           {item.current_step_name || item.status}
         </Badge>,
 
-        // Kolom Aksi
         <DropdownActions
           key={`action-${item.id}`}
           menu={[
@@ -174,7 +163,7 @@ export default function RiwayatPermohonan() {
                     value={searchTerm}
                     onChange={(e) => {
                       setSearchTerm(e.target.value);
-                      handleChangePage(1); // Reset ke halaman 1 saat mencari
+                      handleChangePage(1);
                     }}
                     className="pl-10 rounded-xl border-gray-300 focus:border-green-500 focus:ring-green-500"
                   />
@@ -187,7 +176,7 @@ export default function RiwayatPermohonan() {
                   value={statusFilter}
                   onValueChange={(val) => {
                     setStatusFilter(val);
-                    handleChangePage(1); // Reset ke halaman 1 saat filter berubah
+                    handleChangePage(1);
                   }}
                 >
                   <SelectTrigger className="rounded-xl border-gray-300 focus:border-green-500 focus:ring-green-500">
@@ -198,7 +187,6 @@ export default function RiwayatPermohonan() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="semua">Semua Status</SelectItem>
-                    {/* Pastikan value ini match dengan data backend */}
                     <SelectItem value="APPROVED">Selesai (Approved)</SelectItem>
                     <SelectItem value="PENDING_OPERATOR">
                       Proses Operator
@@ -214,7 +202,7 @@ export default function RiwayatPermohonan() {
                   value={jenisFilter}
                   onValueChange={(val) => {
                     setJenisFilter(val);
-                    handleChangePage(1); // Reset ke halaman 1 saat filter berubah
+                    handleChangePage(1);
                   }}
                 >
                   <SelectTrigger className="rounded-xl border-gray-300 focus:border-green-500 focus:ring-green-500">
