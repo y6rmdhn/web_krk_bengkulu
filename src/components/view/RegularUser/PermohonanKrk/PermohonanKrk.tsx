@@ -43,15 +43,12 @@ export default function PermohonanKrk() {
         <CardContent className="space-y-12">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-12">
-              {/* Bagian 1: Peta */}
               <WilayahForm form={form} />
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-12 gap-y-8">
-                {/* Bagian 2: Data Pemohon */}
                 <DataPemohonForm form={form} />
 
                 <div className="space-y-6">
-                  {/* Checkbox Copy Data */}
                   <div className="flex items-center space-x-2 bg-gray-50 p-4 rounded-md border border-gray-200">
                     <input
                       id="copy-data"
@@ -67,17 +64,11 @@ export default function PermohonanKrk() {
                     </label>
                   </div>
 
-                  {/* Bagian 3: Data Pemilik (Selalu Muncul) */}
                   <DataPemilik form={form} />
                 </div>
               </div>
 
-              {/* Bagian 4: Lokasi & Captcha */}
               <DataLokasi form={form} />
-              {/* <Captcha
-                form={form}
-                handleRefreshCaptcha={handleRefreshCaptcha}
-              /> */}
 
               <div className="flex justify-end items-center gap-4 pt-4">
                 <Button

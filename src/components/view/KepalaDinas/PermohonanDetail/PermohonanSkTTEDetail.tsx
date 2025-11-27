@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react"; // Tambah useMemo
+import { useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import usePermohonanSkTTEDetail from "./usePermohonanSkTTEDetail";
 
@@ -23,9 +23,7 @@ import { getStatusColor, getStatusText } from "@/utils/statusUtils";
 import { formatAlamat } from "@/utils/formatUtils";
 
 import { Eye, Loader2 } from "lucide-react";
-
-// HAPUS SEMUA IMPORT REACT-PDF (Document, Page, pdfjs, css) BIAR GAK BERAT
-// import { Document, Page, pdfjs } from "react-pdf"; ... hapus ini
+import LocationMap from "@/components/commons/LocationMap";
 
 const PermohonanSkTTEDetail = () => {
   const navigate = useNavigate();
@@ -34,18 +32,14 @@ const PermohonanSkTTEDetail = () => {
   const { data, isLoading, dataDetailHistory, dataSk, isLoadingSk } =
     usePermohonanSkTTEDetail(id!);
 
-  // --- SOLUSI UTAMA: BUAT URL BLOB MANUAL ---
-  // Ini trik biar browser bisa baca Blob data dari Backend
   const pdfUrl = useMemo(() => {
     if (!dataSk) return null;
 
-    // Cek dulu, kalau backend balikin JSON error dalam bentuk Blob
     if (dataSk.type === "application/json") {
       console.error("Data SK ternyata JSON (Mungkin Error Backend):", dataSk);
       return null;
     }
 
-    // Buat URL sementara untuk file PDF
     const blob = new Blob([dataSk], { type: "application/pdf" });
     return window.URL.createObjectURL(blob);
   }, [dataSk]);
@@ -89,7 +83,6 @@ const PermohonanSkTTEDetail = () => {
             getStatusText={getStatusText}
           />
 
-          {/* Cek dataSk ada isinya atau tidak */}
           {dataSk && (
             <Dialog>
               <DialogTrigger asChild>
@@ -102,25 +95,22 @@ const PermohonanSkTTEDetail = () => {
                 </Button>
               </DialogTrigger>
 
-              {/* MODAL CONTENT */}
               <DialogContent className="!max-w-[90vw] w-full h-[90vh] flex flex-col p-0 gap-0">
                 <DialogHeader className="p-4 border-b">
                   <DialogTitle>Preview Surat Keputusan (SK)</DialogTitle>
                 </DialogHeader>
 
-                {/* AREA PDF MENGGUNAKAN IFRAME */}
                 <div className="flex-1 bg-slate-100 w-full h-full relative">
                   {isLoadingSk ? (
                     <div className="flex items-center justify-center h-full gap-2">
                       <Loader2 className="animate-spin" /> Memuat Dokumen...
                     </div>
                   ) : pdfUrl ? (
-                    // INI SOLUSINYA: Iframe + Blob URL
                     <iframe
                       src={pdfUrl}
                       className="w-full h-full"
                       title="Preview SK"
-                      style={{ border: "none" }} // Hilangkan border default
+                      style={{ border: "none" }}
                     />
                   ) : (
                     <div className="flex items-center justify-center h-full text-red-500">
@@ -135,6 +125,8 @@ const PermohonanSkTTEDetail = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">
+            <LocationMap latitude={data.latitude} longitude={data.longitude} />
+
             <DataPemohonCard data={data} formatAlamat={formatAlamat} />
             <DataPemilikCard data={data} formatAlamat={formatAlamat} />
             <DataBangunanCard data={data} formatAlamat={formatAlamat} />

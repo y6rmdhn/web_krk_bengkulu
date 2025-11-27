@@ -23,7 +23,6 @@ L.Icon.Default.mergeOptions({
     "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
 });
 
-// --- TYPES ---
 interface SearchResult {
   name: string;
   position: [number, number];
@@ -33,6 +32,7 @@ interface SearchableMapProps {
   onCoordinateSelect?: (lat: number, lng: number, address: string) => void;
   initialPosition?: [number, number];
   initialSearchQuery?: string;
+  readonly?: boolean;
 }
 
 interface NominatimResult {
@@ -41,8 +41,6 @@ interface NominatimResult {
   lon: string;
   display_name: string;
 }
-
-// --- SUB-COMPONENTS ---
 
 function ChangeView({
   center,
@@ -71,18 +69,20 @@ function MapClickHandler({
   return null;
 }
 
-// --- MAIN COMPONENT ---
-
 const SearchableMap: React.FC<SearchableMapProps> = ({
   onCoordinateSelect,
   initialPosition = [-3.792286, 102.26238],
   initialSearchQuery = "",
+  readonly = false,
 }) => {
-  // State Map & Marker
   const [position, setPosition] = useState<[number, number]>(initialPosition);
+
+  useEffect(() => {
+    setPosition(initialPosition);
+  }, [initialPosition]);
+
   const [searchResult, setSearchResult] = useState<SearchResult | null>(null);
 
-  // State Pencarian
   const [searchText, setSearchText] = useState<string>(initialSearchQuery);
   const [searchResultsList, setSearchResultsList] = useState<NominatimResult[]>(
     []
@@ -128,24 +128,24 @@ const SearchableMap: React.FC<SearchableMapProps> = ({
           layer.setStyle({ fillOpacity: 0.4, weight: 1 });
         },
         click: (e: any) => {
-          handleMapClick(e.latlng.lat, e.latlng.lng);
+          if (!readonly) {
+            handleMapClick(e.latlng.lat, e.latlng.lng);
+          }
         },
       });
     }
   };
 
-  // Effect: Auto search
   useEffect(() => {
-    if (initialSearchQuery) {
+    if (initialSearchQuery && !readonly) {
       setSearchText(initialSearchQuery);
       const timer = setTimeout(() => {
         handleSearch();
       }, 500);
       return () => clearTimeout(timer);
     }
-  }, [initialSearchQuery]);
+  }, [initialSearchQuery, readonly]);
 
-  // Effect: Click outside dropdown
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -165,7 +165,9 @@ const SearchableMap: React.FC<SearchableMapProps> = ({
     setShowDropdown(false);
     try {
       const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchText)}&limit=5`
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
+          searchText
+        )}&limit=5`
       );
       const data: NominatimResult[] = await response.json();
       if (data && data.length > 0) {
@@ -195,6 +197,8 @@ const SearchableMap: React.FC<SearchableMapProps> = ({
   };
 
   const handleMapClick = (lat: number, lng: number) => {
+    if (readonly) return;
+
     const newPosition: [number, number] = [lat, lng];
     setPosition(newPosition);
     const label = `Koordinat: ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
@@ -205,64 +209,78 @@ const SearchableMap: React.FC<SearchableMapProps> = ({
 
   return (
     <div className="space-y-4 z-0">
-      <div className="flex gap-2 mb-2 relative" ref={dropdownRef}>
-        <div className="flex-1 relative">
-          <input
-            type="text"
-            value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-            onFocus={() =>
-              searchResultsList.length > 0 && setShowDropdown(true)
-            }
-            placeholder="Cari lokasi..."
-            className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-            onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-          />
-          {showDropdown && searchResultsList.length > 0 && (
-            <div className="absolute z-[1000] w-full bg-white border shadow-lg max-h-60 overflow-y-auto mt-1">
-              {searchResultsList.map((item) => (
-                <div
-                  key={item.place_id}
-                  onClick={() => handleSelectLocation(item)}
-                  className="px-4 py-2 hover:bg-blue-50 cursor-pointer border-b text-sm"
-                >
-                  <p className="font-semibold">
-                    {item.display_name.split(",")[0]}
-                  </p>
-                  <p className="text-xs text-gray-500 truncate">
-                    {item.display_name}
-                  </p>
-                </div>
-              ))}
-            </div>
-          )}
+      {!readonly && (
+        <div className="flex gap-2 mb-2 relative" ref={dropdownRef}>
+          <div className="flex-1 relative">
+            <input
+              type="text"
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              onFocus={() =>
+                searchResultsList.length > 0 && setShowDropdown(true)
+              }
+              placeholder="Cari lokasi..."
+              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+            />
+            {showDropdown && searchResultsList.length > 0 && (
+              <div className="absolute z-[1000] w-full bg-white border shadow-lg max-h-60 overflow-y-auto mt-1">
+                {searchResultsList.map((item) => (
+                  <div
+                    key={item.place_id}
+                    onClick={() => handleSelectLocation(item)}
+                    className="px-4 py-2 hover:bg-blue-50 cursor-pointer border-b text-sm"
+                  >
+                    <p className="font-semibold">
+                      {item.display_name.split(",")[0]}
+                    </p>
+                    <p className="text-xs text-gray-500 truncate">
+                      {item.display_name}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+          <button
+            type="button"
+            onClick={handleSearch}
+            disabled={isLoading}
+            className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm"
+          >
+            {isLoading ? "..." : "Cari"}
+          </button>
         </div>
-        <button
-          type="button"
-          onClick={handleSearch}
-          disabled={isLoading}
-          className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm"
-        >
-          {isLoading ? "..." : "Cari"}
-        </button>
-      </div>
+      )}
 
-      <div className="bg-blue-50 border border-blue-100 rounded-md p-3 text-xs text-blue-700">
-        <p>
-          💡 <strong>Tips:</strong> Peta berwarna menunjukkan Pola Ruang Kota
-          Bengkulu.
-        </p>
-      </div>
+      {readonly && (
+        <div className="flex gap-2 mb-2">
+          <span className="text-xs bg-gray-100 text-gray-500 px-2 py-1 rounded border">
+            Mode Lihat: Lokasi dikunci sesuai data.
+          </span>
+        </div>
+      )}
+
+      {!readonly && (
+        <div className="bg-blue-50 border border-blue-100 rounded-md p-3 text-xs text-blue-700">
+          <p>
+            💡 <strong>Tips:</strong> Peta berwarna menunjukkan Pola Ruang Kota
+            Bengkulu.
+          </p>
+        </div>
+      )}
 
       <div className="relative rounded-lg overflow-hidden border border-gray-300 shadow-sm">
         <MapContainer
           center={position}
           zoom={15}
           style={{ height: "400px", width: "100%", zIndex: 10 }}
-          scrollWheelZoom={true}
+          scrollWheelZoom={!readonly}
+          dragging={true}
         >
           <ChangeView center={position} zoom={15} />
-          <MapClickHandler onMapClick={handleMapClick} />
+
+          {!readonly && <MapClickHandler onMapClick={handleMapClick} />}
 
           <TileLayer
             attribution="&copy; OpenStreetMap"
@@ -279,8 +297,7 @@ const SearchableMap: React.FC<SearchableMapProps> = ({
           <Marker position={position}>
             <Popup>
               <div className="text-center">
-                <strong className="block mb-1">Lokasi Terpilih</strong>
-                {searchResult ? searchResult.name : "Titik Awal"} <br />
+                <strong className="block mb-1">Lokasi</strong>
                 <span className="text-xs text-gray-500">
                   {position[0].toFixed(5)}, {position[1].toFixed(5)}
                 </span>
@@ -290,7 +307,7 @@ const SearchableMap: React.FC<SearchableMapProps> = ({
         </MapContainer>
       </div>
 
-      {searchResult && (
+      {!readonly && searchResult && (
         <div className="p-3 bg-gray-50 border rounded-md">
           <p className="text-xs font-bold text-gray-500">Koordinat Terpilih</p>
           <p className="font-mono text-sm">

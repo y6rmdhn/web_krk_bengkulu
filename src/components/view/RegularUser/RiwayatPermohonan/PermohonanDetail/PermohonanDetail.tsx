@@ -21,6 +21,7 @@ import AlurPermohonanCard from "./AlurPermohonan";
 import { getStatusColor, getStatusText } from "@/utils/statusUtils";
 import { formatAlamat } from "@/utils/formatUtils";
 import { Eye, Loader2 } from "lucide-react";
+import LocationMap from "@/components/commons/LocationMap";
 
 const DetailPermohonan = () => {
   const navigate = useNavigate();
@@ -121,6 +122,7 @@ const DetailPermohonan = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">
+            <LocationMap latitude={data.latitude} longitude={data.longitude} />
             <DataPemohonCard data={data} formatAlamat={formatAlamat} />
             <DataPemilikCard data={data} formatAlamat={formatAlamat} />
             <DataBangunanCard data={data} formatAlamat={formatAlamat} />

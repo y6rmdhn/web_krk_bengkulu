@@ -22,6 +22,7 @@ import { getStatusColor, getStatusText } from "@/utils/statusUtils";
 import { formatAlamat } from "@/utils/formatUtils";
 import JFLayout from "@/components/layouts/JFLayout";
 import { Eye, Loader2 } from "lucide-react";
+import LocationMap from "@/components/commons/LocationMap";
 
 const DisposisiSurveiMasukDetail = () => {
   const navigate = useNavigate();
@@ -29,7 +30,6 @@ const DisposisiSurveiMasukDetail = () => {
   const { data, isLoading, dataDetailHistory, dataSk, isLoadingSk } =
     useDisposisiSurveiMasukDetail(id!);
 
-  // --- LOGIC BUAT URL PDF ---
   const pdfUrl = useMemo(() => {
     if (!dataSk) return null;
 
@@ -70,7 +70,6 @@ const DisposisiSurveiMasukDetail = () => {
       desc={`Detail permohonan KRK ${data.nomor_permohonan}`}
     >
       <div className="mt-10 flex flex-col gap-6">
-        {/* Header Section + Tombol Dialog */}
         <div className="flex flex-col md:flex-row justify-between md:items-start gap-4">
           <HeaderSection
             data={data}
@@ -79,7 +78,6 @@ const DisposisiSurveiMasukDetail = () => {
             getStatusText={getStatusText}
           />
 
-          {/* Logic Tombol Lihat SK (Jika ada dataSk) */}
           {dataSk && (
             <Dialog>
               <DialogTrigger asChild>
@@ -92,13 +90,11 @@ const DisposisiSurveiMasukDetail = () => {
                 </Button>
               </DialogTrigger>
 
-              {/* MODAL CONTENT dengan ukuran LEBAR (!max-w-[90vw]) */}
               <DialogContent className="!max-w-[90vw] w-full h-[90vh] flex flex-col p-0 gap-0">
                 <DialogHeader className="p-4 border-b">
                   <DialogTitle>Preview Surat Keputusan (SK)</DialogTitle>
                 </DialogHeader>
 
-                {/* AREA PDF MENGGUNAKAN IFRAME */}
                 <div className="flex-1 bg-slate-100 w-full h-full relative">
                   {isLoadingSk ? (
                     <div className="flex items-center justify-center h-full gap-2">
@@ -123,8 +119,9 @@ const DisposisiSurveiMasukDetail = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Kolom Kiri - Data Permohonan */}
           <div className="lg:col-span-2 space-y-6">
+            <LocationMap latitude={data.latitude} longitude={data.longitude} />
+
             <DataPemohonCard data={data} formatAlamat={formatAlamat} />
             <DataPemilikCard data={data} formatAlamat={formatAlamat} />
             <DataBangunanCard data={data} formatAlamat={formatAlamat} />
@@ -134,7 +131,6 @@ const DisposisiSurveiMasukDetail = () => {
             )}
           </div>
 
-          {/* Kolom Kanan - Alur Permohonan dan Actions */}
           <div className="lg:col-span-1 space-y-6">
             <AlurPermohonanCard data={dataDetailHistory} />
             <ActionButtons id={`${id}`} />
