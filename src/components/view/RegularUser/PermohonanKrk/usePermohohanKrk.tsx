@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import z from "zod";
 
-const fileSchema = z
+export const fileSchema = z
   .instanceof(File, { message: "File wajib diunggah" })
   .refine((file) => file.size <= 5 * 1024 * 1024, "Ukuran file maksimal 5MB") // Limit 5MB
   .refine(

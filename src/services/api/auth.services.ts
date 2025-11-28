@@ -2,6 +2,7 @@ import axiosInstance from "@/lib/axiosInstance";
 import endpoint from "./endpoint";
 import type { ILogin, ILogout, IResgister, IVerifyEmail } from "@/types/auth";
 import type { IdentitasFormValues } from "@/components/view/RegularUser/Berkas/IdentitasTab/useIdentitas";
+import type { ForgotPasswordForm } from "@/components/view/Auth/ForgotPassword/useForgotPassword";
 
 const authServices = {
   login: (paylaod: ILogin) =>
@@ -10,6 +11,8 @@ const authServices = {
     axiosInstance.post(`${endpoint.AUTH}/register`, paylaod),
   updateProfile: (paylaod: IdentitasFormValues) =>
     axiosInstance.put(`${endpoint.AUTH}/profile`, paylaod),
+  resetPassword: (paylaod: ForgotPasswordForm) =>
+    axiosInstance.put(`${endpoint.AUTH}/password`, paylaod),
   resendVerifyCode: (paylaod: IVerifyEmail) =>
     axiosInstance.post(`${endpoint.AUTH}/resend-email`, paylaod),
   getProfile: () => axiosInstance.get(`${endpoint.AUTH}/me`),

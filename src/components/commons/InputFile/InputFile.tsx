@@ -28,7 +28,7 @@ export default function InputFile({
     <FormField
       control={form.control}
       name={name}
-      render={({ field: { onChange, ...fieldProps } }) => (
+      render={({ field: { value, onChange, ...fieldProps } }) => (
         <FormItem>
           <FormLabel>{label}</FormLabel>
           <FormControl>

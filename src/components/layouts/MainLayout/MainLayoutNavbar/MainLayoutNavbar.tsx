@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { UserPlus, LogIn, LayoutDashboard, LogOut } from "lucide-react";
+import { UserPlus, LogIn, LayoutDashboard, LogOut, Key } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -124,6 +124,13 @@ const MainLayoutNavbar = (props: PropTypes) => {
                   <Link to="/admin/dashboard">
                     <LayoutDashboard className="mr-2 h-4 w-4" />
                     <span>Dashboard Admin</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild className="cursor-pointer">
+                  <Link to="/reset-password">
+                    <Key className="mr-2 h-4 w-4" />
+                    <span>Reset Password</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />

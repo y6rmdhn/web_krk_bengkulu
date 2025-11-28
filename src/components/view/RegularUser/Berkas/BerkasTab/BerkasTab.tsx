@@ -10,57 +10,84 @@ import {
 import useBerkasTab from "./useBerkastab";
 import DataTable from "@/components/commons/DataTable";
 import { useMemo, useState } from "react";
-import { Plus } from "lucide-react";
+import { Plus, Eye } from "lucide-react";
 import useDataTable from "@/hooks/useDataTable";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import FormInput from "@/components/commons/FormInput";
-
-// ... dummyData tetap sama ...
-const dummyData = [
-  {
-    no: "1",
-    keterangan: "Surat Permohonan Pengajuan KRK",
-    status: "belum diupload",
-    uploadBerkas: <Input type="file" />,
-  },
-];
+import FormFieldSelect from "@/components/commons/FormFieldSelect";
+import InputFile from "@/components/commons/InputFile";
+import { Spinner } from "@/components/ui/spinner";
 
 const BerkasTab = () => {
-  const { data, handleSubmitData, isLoading, form } = useBerkasTab();
+  const {
+    handleSubmitData,
+    form,
+    uploadFormBerkas,
+    handleUploadBerkas,
+    isPendingUploadBerkas,
+    dataMaster,
+    isLoadingDataMaster,
+    isPending,
+    dataListBerkas, // Data dari API
+    isLoadingDataListBerkas, // Loading state dari API
+  } = useBerkasTab();
 
-  // State untuk kontrol Modal/Dialog
   const [isOpen, setIsOpen] = useState(false);
+  const [isOpenUploadBerkas, setIsOpenUploadBerkas] = useState(false);
+  const [file, setFile] = useState<File | null>(null);
 
   const { currentPage, currentLimit, handleChangePage, handleLimitChange } =
     useDataTable();
 
-  // useMemo kembali bersih, hanya untuk mapping data tabel
+  // --- LOGIKA MAPPING DATA DARI API ---
   const filteredData = useMemo(() => {
+    // Jika data belum ada, kembalikan array kosong
+    if (!dataListBerkas) return [];
+
     const startIndex = (currentPage - 1) * currentLimit;
     const endIndex = startIndex + currentLimit;
-    const paginatedData = dummyData.slice(startIndex, endIndex);
+    const paginatedData = dataListBerkas.slice(startIndex, endIndex);
 
-    return paginatedData.map((item) => {
+    return paginatedData.map((item: any, index: number) => {
+      const rowNumber = startIndex + index + 1;
+
       return [
-        item.no,
-        item.keterangan,
+        rowNumber,
+        item.masterBerkas?.nama || "-",
         <Badge
-          variant={item.status === "sudah diupload" ? "outline" : "destructive"}
+          variant="outline"
+          className="bg-green-50 text-green-700 border-green-200"
         >
-          {item.status}
+          Sudah Diupload
         </Badge>,
-        item.uploadBerkas,
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => window.open(item.file_path, "_blank")}
+          className="gap-2"
+        >
+          <Eye size={14} />
+          Lihat File
+        </Button>,
       ];
     });
-  }, [dummyData, currentPage, currentLimit]);
+  }, [dataListBerkas, currentPage, currentLimit]);
 
-  const totalPages = Math.ceil(dummyData.length / currentLimit);
+  const totalPages = Math.ceil((dataListBerkas?.length || 0) / currentLimit);
 
   const onSubmit = (values: any) => {
     handleSubmitData(values);
     setIsOpen(false);
+  };
+
+  const onSubmitUploadBerkas = (values: any) => {
+    if (!file && !values.file) return;
+
+    handleUploadBerkas(values);
+
+    setIsOpenUploadBerkas(false);
+    setFile(null);
   };
 
   return (
@@ -68,16 +95,22 @@ const BerkasTab = () => {
       <CardContent className="p-6 space-y-4">
         <div className="flex justify-between items-center">
           <h3 className="text-lg font-semibold">Daftar Berkas</h3>
-          <Button onClick={() => setIsOpen(true)}>
-            <Plus size={16} className="mr-2" />
-            Tambah Berkas
-          </Button>
+          <div className="flex gap-2">
+            <Button onClick={() => setIsOpen(true)}>
+              <Plus size={16} className="mr-2" />
+              Tambah Master
+            </Button>
+            <Button onClick={() => setIsOpenUploadBerkas(true)}>
+              <Plus size={16} className="mr-2" />
+              Upload Berkas
+            </Button>
+          </div>
         </div>
 
         {/* Tabel Data */}
         <DataTable
-          header={["No", "Keterangan", "Status", "Upload Berkas"]}
-          isLoading={false}
+          header={["No", "Keterangan", "Status", "Aksi"]}
+          isLoading={isLoadingDataListBerkas}
           data={filteredData}
           totalPages={totalPages}
           currentPage={currentPage}
@@ -86,11 +119,10 @@ const BerkasTab = () => {
           onChangeLimit={handleLimitChange}
         />
 
-        {/* --- DIALOG / POP UP FORM --- */}
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
           <DialogContent className="sm:max-w-[500px]">
             <DialogHeader>
-              <DialogTitle>Tambah Berkas Baru</DialogTitle>
+              <DialogTitle>Tambah Master Berkas Baru</DialogTitle>
             </DialogHeader>
 
             <Form {...form}>
@@ -114,17 +146,60 @@ const BerkasTab = () => {
 
                 <DialogFooter>
                   <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setIsOpen(false)}
+                    type="submit"
+                    className="bg-[#2451AA] hover:bg-[#1D4ED8] px-8"
+                    disabled={isPending}
                   >
-                    Batal
+                    {isPending ? <Spinner /> : "Simpan"}
                   </Button>
+                </DialogFooter>
+              </form>
+            </Form>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={isOpenUploadBerkas} onOpenChange={setIsOpenUploadBerkas}>
+          <DialogContent className="sm:max-w-[500px]">
+            <DialogHeader>
+              <DialogTitle>Upload Berkas</DialogTitle>
+            </DialogHeader>
+
+            <Form {...uploadFormBerkas}>
+              <form
+                onSubmit={uploadFormBerkas.handleSubmit(onSubmitUploadBerkas)}
+                className="space-y-4"
+              >
+                <FormFieldSelect
+                  form={uploadFormBerkas}
+                  name="master_berkas_id"
+                  label="Nama Berkas"
+                  placeholder={
+                    isLoadingDataMaster ? "Memuat..." : "--Pilih Berkas--"
+                  }
+                  options={
+                    dataMaster?.map((item: { nama: string; id: string }) => ({
+                      label: item.nama,
+                      value: item.id,
+                    })) || []
+                  }
+                />
+
+                <InputFile
+                  form={uploadFormBerkas}
+                  label="Upload File Berkas"
+                  name="file"
+                  accept=".pdf"
+                  selectedFile={file}
+                  setSelectedFile={setFile}
+                />
+
+                <DialogFooter>
                   <Button
                     type="submit"
                     className="bg-[#2451AA] hover:bg-[#1D4ED8] px-8"
+                    disabled={isPendingUploadBerkas}
                   >
-                    Simpan
+                    {isPendingUploadBerkas ? <Spinner /> : "Simpan"}
                   </Button>
                 </DialogFooter>
               </form>

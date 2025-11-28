@@ -8,6 +8,9 @@ import kepalaDinasLoader from "./components/layouts/KepalaDinas/KepalaDinasLayou
 
 const Homepage = lazy(() => import("./components/view/RegularUser/Homepage"));
 const LoginPage = lazy(() => import("./components/view/Auth/Login/Login"));
+const ForgotPasswordPage = lazy(
+  () => import("./components/view/Auth/ForgotPassword")
+);
 const RegisterPage = lazy(
   () => import("./components/view/Auth/Register/Register")
 );
@@ -118,6 +121,11 @@ const router = createBrowserRouter([
     path: "/login",
     loader: authLoader,
     element: <LoginPage />,
+  },
+  {
+    path: "/reset-password",
+    loader: adminLoader,
+    element: <ForgotPasswordPage />,
   },
   {
     path: "/register",

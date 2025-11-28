@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils";
 interface FormInputProps<T extends FieldValues> {
   form: UseFormReturn<T>;
   name: Path<T>;
-  label: string;
+  label?: string;
   placeholder?: string;
   type?: string;
   showPassword?: boolean;
