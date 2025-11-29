@@ -15,12 +15,10 @@ const DataPemohonForm = (props: PropTypes) => {
   const { form } = props;
   const [fileDoc, setFileDoc] = useState<File | null>(null);
 
-  // 1. Watch value dari parent region untuk mentrigger fetch data child
   const selectedProvinsi = form.watch("provinsi_pemohon");
   const selectedKota = form.watch("kota_pemohon");
   const selectedKecamatan = form.watch("kecamatan_pemohon");
 
-  // 2. Panggil Hook Wilayah
   const {
     provinces,
     regencies,
@@ -32,26 +30,21 @@ const DataPemohonForm = (props: PropTypes) => {
     isVillagesLoading,
   } = useWilayahData(selectedProvinsi, selectedKota, selectedKecamatan);
 
-  // 3. Logic Reset Cascading (Penting!)
-  // Kalau Provinsi berubah, reset Kota, Kecamatan, Kelurahan
   useEffect(() => {
     form.setValue("kota_pemohon", "");
     form.setValue("kecamatan_pemohon", "");
     form.setValue("kelurahan_pemohon", "");
   }, [selectedProvinsi, form]);
 
-  // Kalau Kota berubah, reset Kecamatan, Kelurahan
   useEffect(() => {
     form.setValue("kecamatan_pemohon", "");
     form.setValue("kelurahan_pemohon", "");
   }, [selectedKota, form]);
 
-  // Kalau Kecamatan berubah, reset Kelurahan
   useEffect(() => {
     form.setValue("kelurahan_pemohon", "");
   }, [selectedKecamatan, form]);
 
-  // 4. Mapping data API ke format Options {label, value}
   const provinceOptions = provinces.map((p) => ({
     label: p.name,
     value: p.id,

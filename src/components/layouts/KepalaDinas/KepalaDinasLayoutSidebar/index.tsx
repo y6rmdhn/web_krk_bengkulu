@@ -1,3 +1,3 @@
-import AdminLayoutSidebar from "./AdminLayoutSidebar";
+import KepalaDinasLayoutSidebar from "./KepalaDinasLayoutSidebar";
 
-export default AdminLayoutSidebar;
+export default KepalaDinasLayoutSidebar;

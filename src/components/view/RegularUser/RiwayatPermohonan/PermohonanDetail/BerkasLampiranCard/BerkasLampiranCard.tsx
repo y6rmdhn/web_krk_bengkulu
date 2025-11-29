@@ -10,7 +10,6 @@ interface BerkasLampiranCardProps {
 }
 
 const BerkasLampiranCard = ({ attachments }: BerkasLampiranCardProps) => {
-  // State untuk mengontrol Modal
   const [selectedFile, setSelectedFile] = useState<{
     url: string;
     name: string;

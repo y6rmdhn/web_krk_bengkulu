@@ -7,12 +7,9 @@ import {
 import { Worker, Viewer } from "@react-pdf-viewer/core";
 import { defaultLayoutPlugin } from "@react-pdf-viewer/default-layout";
 
-// Import styles wajib
 import "@react-pdf-viewer/core/lib/styles/index.css";
 import "@react-pdf-viewer/default-layout/lib/styles/index.css";
 
-// Sesuaikan versi pdfjs-dist dengan yang diinstall (biasanya otomatis, tapi perlu URL worker)
-// Kita pakai CDN unpkg agar tidak ribet config webpack/vite
 const WORKER_URL =
   "https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js";
 

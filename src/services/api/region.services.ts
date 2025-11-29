@@ -1,4 +1,3 @@
-// services/wilayahService.ts
 import axios from "axios";
 
 export const wilayahServices = {
@@ -23,7 +22,6 @@ export const wilayahServices = {
     ),
 };
 
-// Format response untuk provinces
 export const formatProvinces = (provinces: any[]) => {
   return provinces.map((province) => ({
     id: province.id,
@@ -31,7 +29,6 @@ export const formatProvinces = (provinces: any[]) => {
   }));
 };
 
-// Format response untuk regencies/kota
 export const formatRegencies = (regencies: any[]) => {
   return regencies.map((regency) => ({
     id: regency.id,
@@ -40,7 +37,6 @@ export const formatRegencies = (regencies: any[]) => {
   }));
 };
 
-// Format response untuk districts/kecamatan
 export const formatDistricts = (districts: any[]) => {
   return districts.map((district) => ({
     id: district.id,
@@ -49,7 +45,6 @@ export const formatDistricts = (districts: any[]) => {
   }));
 };
 
-// Format response untuk villages/kelurahan
 export const formatVillages = (villages: any[]) => {
   return villages.map((village) => ({
     id: village.id,

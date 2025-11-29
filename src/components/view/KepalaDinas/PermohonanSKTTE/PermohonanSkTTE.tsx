@@ -24,16 +24,13 @@ const PermohonanSkTTE = () => {
     usePermohonanSkTTE();
   const navigate = useNavigate();
 
-  // 1. State untuk Search & Filter
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
 
-  // 2. Logic Filtering (Filter Dulu, Baru Paginasi)
   const filteredResult = useMemo(() => {
     const data = dataListPermohonanKrk || [];
 
     return data.filter((item: any) => {
-      // Filter Search
       const term = searchTerm.toLowerCase();
       const matchesSearch =
         (item.nomor_permohonan &&
@@ -41,7 +38,6 @@ const PermohonanSkTTE = () => {
         (item.nama_pemilik && item.nama_pemilik.toLowerCase().includes(term)) ||
         (item.user?.name && item.user.name.toLowerCase().includes(term));
 
-      // Filter Status
       const matchesStatus =
         statusFilter === "all" || item.status === statusFilter;
 
@@ -49,19 +45,15 @@ const PermohonanSkTTE = () => {
     });
   }, [dataListPermohonanKrk, searchTerm, statusFilter]);
 
-  // 3. Hitung Total Page berdasarkan data yang sudah difilter
   const totalPages = Math.ceil(filteredResult.length / currentLimit);
 
-  // 4. Logic Mapping Data ke Tampilan Tabel
   const tableRows = useMemo(() => {
     const startIndex = (currentPage - 1) * currentLimit;
     const endIndex = startIndex + currentLimit;
 
-    // Slice data hasil filter
     const paginatedData = filteredResult.slice(startIndex, endIndex);
 
     return paginatedData.map((item: any, index: number) => {
-      // Logic Warna Badge
       let badgeColor = "bg-gray-100 text-gray-700";
       if (item.status === "PENDING_OPERATOR") {
         badgeColor =
@@ -124,10 +116,8 @@ const PermohonanSkTTE = () => {
       desc="Permohonan Masuk"
     >
       <div className="mt-10 flex flex-col gap-6">
-        {/* Filter Section */}
         <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-start">
           <div className="flex flex-col lg:flex-row gap-4 w-full lg:w-auto">
-            {/* Search Input */}
             <div className="relative w-full lg:w-[300px]">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <Input
@@ -136,17 +126,16 @@ const PermohonanSkTTE = () => {
                 value={searchTerm}
                 onChange={(e) => {
                   setSearchTerm(e.target.value);
-                  handleChangePage(1); // Reset page ke 1 saat mengetik
+                  handleChangePage(1);
                 }}
               />
             </div>
 
-            {/* Filter Status */}
             <Select
               value={statusFilter}
               onValueChange={(val) => {
                 setStatusFilter(val);
-                handleChangePage(1); // Reset page ke 1 saat filter berubah
+                handleChangePage(1);
               }}
             >
               <SelectTrigger className="w-full lg:w-[180px]">
@@ -164,7 +153,6 @@ const PermohonanSkTTE = () => {
           </div>
         </div>
 
-        {/* Table Section */}
         <Card className="flex-1">
           <CardHeader>
             <div className="flex justify-between items-center">
@@ -185,7 +173,7 @@ const PermohonanSkTTE = () => {
                 "Aksi",
               ]}
               isLoading={isLoadingListPermohonanKrk}
-              data={tableRows} // Gunakan data yang sudah di-mapping
+              data={tableRows}
               totalPages={totalPages}
               currentPage={currentPage}
               currentLimit={currentLimit}

@@ -25,12 +25,10 @@ type PropTypes = {
 const DataPemilik = (props: PropTypes) => {
   const { form } = props;
 
-  // 1. Watch values
   const selectedProvinsi = form.watch("provinsi_pemilik");
   const selectedKota = form.watch("kota_pemilik");
   const selectedKecamatan = form.watch("kecamatan_pemilik");
 
-  // 2. Hook Wilayah (Pastikan pakai versi hook yang sudah ada String() normalization)
   const { provinces, regencies, districts, villages, isProvincesLoading } =
     useWilayahData(
       selectedProvinsi ? String(selectedProvinsi) : "",
@@ -38,7 +36,6 @@ const DataPemilik = (props: PropTypes) => {
       selectedKecamatan ? String(selectedKecamatan) : ""
     );
 
-  // 3. Helper Options
   const provinceOptions = provinces.map((p) => ({
     label: p.name,
     value: p.id,
@@ -50,7 +47,6 @@ const DataPemilik = (props: PropTypes) => {
   }));
   const villageOptions = villages.map((v) => ({ label: v.name, value: v.id }));
 
-  // 4. Handler Ganti Manual
   const handleSelectChange = (
     value: string,
     onChange: (val: any) => void,
@@ -178,7 +174,6 @@ const DataPemilik = (props: PropTypes) => {
               </FormLabel>
               <div className="w-full flex flex-col gap-1">
                 <Select
-                  // KEY INI PENTING
                   key={`kota-${regencyOptions.length}`}
                   onValueChange={(val) =>
                     handleSelectChange(val, field.onChange, regencyOptions, [
@@ -218,7 +213,6 @@ const DataPemilik = (props: PropTypes) => {
               </FormLabel>
               <div className="w-full flex flex-col gap-1">
                 <Select
-                  // KEY INI PENTING
                   key={`kecamatan-${districtOptions.length}`}
                   onValueChange={(val) =>
                     handleSelectChange(val, field.onChange, districtOptions, [
@@ -257,7 +251,6 @@ const DataPemilik = (props: PropTypes) => {
               </FormLabel>
               <div className="w-full flex flex-col gap-1">
                 <Select
-                  // KEY INI PENTING
                   key={`kelurahan-${villageOptions.length}`}
                   onValueChange={(val) =>
                     handleSelectChange(val, field.onChange, villageOptions, [])

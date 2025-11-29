@@ -1,4 +1,3 @@
-// hooks/useWilayahData.ts
 import {
   formatDistricts,
   formatProvinces,
@@ -13,7 +12,6 @@ export const useWilayahData = (
   selectedRegencyId: string,
   selectedDistrictId: string
 ) => {
-  // Query untuk provinces
   const {
     data: provincesData,
     isLoading: isProvincesLoading,
@@ -32,7 +30,6 @@ export const useWilayahData = (
     staleTime: 1000 * 60 * 60, // 1 hour
   });
 
-  // Query untuk regencies (tergantung province yang dipilih)
   const {
     data: regenciesData,
     isLoading: isRegenciesLoading,
@@ -50,11 +47,10 @@ export const useWilayahData = (
         return [];
       }
     },
-    enabled: !!selectedProvinceId, // Hanya fetch jika province dipilih
+    enabled: !!selectedProvinceId,
     staleTime: 1000 * 60 * 60, // 1 hour
   });
 
-  // Query untuk districts (tergantung regency yang dipilih)
   const {
     data: districtsData,
     isLoading: isDistrictsLoading,
@@ -72,11 +68,10 @@ export const useWilayahData = (
         return [];
       }
     },
-    enabled: !!selectedRegencyId, // Hanya fetch jika regency dipilih
+    enabled: !!selectedRegencyId,
     staleTime: 1000 * 60 * 60, // 1 hour
   });
 
-  // Query untuk villages (tergantung district yang dipilih)
   const {
     data: villagesData,
     isLoading: isVillagesLoading,
@@ -94,7 +89,7 @@ export const useWilayahData = (
         return [];
       }
     },
-    enabled: !!selectedDistrictId, // Hanya fetch jika district dipilih
+    enabled: !!selectedDistrictId,
     staleTime: 1000 * 60 * 60, // 1 hour
   });
 

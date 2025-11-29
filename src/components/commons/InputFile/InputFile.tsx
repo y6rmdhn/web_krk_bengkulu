@@ -19,7 +19,7 @@ export default function InputFile({
 }: {
   label: string;
   form: any;
-  name: string; // Ganti any jadi string biar aman
+  name: string;
   accept?: string;
   selectedFile?: File | null;
   setSelectedFile?: (file: File | null) => void;
@@ -48,13 +48,12 @@ export default function InputFile({
                       const file = event.target.files && event.target.files[0];
                       if (file) {
                         onChange(file);
-                        setSelectedFile?.(file); // Update state preview lokal
+                        setSelectedFile?.(file);
                       }
                     }}
                   />
                 </div>
               ) : (
-                /* AREA PREVIEW FILE (JIKA SUDAH PILIH) */
                 <div className="flex items-center justify-between rounded-md border p-3 bg-blue-50/50 dark:bg-blue-900/20">
                   <div className="flex items-center gap-3">
                     <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-200">
@@ -76,8 +75,8 @@ export default function InputFile({
                     size="sm"
                     className="text-red-500 hover:text-red-600 hover:bg-red-100"
                     onClick={() => {
-                      onChange(undefined); // PERBAIKAN: Reset form value jadi undefined/null
-                      setSelectedFile?.(null); // Reset preview lokal
+                      onChange(undefined);
+                      setSelectedFile?.(null);
                     }}
                   >
                     <X className="h-4 w-4" />

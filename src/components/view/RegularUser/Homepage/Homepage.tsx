@@ -1,5 +1,3 @@
-// src/components/DashboardContent.tsx
-
 import { Card, CardContent } from "@/components/ui/card";
 import MenuItem from "@/components/commons/MenuItem";
 import MainLayout from "@/components/layouts/MainLayout/MainLayout";

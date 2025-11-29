@@ -11,8 +11,6 @@ import { Button } from "@/components/ui/button";
 export default function PermohonanKrk() {
   const { form, onSubmit, isPending } = usePermohohanKrk();
 
-  console.log("Form Errors:", form.formState.errors);
-
   const handleCopyData = (isChecked: boolean) => {
     if (isChecked) {
       const values = form.getValues();

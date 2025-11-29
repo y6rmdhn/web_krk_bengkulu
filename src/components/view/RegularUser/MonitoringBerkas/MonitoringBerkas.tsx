@@ -15,10 +15,8 @@ export default function MonitoringBerkasPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsSearching(true);
-    // Simulate API call
     setTimeout(() => {
       setIsSearching(false);
-      console.log("Searching for:", noResi);
     }, 1500);
   };
 

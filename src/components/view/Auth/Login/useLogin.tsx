@@ -57,7 +57,6 @@ const useLogin = () => {
 
   const handleLogin = (values: ILogin) => {
     mutateLogin(values);
-    console.log(values);
   };
 
   return {

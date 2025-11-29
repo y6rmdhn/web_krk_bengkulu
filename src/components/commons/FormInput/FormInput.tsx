@@ -23,7 +23,6 @@ interface FormInputProps<T extends FieldValues> {
   labelIcon?: ReactNode;
   className?: string;
   inputClassName?: string;
-  // Props untuk radio
   radioOptions?: { value: string; label: string }[];
   radioDirection?: "horizontal" | "vertical";
 }
@@ -39,7 +38,6 @@ export default function FormInput<T extends FieldValues>({
   labelIcon,
   className = "",
   inputClassName = "",
-  // Props untuk radio
   radioOptions = [],
   radioDirection = "horizontal",
 }: FormInputProps<T>) {
@@ -78,7 +76,6 @@ export default function FormInput<T extends FieldValues>({
                   )}
                 />
               ) : isRadioType ? (
-                // Radio Group
                 <div
                   className={cn(
                     "flex gap-4 mt-2",
@@ -108,7 +105,6 @@ export default function FormInput<T extends FieldValues>({
                   ))}
                 </div>
               ) : (
-                // Input biasa (text, password, email, dll)
                 <Input
                   {...field}
                   type={inputType}

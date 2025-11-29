@@ -29,8 +29,8 @@ const BerkasTab = () => {
     dataMaster,
     isLoadingDataMaster,
     isPending,
-    dataListBerkas, // Data dari API
-    isLoadingDataListBerkas, // Loading state dari API
+    dataListBerkas,
+    isLoadingDataListBerkas,
   } = useBerkasTab();
 
   const [isOpen, setIsOpen] = useState(false);
@@ -40,9 +40,7 @@ const BerkasTab = () => {
   const { currentPage, currentLimit, handleChangePage, handleLimitChange } =
     useDataTable();
 
-  // --- LOGIKA MAPPING DATA DARI API ---
   const filteredData = useMemo(() => {
-    // Jika data belum ada, kembalikan array kosong
     if (!dataListBerkas) return [];
 
     const startIndex = (currentPage - 1) * currentLimit;

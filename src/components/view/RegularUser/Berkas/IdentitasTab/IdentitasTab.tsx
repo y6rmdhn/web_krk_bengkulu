@@ -176,12 +176,7 @@ const IdentitasTab = () => {
 
             {/* Tombol Aksi */}
             <div className="flex justify-end gap-3 pt-4 border-t">
-              <Button
-                type="button"
-                variant="outline"
-                className="px-6"
-                // disabled={isSubmitting}
-              >
+              <Button type="button" variant="outline" className="px-6">
                 Batal
               </Button>
               <Button

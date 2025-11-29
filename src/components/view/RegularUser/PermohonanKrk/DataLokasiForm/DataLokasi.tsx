@@ -14,7 +14,6 @@ type PropTypes = {
 const DataLokasi = (props: PropTypes) => {
   const { form } = props;
 
-  // State untuk file preview (opsional, tergantung implementasi InputFile kamu)
   const [simbFile, setSimbFile] = useState<File | null>(null);
   const [sertifikatFile, setSertifikatFile] = useState<File | null>(null);
   const [PpbFile, setPpbFile] = useState<File | null>(null);

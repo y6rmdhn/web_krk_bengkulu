@@ -1,4 +1,3 @@
-// File: MenuItem.tsx
 import { Link } from "react-router-dom";
 import { ArrowRight, type LucideIcon } from "lucide-react";
 
@@ -50,7 +49,6 @@ export default function MenuItem({
                   alt={title}
                   className="h-12 w-12 object-contain transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3"
                   onError={(e) => {
-                    // Fallback icon jika gambar tidak load
                     e.currentTarget.style.display = "none";
                     const fallback = document.createElement("div");
                     fallback.className = `h-12 w-12 rounded-2xl bg-gradient-to-br ${gradient} flex items-center justify-center`;

@@ -1,5 +1,3 @@
-// src/components/ProsedurPage.jsx
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -21,7 +19,6 @@ import {
 } from "lucide-react";
 import ProsedurList from "./ProsedurList";
 
-// Data untuk daftar Syarat dan Prosedur
 const prosedurData = [
   {
     id: 1,

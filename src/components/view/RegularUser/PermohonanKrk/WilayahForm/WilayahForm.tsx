@@ -20,7 +20,6 @@ type PropTypes = {
   form: UseFormReturn<PermohonanFormValues>;
 };
 
-// ID untuk Bengkulu
 const BENGKULU_PROVINCE_ID = "17";
 const BENGKULU_CITY_ID = "1771";
 

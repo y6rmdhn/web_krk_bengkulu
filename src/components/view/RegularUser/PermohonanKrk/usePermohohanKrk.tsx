@@ -9,7 +9,7 @@ import z from "zod";
 
 export const fileSchema = z
   .instanceof(File, { message: "File wajib diunggah" })
-  .refine((file) => file.size <= 5 * 1024 * 1024, "Ukuran file maksimal 5MB") // Limit 5MB
+  .refine((file) => file.size <= 5 * 1024 * 1024, "Ukuran file maksimal 5MB")
   .refine(
     (file) =>
       ["application/pdf", "image/jpeg", "image/png"].includes(file.type),
@@ -17,18 +17,16 @@ export const fileSchema = z
   );
 
 const permohonanSchema = z.object({
-  // Seksi 1: Pilih Wilayah & Peta
   jenis_layanan_id: z.string().min(1, "Layanan harus diisi"),
   latitude: z.string().min(1, "Koordinat harus diisi"),
   longitude: z.string().min(1, "Koordinat harus diisi"),
 
-  // Seksi 2: Data Pemohon
   no_ktp_pemohon: z
     .string()
     .min(16, "No KTP harus 16 digit")
     .max(16, "No KTP harus 16 digit")
     .regex(/^\d+$/, "No KTP harus berupa angka"),
-  nama_pemohon: z.string().min(1, "Nama pemohon harus diisi"), // Fixed typo: pemomohon -> pemohon
+  nama_pemohon: z.string().min(1, "Nama pemohon harus diisi"),
   email_pemohon: z.string().email("Format email tidak valid"),
   no_hp_pemohon: z
     .string()
@@ -43,10 +41,8 @@ const permohonanSchema = z.object({
   kecamatan_pemohon: z.string().min(1, "Kecamatan pemohon harus diisi"),
   kelurahan_pemohon: z.string().min(1, "Kelurahan pemohon harus diisi"),
 
-  // FILE 1: KTP PEMOHON (Sesuai Gambar: KTP-Pemohon)
   file_ktp_pemohon: fileSchema,
 
-  // Seksi 2: Data Pemilik
   no_ktp_pemilik: z
     .string()
     .min(16, "No KTP harus 16 digit")
@@ -66,7 +62,6 @@ const permohonanSchema = z.object({
   kecamatan_pemilik: z.string().min(1, "Kecamatan pemilik harus diisi"),
   kelurahan_pemilik: z.string().min(1, "Kelurahan pemilik harus diisi"),
 
-  // Seksi 3: Data Lokasi
   alamat_bangunan: z.string().min(1, "Alamat bangunan harus diisi"),
   no_lokasi: z.string().min(1, "No bangunan harus diisi"),
   rt_lokasi: z.string().regex(/^\d+$/, "RT harus angka"),
@@ -79,10 +74,9 @@ const permohonanSchema = z.object({
   no_sertifikat_tanah: z.string().min(1, "No sertifikat tanah harus diisi"),
   hasil_ukur: z.string().min(1, "Hasil ukur harus diisi"),
 
-  // FILE 2, 3, 4 (Sesuai Gambar)
-  SIMB: fileSchema, // Untuk Key: SIMB
-  file_sertifikat_tanah: fileSchema, // Untuk Key: Sertifikat-Tanah
-  PBB: fileSchema, // Untuk Key: PBB
+  SIMB: fileSchema,
+  file_sertifikat_tanah: fileSchema,
+  PBB: fileSchema,
 });
 
 export type PermohonanFormValues = z.infer<typeof permohonanSchema>;
@@ -96,7 +90,7 @@ const usePermohohanKrk = () => {
       longitude: "",
 
       no_ktp_pemohon: "",
-      nama_pemohon: "", // Fixed
+      nama_pemohon: "",
       email_pemohon: "",
       no_hp_pemohon: "",
       alamat_pemohon: "",
@@ -107,7 +101,6 @@ const usePermohohanKrk = () => {
       kota_pemohon: "",
       kecamatan_pemohon: "",
       kelurahan_pemohon: "",
-      // File defaultnya undefined/null, tidak perlu string kosong
 
       no_ktp_pemilik: "",
       email_pemilik: "",
@@ -191,9 +184,7 @@ const usePermohohanKrk = () => {
     mutate(formData);
   };
 
-  const handleRefreshCaptcha = () => {
-    console.log("Refresh captcha logic here");
-  };
+  const handleRefreshCaptcha = () => {};
 
   return {
     form,

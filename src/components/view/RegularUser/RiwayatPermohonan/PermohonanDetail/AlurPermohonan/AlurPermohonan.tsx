@@ -13,7 +13,6 @@ import {
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
 
-// 1. Sesuaikan Type dengan Response API
 interface Actor {
   name: string;
 }
@@ -22,18 +21,16 @@ interface HistoryItem {
   step_name: string;
   status_keputusan: string;
   actor: Actor;
-  created_at?: string; // Asumsi ada tanggal di API, jika tidak ada akan handle default
-  note?: string; // Asumsi ada catatan jika rejected
+  created_at?: string;
+  note?: string;
 }
 
 interface AlurPermohonanCardProps {
-  data: HistoryItem[]; // Data sekarang berupa Array
+  data: HistoryItem[];
 }
 
 const AlurPermohonanCard = ({ data }: AlurPermohonanCardProps) => {
-  // 2. Helper untuk menentukan Style berdasarkan status_keputusan
   const getStatusConfig = (status: string) => {
-    // Normalisasi string status agar case-insensitive
     const s = status?.toUpperCase() || "";
 
     if (s.includes("REJECTED") || s.includes("TOLAK")) {
@@ -68,7 +65,6 @@ const AlurPermohonanCard = ({ data }: AlurPermohonanCardProps) => {
         label: "Dalam Proses",
       };
     } else {
-      // Default
       return {
         bg: "bg-gray-100",
         text: "text-gray-400",
@@ -80,7 +76,6 @@ const AlurPermohonanCard = ({ data }: AlurPermohonanCardProps) => {
     }
   };
 
-  // 3. Helper Icon khusus berdasarkan Nama Step (Optional, biar icon beda-beda tiap step)
   const getStepSpecificIcon = (
     stepName: string,
     defaultIcon: React.ReactNode
@@ -94,7 +89,6 @@ const AlurPermohonanCard = ({ data }: AlurPermohonanCardProps) => {
     return defaultIcon;
   };
 
-  // 4. Format Tanggal
   const formatTanggal = (dateString?: string) => {
     if (!dateString) return "-";
     try {
@@ -118,24 +112,19 @@ const AlurPermohonanCard = ({ data }: AlurPermohonanCardProps) => {
             </div>
           )}
 
-          {/* Looping Data Array dari API */}
           {data?.map((item, index) => {
             const config = getStatusConfig(item.status_keputusan);
-            // Override icon default status dengan icon spesifik step jika perlu, atau pakai config.icon
             const finalIcon = getStepSpecificIcon(item.step_name, config.icon);
 
             return (
               <div key={index} className="flex gap-4 group min-h-[80px]">
-                {/* Sisi Kiri: Icon & Garis */}
                 <div className="flex flex-col items-center">
-                  {/* Bulatan Icon */}
                   <div
                     className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-colors ${config.bg} ${config.text}`}
                   >
                     {finalIcon}
                   </div>
 
-                  {/* Garis Penghubung (Jangan render di item terakhir) */}
                   {index < data.length - 1 && (
                     <div
                       className={`w-0.5 h-full my-2 rounded-full ${config.line}`}
@@ -143,7 +132,6 @@ const AlurPermohonanCard = ({ data }: AlurPermohonanCardProps) => {
                   )}
                 </div>
 
-                {/* Sisi Kanan: Konten */}
                 <div className="flex-1 pb-8">
                   <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
                     <div>
@@ -151,14 +139,12 @@ const AlurPermohonanCard = ({ data }: AlurPermohonanCardProps) => {
                         {item.step_name}
                       </h3>
 
-                      {/* Deskripsi Actor */}
                       <p className="text-gray-600 text-sm mt-1">
                         {item.actor?.name === "Sistem"
                           ? "Diproses oleh Sistem"
                           : `Oleh: ${item.actor?.name}`}
                       </p>
 
-                      {/* Jika ada catatan penolakan/keterangan */}
                       {item.note && (
                         <div className="mt-2 bg-red-50 p-2 rounded border border-red-100 flex gap-2 items-start text-xs text-red-700">
                           <AlertCircle className="w-3 h-3 mt-0.5 shrink-0" />
@@ -167,13 +153,11 @@ const AlurPermohonanCard = ({ data }: AlurPermohonanCardProps) => {
                       )}
                     </div>
 
-                    {/* Badge Status & Tanggal */}
                     <div className="flex flex-col items-end gap-1">
                       <Badge
                         variant="secondary"
                         className={`${config.badge} capitalize whitespace-nowrap`}
                       >
-                        {/* Menampilkan status raw atau label yang sudah diformat */}
                         {item.status_keputusan?.replace(/_/g, " ") ||
                           config.label}
                       </Badge>
