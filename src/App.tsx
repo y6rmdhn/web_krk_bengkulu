@@ -64,6 +64,7 @@ const SuccessVerificationEmailPage = lazy(
 
 // admin
 const JenisLayanan = lazy(() => import("./components/view/Admin/JenisLayanan"));
+const AdminBerkas = lazy(() => import("./components/view/Admin/Berkas"));
 
 // operator
 const DasboardAdmin = lazy(() => import("./components/view/Operator/Dasboard"));
@@ -189,6 +190,11 @@ const router = createBrowserRouter([
         path: "jenis-layanan",
         loader: operatorLoader,
         element: <JenisLayanan />,
+      },
+      {
+        path: "berkas",
+        loader: operatorLoader,
+        element: <AdminBerkas />,
       },
     ],
   },
