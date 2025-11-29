@@ -3,7 +3,7 @@ import authServices from "@/services/api/auth.services";
 import session from "@/utils/session";
 import { redirect } from "react-router-dom";
 
-export default async function kepalaDinasLoader() {
+export default async function mainLoader() {
   const isAuthenticated = session.isAuthenticated();
   if (!isAuthenticated) {
     return redirect("/login");
@@ -20,7 +20,12 @@ export default async function kepalaDinasLoader() {
 
     const userRoles = dataProfile.roles.map((r: any) => r.name);
 
-    const isAllowed = userRoles.includes("Kepala Dinas");
+    const isAllowed =
+      userRoles.includes("Pemohon") |
+      userRoles.includes("Kepala Dinas") |
+      userRoles.includes("Surveyor Lapangan") |
+      userRoles.includes("Admin") |
+      userRoles.includes("Operator");
 
     if (!isAllowed) {
       return redirect("/");

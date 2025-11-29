@@ -5,6 +5,8 @@ import authLoader from "./components/layouts/AuthLayout/AuthLayout.loader";
 import operatorLoader from "./components/layouts/OperatorLayout/OperatorLayout.loader";
 import surveyorLoader from "./components/layouts/SurveyorLayout/SurveyorLayout.loader";
 import kepalaDinasLoader from "./components/layouts/KepalaDinas/KepalaDinasLayout.loader";
+import adminLoader from "./components/layouts/AdminLayout/AdminLayout.loader";
+import mainLoader from "./components/layouts/MainLayout/MainLayout.loader";
 
 const Homepage = lazy(() => import("./components/view/RegularUser/Homepage"));
 const LoginPage = lazy(() => import("./components/view/Auth/Login/Login"));
@@ -70,16 +72,16 @@ const JenisPermohonanAdmin = lazy(
 );
 
 // operator
-const DasboardAdmin = lazy(() => import("./components/view/Operator/Dasboard"));
+// const DasboardAdmin = lazy(() => import("./components/view/Operator/Dasboard"));
 const PermohonanAdminPage = lazy(
   () => import("./components/view/Operator/Permohonan")
 );
 const DetailPermohonanAdminPage = lazy(
   () => import("./components/view/Operator/PermohonanDetail")
 );
-const RiwayatPermohonanAdminPage = lazy(
-  () => import("./components/view/Operator/RiwayatPermohonan")
-);
+// const RiwayatPermohonanAdminPage = lazy(
+//   () => import("./components/view/Operator/RiwayatPermohonan")
+// );
 
 // Surveyor Lapangan
 const DisposisiSurveiMasuk = lazy(
@@ -109,7 +111,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/reset-password",
-    loader: operatorLoader,
+    loader: mainLoader,
     element: <ForgotPasswordPage />,
   },
   {
@@ -129,7 +131,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/berkas",
-    loader: operatorLoader,
+    loader: mainLoader,
     element: <KelengkapanBerkas />,
   },
   {
@@ -146,12 +148,12 @@ const router = createBrowserRouter([
   },
   {
     path: "/permohonan-krk",
-    loader: operatorLoader,
+    loader: mainLoader,
     element: <PermohonanKrk />,
   },
   {
     path: "/permohonan-krk/edit/:id",
-    loader: operatorLoader,
+    loader: mainLoader,
     element: <PermohonanKrkEdit />,
   },
   {
@@ -191,17 +193,17 @@ const router = createBrowserRouter([
     children: [
       {
         path: "jenis-layanan",
-        loader: operatorLoader,
+        loader: adminLoader,
         element: <JenisLayanan />,
       },
       {
         path: "berkas",
-        loader: operatorLoader,
+        loader: adminLoader,
         element: <AdminBerkas />,
       },
       {
         path: "jenis-permohonan",
-        loader: operatorLoader,
+        loader: adminLoader,
         element: <JenisPermohonanAdmin />,
       },
     ],
@@ -209,21 +211,21 @@ const router = createBrowserRouter([
   {
     path: "/operator",
     children: [
-      {
-        path: "dashboard",
-        loader: operatorLoader,
-        element: <DasboardAdmin />,
-      },
+      // {
+      //   path: "dashboard",
+      //   loader: operatorLoader,
+      //   element: <DasboardAdmin />,
+      // },
       {
         path: "permohonan-krk",
         loader: operatorLoader,
         element: <PermohonanAdminPage />,
       },
-      {
-        path: "riwayat-permohonan-krk",
-        loader: operatorLoader,
-        element: <RiwayatPermohonanAdminPage />,
-      },
+      // {
+      //   path: "riwayat-permohonan-krk",
+      //   loader: operatorLoader,
+      //   element: <RiwayatPermohonanAdminPage />,
+      // },
       {
         path: "detail/:id",
         loader: operatorLoader,
