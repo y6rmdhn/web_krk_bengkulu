@@ -63,6 +63,9 @@ const SuccessVerificationEmailPage = lazy(
 );
 
 // admin
+const JenisLayanan = lazy(() => import("./components/view/Admin/JenisLayanan"));
+
+// operator
 const DasboardAdmin = lazy(() => import("./components/view/Operator/Dasboard"));
 const PermohonanAdminPage = lazy(
   () => import("./components/view/Operator/Permohonan")
@@ -178,6 +181,16 @@ const router = createBrowserRouter([
   {
     path: "/pengaduan",
     element: <PengaduanPage />,
+  },
+  {
+    path: "/admin",
+    children: [
+      {
+        path: "jenis-layanan",
+        loader: operatorLoader,
+        element: <JenisLayanan />,
+      },
+    ],
   },
   {
     path: "/operator",
