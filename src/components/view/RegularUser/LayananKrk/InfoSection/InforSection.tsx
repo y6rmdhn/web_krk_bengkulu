@@ -1,6 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Calendar, FileText } from "lucide-react";
-import React from "react";
 
 const InforSection = () => {
   return (

@@ -43,10 +43,10 @@ export default function PermohonanKrkEdit() {
         <CardContent className="space-y-12">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-12">
-              <WilayahForm form={form} />
+              <WilayahForm form={form as any} />
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-12 gap-y-8">
-                <DataPemohonForm form={form} />
+                <DataPemohonForm form={form as any} />
 
                 <div className="space-y-6">
                   <div className="flex items-center space-x-2 bg-gray-50 p-4 rounded-md border border-gray-200">
@@ -64,11 +64,11 @@ export default function PermohonanKrkEdit() {
                     </label>
                   </div>
 
-                  <DataPemilik form={form} />
+                  <DataPemilik form={form as any} />
                 </div>
               </div>
 
-              <DataLokasi form={form} />
+              <DataLokasi form={form as any} />
 
               <div className="flex justify-end items-center gap-4 pt-4">
                 <Button

@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import SectionTitle from "../SectionTitle";
 import type { UseFormReturn } from "react-hook-form";
-import type { PermohonanFormValues } from "../usePermohohanKrkEdit";
 import InputFile from "@/components/commons/InputFile";
 import FormInput from "@/components/commons/FormInput";
 import FormFieldSelect from "@/components/commons/FormFieldSelect";
 import { useWilayahData } from "@/hooks/useWilayah";
+import type { PermohonanFormValues } from "../../PermohonanKrk/usePermohohanKrk";
 
 type PropTypes = {
   form: UseFormReturn<PermohonanFormValues>;

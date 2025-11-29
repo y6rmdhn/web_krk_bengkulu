@@ -1,5 +1,3 @@
-import React from "react";
-
 const MainLayoutFooter = () => {
   return (
     <footer className="bg-gray-100/60 border-t border-gray-200/30">

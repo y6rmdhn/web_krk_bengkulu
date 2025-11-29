@@ -1,3 +1,3 @@
-import SelectForm from "./SelectForm";
+import { SelectFilter } from "./SelectForm";
 
-export default SelectForm;
+export default SelectFilter;

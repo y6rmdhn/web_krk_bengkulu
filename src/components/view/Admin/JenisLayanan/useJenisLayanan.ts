@@ -117,7 +117,7 @@ const useJenisLayanan = () => {
 
   // --- DELETE MUTATION ---
   // PERBAIKAN: Terima parameter ID disini
-  const deleteJenisLayanan = async (id: string | number) => {
+  const deleteJenisLayanan = async (id: string) => {
     const result = await jenisLayananServices.deleteJenisLayanan(id);
     return result.data;
   };
@@ -143,7 +143,7 @@ const useJenisLayanan = () => {
   });
 
   // PERBAIKAN: Wrapper function terima ID
-  const handleDeleteJenisLayanan = (id: string | number) => {
+  const handleDeleteJenisLayanan = (id: string) => {
     mutateDeleteJenisLayanan(id);
   };
 

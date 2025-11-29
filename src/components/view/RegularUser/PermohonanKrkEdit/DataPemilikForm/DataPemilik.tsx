@@ -1,6 +1,5 @@
 import SectionTitle from "../SectionTitle";
 import type { UseFormReturn } from "react-hook-form";
-import type { PermohonanFormValues } from "../usePermohohanKrkEdit";
 import FormInput from "@/components/commons/FormInput";
 import { useWilayahData } from "@/hooks/useWilayah";
 import {
@@ -17,6 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import type { PermohonanFormValues } from "../../PermohonanKrk/usePermohohanKrk";
 
 type PropTypes = {
   form: UseFormReturn<PermohonanFormValues>;

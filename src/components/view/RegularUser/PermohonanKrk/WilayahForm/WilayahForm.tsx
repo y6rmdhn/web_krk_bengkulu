@@ -61,11 +61,7 @@ const WilayahForm = (props: PropTypes) => {
     }
   }, [selectedKecamatan, selectedKelurahan, districts, villages]);
 
-  const handleCoordinateSelect = (
-    lat: number,
-    lng: number,
-    address: string
-  ) => {
+  const handleCoordinateSelect = (lat: number, lng: number) => {
     const latString = lat.toFixed(6);
     const lngString = lng.toFixed(6);
 

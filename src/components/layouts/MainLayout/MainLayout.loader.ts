@@ -21,10 +21,10 @@ export default async function mainLoader() {
     const userRoles = dataProfile.roles.map((r: any) => r.name);
 
     const isAllowed =
-      userRoles.includes("Pemohon") |
-      userRoles.includes("Kepala Dinas") |
-      userRoles.includes("Surveyor Lapangan") |
-      userRoles.includes("Admin") |
+      userRoles.includes("Pemohon") ||
+      userRoles.includes("Kepala Dinas") ||
+      userRoles.includes("Surveyor Lapangan") ||
+      userRoles.includes("Admin") ||
       userRoles.includes("Operator");
 
     if (!isAllowed) {

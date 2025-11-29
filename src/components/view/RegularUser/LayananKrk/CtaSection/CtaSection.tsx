@@ -1,5 +1,3 @@
-import React from "react";
-
 const CtaSection = () => {
   return (
     <div className="text-center mt-12">

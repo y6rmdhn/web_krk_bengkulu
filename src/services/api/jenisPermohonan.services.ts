@@ -1,5 +1,6 @@
 import axiosInstance from "@/lib/axiosInstance";
 import endpoint from "./endpoint";
+import type { JenisPermohonanSchema } from "@/components/view/Admin/JenisPermohonan/useJenisPermohonan";
 
 const jenisPermohonanServices = {
   getJenisPermohonan: () => axiosInstance.get(`${endpoint.MASTER}/permohonan/`),

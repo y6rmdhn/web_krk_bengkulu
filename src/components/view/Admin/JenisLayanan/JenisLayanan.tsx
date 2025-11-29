@@ -75,8 +75,8 @@ const JenisLayanan = () => {
   // Handler konfirmasi delete
   const confirmDelete = () => {
     if (deleteId) {
-      handleDeleteJenisLayanan(deleteId);
-      setIsDeleteDialogOpen(false); // Tutup dialog segera
+      handleDeleteJenisLayanan(`${deleteId}`);
+      setIsDeleteDialogOpen(false);
       setDeleteId(null);
     }
   };

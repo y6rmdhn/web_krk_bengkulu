@@ -1,5 +1,4 @@
 import { User, Mail, Phone, Shield, Building2, MapPin } from "lucide-react";
-import React from "react";
 
 const Branding = () => {
   return (

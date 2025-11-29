@@ -26,6 +26,7 @@ const useJenisPermohonan = () => {
       kode: "",
       is_active: "true",
     },
+    // @ts-ignore
     resolver: zodResolver(jenisPermohonanSchema),
   });
 

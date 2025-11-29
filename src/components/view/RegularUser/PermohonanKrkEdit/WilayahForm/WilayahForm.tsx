@@ -1,7 +1,6 @@
 import SectionTitle from "../SectionTitle";
 import InputField from "@/components/commons/InputField";
 import type { UseFormReturn } from "react-hook-form";
-import type { PermohonanFormValues } from "../usePermohohanKrkEdit";
 import SearchableMap from "@/components/commons/SearchableMap";
 import { useWilayahData } from "@/hooks/useWilayah";
 import { useEffect, useState, useMemo } from "react";
@@ -15,6 +14,7 @@ import {
 } from "@/components/ui/select";
 import useWilayahForm from "./useWilayahForm";
 import FormFieldSelect from "@/components/commons/FormFieldSelect";
+import type { PermohonanFormValues } from "../../PermohonanKrk/usePermohohanKrk";
 
 type PropTypes = {
   form: UseFormReturn<PermohonanFormValues>;
@@ -61,11 +61,7 @@ const WilayahForm = (props: PropTypes) => {
     }
   }, [selectedKecamatan, selectedKelurahan, districts, villages]);
 
-  const handleCoordinateSelect = (
-    lat: number,
-    lng: number,
-    address: string
-  ) => {
+  const handleCoordinateSelect = (lat: number, lng: number) => {
     const latString = lat.toFixed(6);
     const lngString = lng.toFixed(6);
 
