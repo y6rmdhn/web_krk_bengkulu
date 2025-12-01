@@ -9,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search, Filter, Eye, FileText, Pencil } from "lucide-react";
+import { Search, Filter, Eye, FileText, Pencil, FileCheck } from "lucide-react";
 import MainLayout from "@/components/layouts/MainLayout/MainLayout";
 import useDataTable from "@/hooks/useDataTable";
 import { useNavigate } from "react-router-dom";
@@ -23,15 +23,16 @@ export default function RiwayatPermohonan() {
   const [jenisFilter, setJenisFilter] = useState("semua");
 
   const navigate = useNavigate();
+
   const { dataListPermohonanKrk, isLoadingListPermohonanKrk } =
     useRiwayatPermohonan();
+
   const { currentPage, currentLimit, handleChangePage, handleLimitChange } =
     useDataTable();
 
   // --- Logic Filtering ---
   const filteredResult = useMemo(() => {
     const data = dataListPermohonanKrk || [];
-
     return data.filter((item: any) => {
       const term = searchTerm.toLowerCase();
       const matchesSearch =
@@ -39,20 +40,16 @@ export default function RiwayatPermohonan() {
           item.nomor_permohonan.toLowerCase().includes(term)) ||
         (item.nama_pemilik && item.nama_pemilik.toLowerCase().includes(term)) ||
         (item.user?.name && item.user.name.toLowerCase().includes(term));
-
       const matchesStatus =
         statusFilter === "semua" || item.status === statusFilter;
-
       const matchesJenis =
         jenisFilter === "semua" || item.jenisLayanan?.nama === jenisFilter;
-
       return matchesSearch && matchesStatus && matchesJenis;
     });
   }, [dataListPermohonanKrk, searchTerm, statusFilter, jenisFilter]);
 
   const totalPages = Math.ceil(filteredResult.length / currentLimit);
 
-  // --- Helper untuk Warna Badge ---
   const getBadgeColor = (status: string) => {
     if (status === "PENDING_OPERATOR")
       return "bg-yellow-100 text-yellow-700 border-yellow-200";
@@ -69,6 +66,36 @@ export default function RiwayatPermohonan() {
     const paginatedData = filteredResult.slice(startIndex, endIndex);
 
     return paginatedData.map((item: any, index: number) => {
+      const menuActions = [
+        {
+          label: (
+            <span className="flex items-center gap-2">
+              <Eye size={16} /> Detail
+            </span>
+          ),
+          action: () => navigate(`/riwayat-permohonan/detail/${item.id}`),
+        },
+        {
+          label: (
+            <span className="flex items-center gap-2">
+              <Pencil size={16} /> Edit
+            </span>
+          ),
+          action: () => navigate(`/permohonan-krk/edit/${item.id}`),
+        },
+      ];
+
+      if (item.status === "APPROVED") {
+        menuActions.push({
+          label: (
+            <span className="flex items-center gap-2 text-blue-600 font-medium">
+              <FileCheck size={16} /> Lihat SK
+            </span>
+          ),
+          action: () => navigate(`/preview-sk/${item.id}`),
+        });
+      }
+
       return [
         startIndex + index + 1,
         <span className="font-medium whitespace-nowrap">
@@ -96,27 +123,7 @@ export default function RiwayatPermohonan() {
         >
           {item.current_step_name || item.status}
         </Badge>,
-        <DropdownActions
-          key={`action-${item.id}`}
-          menu={[
-            {
-              label: (
-                <span className="flex items-center gap-2">
-                  <Eye size={16} /> Detail
-                </span>
-              ),
-              action: () => navigate(`/riwayat-permohonan/detail/${item.id}`),
-            },
-            {
-              label: (
-                <span className="flex items-center gap-2">
-                  <Pencil size={16} /> Edit
-                </span>
-              ),
-              action: () => navigate(`/permohonan-krk/edit/${item.id}`),
-            },
-          ]}
-        />,
+        <DropdownActions key={`action-${item.id}`} menu={menuActions} />,
       ];
     });
   }, [filteredResult, currentPage, currentLimit, navigate]);
@@ -124,7 +131,7 @@ export default function RiwayatPermohonan() {
   return (
     <MainLayout title="Riwayat Permohonan | KRK Bengkulu" isBgGray isPaddingY>
       <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* --- Header Section --- */}
+        {/* Header & Filter (Sama seperti sebelumnya) */}
         <div className="mb-6 md:mb-8">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
@@ -144,7 +151,6 @@ export default function RiwayatPermohonan() {
           </div>
         </div>
 
-        {/* --- Filter Section --- */}
         <Card className="mb-6 border-0 shadow-md bg-white rounded-2xl">
           <CardContent className="p-4 md:p-6">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -163,7 +169,6 @@ export default function RiwayatPermohonan() {
                   className="pl-10 rounded-xl border-gray-200 focus:ring-green-500"
                 />
               </div>
-
               <Select
                 value={statusFilter}
                 onValueChange={(val) => {
@@ -186,7 +191,6 @@ export default function RiwayatPermohonan() {
                   <SelectItem value="REJECTED">Ditolak</SelectItem>
                 </SelectContent>
               </Select>
-
               <Select
                 value={jenisFilter}
                 onValueChange={(val) => {
@@ -211,10 +215,9 @@ export default function RiwayatPermohonan() {
           </CardContent>
         </Card>
 
-        {/* --- Table Section (Scrollable on Mobile) --- */}
+        {/* Table */}
         <Card className="border-0 shadow-lg bg-white rounded-2xl overflow-hidden">
-          <CardContent className="">
-            {/* Wrapper div dengan overflow-x-auto agar bisa discroll di HP */}
+          <CardContent className="p-0">
             <div className="overflow-x-auto">
               <div className="min-w-[800px] align-middle inline-block min-w-full">
                 <DataTable

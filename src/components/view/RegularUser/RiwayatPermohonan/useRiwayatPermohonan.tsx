@@ -4,7 +4,6 @@ import { useQuery } from "@tanstack/react-query";
 const useRiwayatPermohonan = () => {
   const getListPermohonan = async () => {
     const result = await permohonanKrkServices.getPermohonanKrk();
-
     return result.data.data;
   };
 

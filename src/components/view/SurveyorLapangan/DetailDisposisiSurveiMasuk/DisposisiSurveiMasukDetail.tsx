@@ -1,16 +1,6 @@
-import { useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate, useParams } from "react-router-dom";
 import useDisposisiSurveiMasukDetail from "./useDisposisiSurveiMasukDetail";
-
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-
 import HeaderSection from "./HeaderSection";
 import DataPemohonCard from "./DataPemohonCard";
 import DataPemilikCard from "./DataPemilikCard";
@@ -21,26 +11,15 @@ import ActionButtons from "./ActionButton";
 import { getStatusColor, getStatusText } from "@/utils/statusUtils";
 import { formatAlamat } from "@/utils/formatUtils";
 import SurveyorLayout from "@/components/layouts/SurveyorLayout";
-import { Eye, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import LocationMap from "@/components/commons/LocationMap";
 
 const DisposisiSurveiMasukDetail = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-  const { data, isLoading, dataDetailHistory, dataSk, isLoadingSk } =
-    useDisposisiSurveiMasukDetail(id!);
-
-  const pdfUrl = useMemo(() => {
-    if (!dataSk) return null;
-
-    if (dataSk.type === "application/json") {
-      console.error("Data SK ternyata JSON (Mungkin Error Backend):", dataSk);
-      return null;
-    }
-
-    const blob = new Blob([dataSk], { type: "application/pdf" });
-    return window.URL.createObjectURL(blob);
-  }, [dataSk]);
+  const { data, isLoading, dataDetailHistory } = useDisposisiSurveiMasukDetail(
+    id!
+  );
 
   if (isLoading) {
     return (
@@ -80,45 +59,6 @@ const DisposisiSurveiMasukDetail = () => {
             getStatusColor={getStatusColor}
             getStatusText={getStatusText}
           />
-
-          {dataSk && (
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="gap-2 border-blue-500 text-blue-600 hover:bg-blue-50"
-                >
-                  <Eye className="w-4 h-4" />
-                  Lihat Surat SK
-                </Button>
-              </DialogTrigger>
-
-              <DialogContent className="!max-w-[90vw] w-full h-[90vh] flex flex-col p-0 gap-0">
-                <DialogHeader className="p-4 border-b">
-                  <DialogTitle>Preview Surat Keputusan (SK)</DialogTitle>
-                </DialogHeader>
-
-                <div className="flex-1 bg-slate-100 w-full h-full relative">
-                  {isLoadingSk ? (
-                    <div className="flex items-center justify-center h-full gap-2">
-                      <Loader2 className="animate-spin" /> Memuat Dokumen...
-                    </div>
-                  ) : pdfUrl ? (
-                    <iframe
-                      src={pdfUrl}
-                      className="w-full h-full"
-                      title="Preview SK"
-                      style={{ border: "none" }}
-                    />
-                  ) : (
-                    <div className="flex items-center justify-center h-full text-red-500">
-                      Gagal memuat preview. File mungkin rusak.
-                    </div>
-                  )}
-                </div>
-              </DialogContent>
-            </Dialog>
-          )}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

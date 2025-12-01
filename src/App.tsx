@@ -63,6 +63,9 @@ const SuccessRegisterPage = lazy(
 const SuccessVerificationEmailPage = lazy(
   () => import("./components/view/VerificationEmailSuccess")
 );
+const PreviewSkPage = lazy(
+  () => import("./components/view/RegularUser/PreviewSk")
+);
 
 // admin
 const JenisLayanan = lazy(() => import("./components/view/Admin/JenisLayanan"));
@@ -158,10 +161,17 @@ const router = createBrowserRouter([
   },
   {
     path: "/riwayat-permohonan",
+    loader: mainLoader,
     element: <RiwayatPermohonanPage />,
   },
   {
+    path: "/preview-sk/:id",
+    loader: mainLoader,
+    element: <PreviewSkPage />,
+  },
+  {
     path: "/riwayat-permohonan/detail/:id",
+    loader: mainLoader,
     element: <RiwayatPermohonanDetailPage />,
   },
   {
