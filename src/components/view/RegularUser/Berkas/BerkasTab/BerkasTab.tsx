@@ -18,6 +18,7 @@ import FormInput from "@/components/commons/FormInput";
 import FormFieldSelect from "@/components/commons/FormFieldSelect";
 import InputFile from "@/components/commons/InputFile";
 import { Spinner } from "@/components/ui/spinner";
+import environment from "@/config/environment";
 
 const BerkasTab = () => {
   const {
@@ -62,7 +63,12 @@ const BerkasTab = () => {
         <Button
           variant="outline"
           size="sm"
-          onClick={() => window.open(item.file_path, "_blank")}
+          onClick={() =>
+            window.open(
+              `${environment.API_URL_PDF}/${item.file_path}`,
+              "_blank"
+            )
+          }
           className="gap-2"
         >
           <Eye size={14} />
@@ -94,11 +100,10 @@ const BerkasTab = () => {
         <div className="flex justify-between items-center">
           <h3 className="text-lg font-semibold">Daftar Berkas</h3>
           <div className="flex gap-2">
-            <Button onClick={() => setIsOpen(true)}>
-              <Plus size={16} className="mr-2" />
-              Tambah Master
-            </Button>
-            <Button onClick={() => setIsOpenUploadBerkas(true)}>
+            <Button
+              className="bg-[#2451AA] hover:bg-[#1D4ED8]"
+              onClick={() => setIsOpenUploadBerkas(true)}
+            >
               <Plus size={16} className="mr-2" />
               Upload Berkas
             </Button>

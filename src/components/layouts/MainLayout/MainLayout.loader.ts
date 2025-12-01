@@ -24,7 +24,7 @@ export default async function mainLoader() {
       userRoles.includes("Pemohon") ||
       userRoles.includes("Kepala Dinas") ||
       userRoles.includes("Surveyor Lapangan") ||
-      userRoles.includes("Admin") ||
+      userRoles.includes("admin") ||
       userRoles.includes("Operator");
 
     if (!isAllowed) {

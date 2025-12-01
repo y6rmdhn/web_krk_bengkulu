@@ -20,7 +20,7 @@ export default async function adminLoader() {
 
     const userRoles = dataProfile.roles.map((r: any) => r.name);
 
-    const isAllowed = userRoles.includes("Admin");
+    const isAllowed = userRoles.includes("admin");
 
     if (!isAllowed) {
       return redirect("/");
