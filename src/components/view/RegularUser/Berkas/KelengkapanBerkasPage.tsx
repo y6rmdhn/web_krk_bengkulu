@@ -10,37 +10,40 @@ export default function Berkas() {
   return (
     <MainLayout title="Berkas | KRK Bengkulu">
       <div className="w-full min-h-screen mb-5">
-        <div className="max-w-6xl mx-auto mt-10">
-          <h2 className="text-2xl font-bold mb-4">Kelengkapan Berkas</h2>
+        <div className="max-w-6xl mx-auto mt-6 md:mt-10 px-4 md:px-6 lg:px-8">
+          <h2 className="text-xl md:text-2xl font-bold mb-4 text-gray-900">
+            Kelengkapan Berkas
+          </h2>
+
           <Tabs
             defaultValue="identitas"
             className="w-full"
             value={activeTab}
             onValueChange={setActiveTab}
           >
-            {/* Custom styling untuk Tab List agar sesuai gambar */}
-            <TabsList className="grid w-full grid-cols-2 h-12 rounded-lg p-0">
+            {/* Tab List */}
+            <TabsList className="grid w-full grid-cols-2 h-12 rounded-lg p-1 bg-gray-100/80 mb-6">
               <TabsTrigger
                 value="identitas"
-                className="data-[state=active]:bg-[#2451AA] data-[state=active]:text-white text-md font-semibold rounded-tl-lg h-full"
+                className="data-[state=active]:bg-[#2451AA] data-[state=active]:text-white text-sm md:text-md font-semibold rounded-md h-full transition-all"
               >
                 Identitas
               </TabsTrigger>
               <TabsTrigger
                 value="berkas"
-                className="data-[state=active]:bg-[#2451AA] data-[state=active]:text-white text-md font-semibold rounded-tr-lg h-full"
+                className="data-[state=active]:bg-[#2451AA] data-[state=active]:text-white text-sm md:text-md font-semibold rounded-md h-full transition-all"
               >
                 Berkas
               </TabsTrigger>
             </TabsList>
 
             {/* Konten untuk Tab Identitas */}
-            <TabsContent value="identitas">
+            <TabsContent value="identitas" className="mt-0">
               <IdentitasTab />
             </TabsContent>
 
             {/* Konten untuk Tab Berkas */}
-            <TabsContent value="berkas">
+            <TabsContent value="berkas" className="mt-0">
               <BerkasTab />
             </TabsContent>
           </Tabs>

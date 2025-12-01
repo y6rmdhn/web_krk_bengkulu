@@ -53,10 +53,12 @@ const BerkasTab = () => {
 
       return [
         rowNumber,
-        item.masterBerkas?.nama || "-",
+        <span className="whitespace-nowrap font-medium text-gray-700">
+          {item.masterBerkas?.nama || "-"}
+        </span>,
         <Badge
           variant="outline"
-          className="bg-green-50 text-green-700 border-green-200"
+          className="bg-green-50 text-green-700 border-green-200 whitespace-nowrap"
         >
           Sudah Diupload
         </Badge>,
@@ -69,10 +71,10 @@ const BerkasTab = () => {
               "_blank"
             )
           }
-          className="gap-2"
+          className="gap-2 w-full md:w-auto"
         >
           <Eye size={14} />
-          Lihat File
+          <span className="md:inline">Lihat</span>
         </Button>,
       ];
     });
@@ -87,43 +89,45 @@ const BerkasTab = () => {
 
   const onSubmitUploadBerkas = (values: any) => {
     if (!file && !values.file) return;
-
     handleUploadBerkas(values);
-
     setIsOpenUploadBerkas(false);
     setFile(null);
   };
 
   return (
-    <Card className="rounded-t-none border-t-0">
-      <CardContent className="p-6 space-y-4">
-        <div className="flex justify-between items-center">
-          <h3 className="text-lg font-semibold">Daftar Berkas</h3>
-          <div className="flex gap-2">
-            <Button
-              className="bg-[#2451AA] hover:bg-[#1D4ED8]"
-              onClick={() => setIsOpenUploadBerkas(true)}
-            >
-              <Plus size={16} className="mr-2" />
-              Upload Berkas
-            </Button>
+    <Card className="rounded-lg border shadow-sm">
+      <CardContent className="p-4 md:p-6 space-y-4">
+        {/* Header Section: Stack on Mobile, Row on Desktop */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <h3 className="text-lg font-semibold text-gray-900">Daftar Berkas</h3>
+          <Button
+            className="bg-[#2451AA] hover:bg-[#1D4ED8] w-full md:w-auto"
+            onClick={() => setIsOpenUploadBerkas(true)}
+          >
+            <Plus size={16} className="mr-2" />
+            Upload Berkas
+          </Button>
+        </div>
+
+        {/* Tabel Data Wrapper for Horizontal Scroll */}
+        <div className="overflow-x-auto -mx-4 md:mx-0">
+          <div className="min-w-[600px] px-4 md:px-0">
+            <DataTable
+              header={["No", "Keterangan", "Status", "Aksi"]}
+              isLoading={isLoadingDataListBerkas}
+              data={filteredData}
+              totalPages={totalPages}
+              currentPage={currentPage}
+              currentLimit={currentLimit}
+              onChangePage={handleChangePage}
+              onChangeLimit={handleLimitChange}
+            />
           </div>
         </div>
 
-        {/* Tabel Data */}
-        <DataTable
-          header={["No", "Keterangan", "Status", "Aksi"]}
-          isLoading={isLoadingDataListBerkas}
-          data={filteredData}
-          totalPages={totalPages}
-          currentPage={currentPage}
-          currentLimit={currentLimit}
-          onChangePage={handleChangePage}
-          onChangeLimit={handleLimitChange}
-        />
-
+        {/* Dialog Tambah Master Berkas */}
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
-          <DialogContent className="sm:max-w-[500px]">
+          <DialogContent className="w-[95%] sm:max-w-[500px] rounded-xl">
             <DialogHeader>
               <DialogTitle>Tambah Master Berkas Baru</DialogTitle>
             </DialogHeader>
@@ -150,7 +154,7 @@ const BerkasTab = () => {
                 <DialogFooter>
                   <Button
                     type="submit"
-                    className="bg-[#2451AA] hover:bg-[#1D4ED8] px-8"
+                    className="bg-[#2451AA] hover:bg-[#1D4ED8] px-8 w-full sm:w-auto"
                     disabled={isPending}
                   >
                     {isPending ? <Spinner /> : "Simpan"}
@@ -161,8 +165,9 @@ const BerkasTab = () => {
           </DialogContent>
         </Dialog>
 
+        {/* Dialog Upload Berkas */}
         <Dialog open={isOpenUploadBerkas} onOpenChange={setIsOpenUploadBerkas}>
-          <DialogContent className="sm:max-w-[500px]">
+          <DialogContent className="w-[95%] sm:max-w-[500px] rounded-xl">
             <DialogHeader>
               <DialogTitle>Upload Berkas</DialogTitle>
             </DialogHeader>
@@ -199,7 +204,7 @@ const BerkasTab = () => {
                 <DialogFooter>
                   <Button
                     type="submit"
-                    className="bg-[#2451AA] hover:bg-[#1D4ED8] px-8"
+                    className="bg-[#2451AA] hover:bg-[#1D4ED8] px-8 w-full sm:w-auto"
                     disabled={isPendingUploadBerkas}
                   >
                     {isPendingUploadBerkas ? <Spinner /> : "Simpan"}

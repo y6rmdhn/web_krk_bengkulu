@@ -30,18 +30,18 @@ const IdentitasTab = () => {
     useIdentitasTab();
 
   return (
-    <Card className="rounded-lg shadow-sm border-0">
-      <CardHeader className="pb-4">
-        <CardTitle className="text-xl font-semibold text-gray-900">
+    <Card className="rounded-lg shadow-sm border-0 bg-white">
+      <CardHeader className="pb-4 px-4 md:px-6">
+        <CardTitle className="text-lg md:text-xl font-semibold text-gray-900">
           Data Identitas
         </CardTitle>
-        <CardDescription className="text-gray-600">
+        <CardDescription className="text-sm text-gray-600">
           Lengkapi data identitas diri Anda dengan informasi yang valid dan
           akurat
         </CardDescription>
       </CardHeader>
 
-      <CardContent className="p-6">
+      <CardContent className="p-4 md:p-6">
         <Form {...identitasForm}>
           <form
             onSubmit={identitasForm.handleSubmit(handleUpdateProfile)}
@@ -49,7 +49,7 @@ const IdentitasTab = () => {
           >
             {/* Section Informasi Pribadi */}
             <div className="space-y-4">
-              <h3 className="text-lg font-medium text-gray-900 border-b pb-2">
+              <h3 className="text-base md:text-lg font-medium text-gray-900 border-b pb-2">
                 Informasi Pribadi
               </h3>
 
@@ -117,7 +117,7 @@ const IdentitasTab = () => {
 
             {/* Section Alamat */}
             <div className="space-y-4">
-              <h3 className="text-lg font-medium text-gray-900 border-b pb-2">
+              <h3 className="text-base md:text-lg font-medium text-gray-900 border-b pb-2">
                 Alamat Tempat Tinggal
               </h3>
 
@@ -131,6 +131,7 @@ const IdentitasTab = () => {
                 />
               </div>
 
+              {/* Responsif: 2 Kolom di HP, 4 di Desktop */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <FormInput
                   form={identitasForm}
@@ -174,14 +175,18 @@ const IdentitasTab = () => {
               </div>
             </div>
 
-            {/* Tombol Aksi */}
-            <div className="flex justify-end gap-3 pt-4 border-t">
-              <Button type="button" variant="outline" className="px-6">
+            {/* Tombol Aksi: Stack vertikal di HP, horizontal di Desktop */}
+            <div className="flex flex-col-reverse md:flex-row justify-end gap-3 pt-4 border-t">
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full md:w-auto px-6"
+              >
                 Batal
               </Button>
               <Button
                 type="submit"
-                className="bg-[#2451AA] hover:bg-[#1D4ED8] px-8 gap-2"
+                className="bg-[#2451AA] hover:bg-[#1D4ED8] w-full md:w-auto px-8 gap-2"
                 disabled={
                   isPendingUpdateProfile || !identitasForm.formState.isDirty
                 }
