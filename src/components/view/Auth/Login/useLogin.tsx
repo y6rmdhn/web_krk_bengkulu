@@ -10,7 +10,7 @@ import { toast } from "sonner";
 import z from "zod";
 
 const loginSchema = z.object({
-  email: z.email(),
+  email: z.string().min(1, "Email harus diisi"),
   password: z.string().min(1, "Password harus diisi"),
 });
 

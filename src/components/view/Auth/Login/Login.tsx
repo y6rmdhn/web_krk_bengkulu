@@ -75,7 +75,6 @@ export default function LoginPage() {
                           label="Email"
                           name="email"
                           placeholder="Masukan Email anda"
-                          type="email"
                         />
 
                         <FormInput
