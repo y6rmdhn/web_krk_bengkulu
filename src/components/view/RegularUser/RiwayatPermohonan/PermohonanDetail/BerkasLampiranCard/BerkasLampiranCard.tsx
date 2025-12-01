@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Eye, Download } from "lucide-react";
+import { Eye } from "lucide-react";
 import PdfPreviewDialog from "@/components/commons/PdfPreviewDialog";
 import environment from "@/config/environment";
 
@@ -62,17 +62,6 @@ const BerkasLampiranCard = ({ attachments }: BerkasLampiranCardProps) => {
                   >
                     <Eye className="w-4 h-4 mr-2" />
                     Lihat
-                  </Button>
-
-                  {/* Tombol Download (Opsional) */}
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() =>
-                      window.open(getFileUrl(attachment.file_path), "_blank")
-                    }
-                  >
-                    <Download className="w-4 h-4" />
                   </Button>
                 </div>
               </div>

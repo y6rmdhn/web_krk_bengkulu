@@ -24,10 +24,13 @@ axiosInstance.interceptors.response.use(
     return response;
   },
   (error) => {
-    if (error.response && error.response.status === 403) {
+    if (
+      error.response &&
+      error.response.data.message === "Token tidak valid atau kedaluwarsa."
+    ) {
       session.clearSession();
 
-      window.location.href = "/";
+      window.location.href = "/login";
     }
     return Promise.reject(error);
   }
