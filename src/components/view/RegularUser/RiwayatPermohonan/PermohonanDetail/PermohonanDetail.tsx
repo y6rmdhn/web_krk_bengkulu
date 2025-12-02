@@ -28,6 +28,8 @@ const DetailPermohonan = () => {
   const { data, isLoading, dataDetailHistory, dataSk, isLoadingSk } =
     useDetailPermohonan(id!);
 
+  console.log(data);
+
   const pdfUrl = useMemo(() => {
     if (!dataSk) return null;
 

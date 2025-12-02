@@ -7,6 +7,9 @@ interface DataBangunanCardProps {
 }
 
 const DataBangunanCard = ({ data, formatAlamat }: DataBangunanCardProps) => {
+  // Pastikan data utama ada dulu (safety check tambahan)
+  if (!data) return null;
+
   return (
     <Card>
       <CardHeader>
@@ -20,11 +23,17 @@ const DataBangunanCard = ({ data, formatAlamat }: DataBangunanCardProps) => {
           <div className="space-y-3">
             <div className="flex justify-between">
               <span className="text-gray-600">Jenis Layanan</span>
-              <span className="font-medium">{data.jenisLayanan.nama}</span>
+              {/* PERBAIKAN DI SINI: Gunakan ?. dan || "-" */}
+              <span className="font-medium">
+                {data.jenisLayanan?.nama || "-"}
+              </span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Fungsi Bangunan</span>
-              <span className="font-medium">{data.fungsiBangunan.nama}</span>
+              {/* PERBAIKAN DI SINI: Gunakan ?. dan || "-" */}
+              <span className="font-medium">
+                {data.fungsiBangunan?.nama || "-"}
+              </span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Luas Tanah</span>

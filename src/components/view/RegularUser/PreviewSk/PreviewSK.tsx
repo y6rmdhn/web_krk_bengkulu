@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import MainLayout from "@/components/layouts/MainLayout/MainLayout";
 import { Button } from "@/components/ui/button";
@@ -8,10 +8,8 @@ import {
   Download,
   Printer,
   FileText,
-  Maximize2,
 } from "lucide-react";
 import { usePreviewSk } from "./usePreviewSk";
-import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import {
   Tooltip,
@@ -19,30 +17,73 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+// Import komponen dokumen yang sudah Anda bersihkan sebelumnya
+import KRKPage from "@/components/commons/KrkDocument";
 
 const PreviewSk = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { dataSk, isLoadingSk, isError } = usePreviewSk(id!);
 
-  const pdfUrl = useMemo(() => {
-    if (!dataSk) return null;
-    if (dataSk.type === "application/json") return null;
+  // Asumsi: usePreviewSk sekarang mengembalikan Data JSON (objek), bukan Blob PDF lagi.
+  const { dataSk, isLoadingSk, isError } = usePreviewSk(`${id}`);
 
-    const blob = new Blob([dataSk], { type: "application/pdf" });
-    return window.URL.createObjectURL(blob);
-  }, [dataSk]);
+  // Ref untuk membungkus area yang akan di-print
+  const printAreaRef = useRef<HTMLDivElement>(null);
 
+  // --- FUNGSI CETAK / DOWNLOAD ---
   const handlePrint = () => {
-    if (pdfUrl) {
-      const printWindow = window.open(pdfUrl, "_blank");
-      printWindow?.print();
+    if (!printAreaRef.current) return;
+
+    const printContent = printAreaRef.current.innerHTML;
+    // Membuka jendela baru untuk print agar CSS Sidebar/Layout tidak ikut tercetak
+    const WindowPrint = window.open("", "", "width=900,height=650");
+
+    // FIX: Check if window failed to open (e.g., popup blocker)
+    if (!WindowPrint) {
+      console.error("Popup window blocked. Please allow popups for this site.");
+      return;
     }
+
+    WindowPrint.document.write(`
+      <html>
+        <head>
+          <title>Cetak SK KRK - ${id}</title>
+          <script src="https://cdn.tailwindcss.com"></script>
+          <style>
+            @page { size: A4; margin: 0; }
+            body { margin: 0; -webkit-print-color-adjust: exact; }
+          </style>
+        </head>
+        <body>
+          ${printContent}
+        </body>
+      </html>
+    `);
+
+    WindowPrint.document.close();
+    WindowPrint.focus();
+
+    // Delay sedikit agar script Tailwind sempat ter-load sebelum dialog print muncul
+    setTimeout(() => {
+      // Need to check again inside timeout because closure might capture old state,
+      // but WindowPrint is const so strictly speaking it's fine,
+      // however strict TS might want optional chaining or non-null assertion here too.
+      WindowPrint.print();
+      WindowPrint.close();
+    }, 1000);
+  };
+
+  // Data Mockup untuk Fallback jika dataSk belum siap (Opsional)
+  const dummyData = {
+    nomorSurat: "Loading...",
+    namaPemohon: "Loading...",
+    // ... isi default lainnya
   };
 
   return (
     <MainLayout title="Preview SK | KRK Bengkulu" isBgGray={false}>
       <div className="flex flex-col h-[calc(100vh-64px)] bg-slate-50">
+        {/* --- HEADER --- */}
         <div className="bg-white border-b border-gray-200 px-6 py-3 flex justify-between items-center shadow-sm z-10">
           <div className="flex items-center gap-4">
             <Button
@@ -70,8 +111,9 @@ const PreviewSk = () => {
             </div>
           </div>
 
+          {/* Tombol Aksi (Print & Download) */}
           <div className="flex items-center gap-2">
-            {pdfUrl && (
+            {!isLoadingSk && !isError && (
               <>
                 <TooltipProvider>
                   <Tooltip>
@@ -91,81 +133,44 @@ const PreviewSk = () => {
 
                 <Button
                   className="bg-blue-600 hover:bg-blue-700 shadow-md gap-2"
-                  onClick={() => window.open(pdfUrl, "_blank")}
+                  onClick={handlePrint} // Fungsi sama, karena browser "Save as PDF" ada di dialog print
                 >
                   <Download size={18} />
-                  <span className="hidden sm:inline">Download</span>
+                  <span className="hidden sm:inline">Download PDF</span>
                 </Button>
               </>
             )}
           </div>
         </div>
 
-        <div className="flex-1 overflow-hidden p-4 md:p-6 flex justify-center">
-          <Card className="w-full max-w-5xl h-full shadow-xl border-gray-200/60 overflow-hidden flex flex-col bg-white ring-1 ring-gray-900/5">
-            <div className="bg-gray-100/80 border-b border-gray-200 px-4 py-2 flex justify-between items-center backdrop-blur-sm">
-              <div className="flex gap-1.5">
-                <div className="w-3 h-3 rounded-full bg-red-400/80" />
-                <div className="w-3 h-3 rounded-full bg-yellow-400/80" />
-                <div className="w-3 h-3 rounded-full bg-green-400/80" />
-              </div>
-              <div className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-                PDF Preview Mode
-              </div>
-              <Maximize2 size={14} className="text-gray-400" />
+        {/* --- CONTENT AREA --- */}
+        <div className="flex-1 overflow-auto p-4 md:p-8 flex justify-center bg-gray-200/50">
+          {isLoadingSk ? (
+            /* Loading State */
+            <div className="flex flex-col items-center justify-center h-full gap-4">
+              <div className="w-12 h-12 border-4 border-blue-100 rounded-full animate-spin border-t-blue-600"></div>
+              <p className="text-gray-500 font-medium">Menyiapkan Dokumen...</p>
             </div>
-
-            <div className="flex-1 bg-gray-50 relative">
-              {isLoadingSk ? (
-                <div className="absolute inset-0 flex flex-col items-center justify-center gap-4">
-                  <div className="relative">
-                    <div className="w-12 h-12 border-4 border-blue-100 rounded-full animate-spin border-t-blue-600"></div>
-                  </div>
-                  <div className="text-center space-y-1">
-                    <p className="font-semibold text-gray-800">
-                      Menyiapkan Dokumen
-                    </p>
-                    <p className="text-sm text-gray-500">
-                      Mohon tunggu sebentar...
-                    </p>
-                  </div>
-                </div>
-              ) : isError ? (
-                <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-red-50/50">
-                  <div className="p-4 bg-red-100 rounded-full">
-                    <FileWarning size={32} className="text-red-600" />
-                  </div>
-                  <div className="text-center space-y-2">
-                    <h3 className="font-semibold text-gray-900">
-                      Gagal Memuat Dokumen
-                    </h3>
-                    <p className="text-sm text-gray-500 max-w-xs mx-auto">
-                      Terjadi kesalahan saat mengambil data SK. File mungkin
-                      rusak atau tidak ditemukan.
-                    </p>
-                    <Button
-                      variant="outline"
-                      onClick={() => window.location.reload()}
-                      className="mt-2 border-red-200 text-red-600 hover:bg-red-50"
-                    >
-                      Coba Lagi
-                    </Button>
-                  </div>
-                </div>
-              ) : pdfUrl ? (
-                <iframe
-                  src={`${pdfUrl}#toolbar=0`}
-                  className="w-full h-full block"
-                  title="Preview SK"
-                />
-              ) : (
-                <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-gray-400">
-                  <FileWarning size={48} />
-                  <p>Dokumen tidak tersedia.</p>
-                </div>
-              )}
+          ) : isError ? (
+            /* Error State */
+            <div className="flex flex-col items-center justify-center h-full gap-4">
+              <FileWarning size={48} className="text-red-400" />
+              <p className="text-gray-500">Gagal memuat data dokumen.</p>
+              <Button
+                variant="outline"
+                onClick={() => window.location.reload()}
+              >
+                Coba Lagi
+              </Button>
             </div>
-          </Card>
+          ) : (
+            /* SUKSES: Render KRKPage */
+            /* Kita bungkus dengan div ref agar bisa diambil HTML-nya oleh fungsi handlePrint */
+            <div ref={printAreaRef} className="bg-white shadow-2xl">
+              {/* Pass dataSk ke komponen template */}
+              <KRKPage data={dataSk || dummyData} />
+            </div>
+          )}
         </div>
       </div>
     </MainLayout>
