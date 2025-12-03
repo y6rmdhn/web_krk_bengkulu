@@ -19,7 +19,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
-import { CheckCircle, XCircle, RefreshCcw, Loader2 } from "lucide-react";
+import { CheckCircle, XCircle, Loader2 } from "lucide-react";
 import useActionButton from "./useActionButton";
 
 const ActionButtons = ({ id }: { id: string }) => {
@@ -93,72 +93,6 @@ const ActionButtons = ({ id }: { id: string }) => {
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       )}
                       Setujui
-                    </Button>
-                  </DialogFooter>
-                </form>
-              </Form>
-            </DialogContent>
-          </Dialog>
-
-          {/* --- BUTTON & DIALOG REVISI --- */}
-          <Dialog
-            open={openDialog === "revisi"}
-            onOpenChange={(open) => setOpenDialog(open ? "revisi" : null)}
-          >
-            <DialogTrigger asChild>
-              <Button className="w-full bg-yellow-600 hover:bg-yellow-700 text-white">
-                <RefreshCcw className="h-4 w-4 mr-2" />
-                Revisi Permohonan
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Revisi Permohonan</DialogTitle>
-                <DialogDescription>
-                  Berikan alasan revisi agar pemohon dapat memperbaikinya.
-                </DialogDescription>
-              </DialogHeader>
-              <Form {...formAccept}>
-                <form
-                  onSubmit={(e) => {
-                    actions.onRevisi(e);
-                    setOpenDialog(null);
-                  }}
-                  className="space-y-4"
-                >
-                  <FormField
-                    control={formAccept.control}
-                    name="catatan"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Catatan Revisi</FormLabel>
-                        <FormControl>
-                          <Textarea
-                            placeholder="Jelaskan bagian yang perlu diperbaiki..."
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <DialogFooter>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => setOpenDialog(null)}
-                    >
-                      Batal
-                    </Button>
-                    <Button
-                      type="submit"
-                      className="bg-yellow-600 hover:bg-yellow-700"
-                      disabled={state.isPendingRevisi}
-                    >
-                      {state.isPendingRevisi && (
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      )}
-                      Kirim Revisi
                     </Button>
                   </DialogFooter>
                 </form>
