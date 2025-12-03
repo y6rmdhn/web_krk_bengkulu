@@ -13,16 +13,14 @@ import {
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
 
-interface Actor {
-  name: string;
-}
-
 interface HistoryItem {
+  id: string;
   step_name: string;
   status_keputusan: string;
-  actor: Actor;
+  actor_name: string;
+  keterangan?: string;
+  tte_status?: string | null;
   created_at?: string;
-  note?: string;
 }
 
 interface AlurPermohonanCardProps {
@@ -82,10 +80,16 @@ const AlurPermohonanCard = ({ data }: AlurPermohonanCardProps) => {
   ) => {
     const name = stepName?.toLowerCase() || "";
     if (name.includes("pengajuan")) return <User className="h-5 w-5" />;
-    if (name.includes("operator")) return <UserCheck className="h-5 w-5" />;
-    if (name.includes("superior") || name.includes("lapangan"))
+    if (name.includes("operator") || name.includes("verifikasi"))
+      return <UserCheck className="h-5 w-5" />;
+    if (
+      name.includes("superior") ||
+      name.includes("lapangan") ||
+      name.includes("survey")
+    )
       return <FileCheck className="h-5 w-5" />;
-    if (name.includes("dinas")) return <Building className="h-5 w-5" />;
+    if (name.includes("dinas") || name.includes("draft"))
+      return <Building className="h-5 w-5" />;
     return defaultIcon;
   };
 
@@ -93,7 +97,7 @@ const AlurPermohonanCard = ({ data }: AlurPermohonanCardProps) => {
     if (!dateString) return "-";
     try {
       return format(new Date(dateString), "dd MMM yyyy, HH:mm", { locale: id });
-    } catch (e) {
+    } catch {
       return "-";
     }
   };
@@ -117,7 +121,7 @@ const AlurPermohonanCard = ({ data }: AlurPermohonanCardProps) => {
             const finalIcon = getStepSpecificIcon(item.step_name, config.icon);
 
             return (
-              <div key={index} className="flex gap-4 group min-h-[80px]">
+              <div key={item.id} className="flex gap-4 group min-h-[80px]">
                 <div className="flex flex-col items-center">
                   <div
                     className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-colors ${config.bg} ${config.text}`}
@@ -136,19 +140,19 @@ const AlurPermohonanCard = ({ data }: AlurPermohonanCardProps) => {
                   <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
                     <div>
                       <h3 className="font-semibold text-gray-900 text-base">
-                        {item.step_name}
+                        {item.step_name.replace(/_/g, " ")}
                       </h3>
 
                       <p className="text-gray-600 text-sm mt-1">
-                        {item.actor?.name === "Sistem"
+                        {item.actor_name === "Sistem"
                           ? "Diproses oleh Sistem"
-                          : `Oleh: ${item.actor?.name}`}
+                          : `Oleh: ${item.actor_name}`}
                       </p>
 
-                      {item.note && (
-                        <div className="mt-2 bg-red-50 p-2 rounded border border-red-100 flex gap-2 items-start text-xs text-red-700">
+                      {item.keterangan && (
+                        <div className="mt-2 bg-amber-50 p-2 rounded border border-amber-100 flex gap-2 items-start text-xs text-amber-700">
                           <AlertCircle className="w-3 h-3 mt-0.5 shrink-0" />
-                          <span>{item.note}</span>
+                          <span>{item.keterangan}</span>
                         </div>
                       )}
                     </div>
