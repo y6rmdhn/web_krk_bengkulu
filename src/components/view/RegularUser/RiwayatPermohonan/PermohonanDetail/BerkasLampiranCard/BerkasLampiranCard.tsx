@@ -19,7 +19,7 @@ const BerkasLampiranCard = ({ attachments }: BerkasLampiranCardProps) => {
     const BASE_URL = environment.API_URL;
     console.log(filePath);
 
-    const cleanPath = filePath.replace("public/", "");
+    // const cleanPath = filePath.replace("public/", "");
 
     return `${BASE_URL}attachments/profile`;
   };

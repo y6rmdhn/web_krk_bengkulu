@@ -2,7 +2,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form } from "@/components/ui/form";
 import MainLayout from "@/components/layouts/MainLayout/MainLayout";
 import usePermohohanKrk from "./usePermohohanKrkEdit";
-import WilayahForm from "./WilayahForm/WilayahForm";
 import DataPemohonForm from "./DataPemohonForm/DataPemohonForm";
 import DataPemilik from "./DataPemilikForm/DataPemilik";
 import DataLokasi from "./DataLokasiForm/DataLokasi";
