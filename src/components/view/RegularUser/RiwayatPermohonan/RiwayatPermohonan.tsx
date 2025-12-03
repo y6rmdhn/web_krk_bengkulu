@@ -217,7 +217,7 @@ export default function RiwayatPermohonan() {
 
         {/* Table */}
         <Card className="border-0 shadow-lg bg-white rounded-2xl overflow-hidden">
-          <CardContent className="p-0">
+          <CardContent>
             <div className="overflow-x-auto">
               <div className="min-w-[800px] align-middle inline-block min-w-full">
                 <DataTable
