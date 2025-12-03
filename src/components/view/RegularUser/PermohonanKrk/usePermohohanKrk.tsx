@@ -70,6 +70,9 @@ const permohonanSchema = z.object({
   letak_jalan_utama: z.string().min(1, "Letak antar jalan harus diisi"),
   letak_jalan_sekunder: z.string().min(1, "s/d jalan harus diisi"),
   fungsi_bangunan_id: z.string().min(1, "Fungsi bangunan harus diisi"),
+  kategori_bangunan_id: z
+    .string()
+    .min(1, "Kategori Fungsi bangunan harus diisi"),
   persimpangan_jalan: z.string().min(1, "Field ini harus diisi"),
   no_sertifikat_tanah: z.string().min(1, "No sertifikat tanah harus diisi"),
   hasil_ukur: z.string().min(1, "Hasil ukur harus diisi"),
@@ -121,6 +124,7 @@ const usePermohohanKrk = () => {
       luas_tanah_m2: "",
       letak_jalan_utama: "",
       letak_jalan_sekunder: "",
+      kategori_bangunan_id: "",
       fungsi_bangunan_id: "",
       persimpangan_jalan: "",
       no_sertifikat_tanah: "",
