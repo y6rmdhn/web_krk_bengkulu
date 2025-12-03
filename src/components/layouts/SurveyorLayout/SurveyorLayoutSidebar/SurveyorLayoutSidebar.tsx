@@ -4,6 +4,7 @@ import { CiLogout } from "react-icons/ci";
 import { X } from "lucide-react";
 import type { JSX } from "react";
 import { cn } from "@/lib/utils";
+import useSurveyorLayout from "../useSurveyorLayout";
 
 interface SidebarItem {
   key: string;
@@ -22,6 +23,7 @@ const SurveyorLayoutSidebar = (props: PropsType) => {
   const { isOpen, sidebarItems = [], onClose } = props;
   const navigate = useNavigate();
   const location = useLocation();
+  const { handleLogout } = useSurveyorLayout();
 
   return (
     <>
@@ -118,9 +120,7 @@ const SurveyorLayoutSidebar = (props: PropsType) => {
             variant="outline"
             className="flex justify-start items-center w-full h-11 border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 hover:border-red-300 transition-colors"
             size="lg"
-            onClick={() => {
-              console.log("Logout clicked");
-            }}
+            onClick={handleLogout}
           >
             <CiLogout className="text-lg mr-3" />
             <span className="text-sm font-medium">Logout</span>
