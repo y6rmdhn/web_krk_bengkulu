@@ -3,7 +3,7 @@ import kategoriFungsiBangunanServices from "@/services/api/kategoriFungsiBanguna
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -46,18 +46,6 @@ const useJenisBangunan = () => {
     queryFn: getListKategoriFungsiBangunan,
   });
 
-  useEffect(() => {
-    if (editData && dataListKategoriFungsiBangunan) {
-      form.reset({
-        kode: editData.kode,
-        nama: editData.nama,
-        kategori_id: String(editData.kategori_id),
-      });
-
-      setIsCreating(false);
-    }
-  }, [editData, form, dataListKategoriFungsiBangunan]);
-
   const getListFungsiBangunan = async () => {
     const result = await jenisBangunanServices.getJenisBangunan();
     return result.data.data;
@@ -81,8 +69,7 @@ const useJenisBangunan = () => {
   const { mutate: mutateEditBangunan, isPending: isPendingEditBangunan } =
     useMutation({
       mutationFn: editJenisBangunan,
-      onError(error: any) {
-        // Type 'any' atau 'AxiosError'
+      onError(error) {
         if (error instanceof AxiosError) {
           const message = error.response?.data?.message;
           toast.error(message || "Terjadi kesalahan server");
@@ -112,7 +99,7 @@ const useJenisBangunan = () => {
     isPending: isPendingAddJenisBangunan,
   } = useMutation({
     mutationFn: createJenisBangunan,
-    onError(error: any) {
+    onError(error) {
       if (error instanceof AxiosError) {
         const message = error.response?.data?.message;
         toast.error(message || "Terjadi kesalahan server");
@@ -142,7 +129,7 @@ const useJenisBangunan = () => {
     isPending: isPendingDeleteJenisBangunan,
   } = useMutation({
     mutationFn: deleteJenisBangunan,
-    onError(error: any) {
+    onError(error) {
       if (error instanceof AxiosError) {
         const message = error.response?.data?.message;
         toast.error(message || "Terjadi kesalahan server");

@@ -2,7 +2,7 @@ import jenisPermohonanServices from "@/services/api/jenisPermohonan.services";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -26,20 +26,8 @@ const useJenisPermohonan = () => {
       kode: "",
       is_active: "",
     },
-    // @ts-ignore
     resolver: zodResolver(jenisPermohonanSchema),
   });
-
-  useEffect(() => {
-    if (editData) {
-      form.reset({
-        kode: editData.kode,
-        nama: editData.nama,
-        is_active: editData.is_active ? "true" : "false",
-      });
-      setIsCreating(false);
-    }
-  }, [editData, form]);
 
   const getListPermohonan = async () => {
     const result = await jenisPermohonanServices.getJenisPermohonan();

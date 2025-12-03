@@ -2,7 +2,7 @@ import jenisLayananServices from "@/services/api/jenisLayanan.services";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -32,18 +32,6 @@ const useJenisLayanan = () => {
     },
     resolver: zodResolver(jenisLayananSchema),
   });
-
-  useEffect(() => {
-    if (editData) {
-      form.reset({
-        kode: editData.kode,
-        nama: editData.nama,
-        estimasi_hari: editData.estimasi_hari,
-        is_active: editData.is_active ? "true" : "false",
-      });
-      setIsCreating(false);
-    }
-  }, [editData, form]);
 
   const getListLayanan = async () => {
     const result = await jenisLayananServices.getJenisLayanan();
