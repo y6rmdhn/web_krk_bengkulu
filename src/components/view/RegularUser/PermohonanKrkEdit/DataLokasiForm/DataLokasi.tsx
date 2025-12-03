@@ -6,6 +6,7 @@ import { useState } from "react";
 import FormFieldSelect from "@/components/commons/FormFieldSelect";
 import useDataLocation from "./useDataLocation";
 import type { PermohonanFormValues } from "../../PermohonanKrk/usePermohohanKrk";
+import WilayahForm from "../WilayahForm/WilayahForm";
 
 type PropTypes = {
   form: UseFormReturn<PermohonanFormValues>;
@@ -25,6 +26,8 @@ const DataLokasi = (props: PropTypes) => {
       <p className="text-red-600 text-sm">
         Data harus sesuai dengan sertifikat
       </p>
+
+      <WilayahForm form={form} />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-12 gap-y-6">
         {/* KOLOM KIRI */}

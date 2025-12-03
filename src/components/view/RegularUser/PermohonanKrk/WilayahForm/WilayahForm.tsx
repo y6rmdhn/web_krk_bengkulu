@@ -1,5 +1,4 @@
 import SectionTitle from "../SectionTitle";
-import InputField from "@/components/commons/InputField";
 import type { UseFormReturn } from "react-hook-form";
 import type { PermohonanFormValues } from "../usePermohohanKrk";
 import SearchableMap from "@/components/commons/SearchableMap";
@@ -15,6 +14,7 @@ import {
 } from "@/components/ui/select";
 import useWilayahForm from "./useWilayahForm";
 import FormFieldSelect from "@/components/commons/FormFieldSelect";
+import FormInput from "@/components/commons/FormInput";
 
 type PropTypes = {
   form: UseFormReturn<PermohonanFormValues>;
@@ -162,15 +162,13 @@ const WilayahForm = (props: PropTypes) => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <InputField
-          id="latitude"
+        <FormInput
           label="Latitude"
           form={form}
           name="latitude"
           placeholder="Latitude akan terisi otomatis"
         />
-        <InputField
-          id="longitude"
+        <FormInput
           label="Longitude"
           form={form}
           name="longitude"

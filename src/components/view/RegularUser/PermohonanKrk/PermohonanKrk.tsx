@@ -41,8 +41,6 @@ export default function PermohonanKrk() {
         <CardContent className="space-y-12">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-12">
-              <WilayahForm form={form} />
-
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-12 gap-y-8">
                 <DataPemohonForm form={form} />
 
