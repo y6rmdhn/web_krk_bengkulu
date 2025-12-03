@@ -1,5 +1,3 @@
-// 1. Definisikan Tipe Data (Interface)
-// Ini agar TypeScript tidak marah dan autocomplete jalan
 export interface KRKData {
   nomorSurat: string;
   tanggal: string;
@@ -22,7 +20,6 @@ export interface KRKData {
   kdh: string;
   namaKepalaDinas: string;
   nipKepalaDinas: string;
-  // Index signature untuk jaga-jaga jika ada field dinamis lain
   [key: string]: any;
 }
 
@@ -103,19 +100,16 @@ const SK_KRK_Page2 = ({ data }: { data: KRKData }) => {
   );
 };
 
-// --- KOMPONEN HALAMAN 1 (DOKUMEN SK) ---
 const SK_KRK_Template = ({ data }: { data: KRKData }) => {
-  // Styles untuk tabel agar rapi dan menjorok (tab effect)
   const cellLabel = "w-[200px] align-top py-1";
   const cellTitikDua = "w-[20px] align-top py-1 text-center";
-  const cellIsi = "align-top py-1 pl-6 font-medium"; // pl-6 memberikan jarak "tab"
+  const cellIsi = "align-top py-1 pl-6 font-medium";
 
   return (
     <div className="w-[210mm] min-h-[297mm] bg-white text-black font-serif text-[11pt] leading-tight relative mx-auto p-12 shadow-none">
       {/* --- 1. KOP SURAT --- */}
       <div className="flex items-center border-b-[3px] border-black pb-2 mb-2 relative">
         <div className="absolute left-0 top-1">
-          {/* Ganti dengan <img src="..." /> jika sudah ada logo */}
           <div className="h-20 w-20 bg-gray-200 rounded-full flex items-center justify-center text-xs text-gray-500">
             Logo
           </div>
@@ -295,14 +289,7 @@ const SK_KRK_Template = ({ data }: { data: KRKData }) => {
   );
 };
 
-// --- MAIN PAGE COMPONENT (PARENT) ---
-// PERUBAHAN UTAMA: Menerima props 'data'
 export default function KRKPage({ data }: KRKPageProps) {
-  // CATATAN:
-  // Saya menghapus "bg-gray-200" dan container wrapper di sini,
-  // karena styling container sudah ditangani oleh 'PreviewSk.tsx' (parent).
-  // Di sini kita hanya merender kertas-kertasnya saja agar rapi saat diprint.
-
   return (
     <div className="flex flex-col gap-6 print:block">
       {/* Halaman 1 */}

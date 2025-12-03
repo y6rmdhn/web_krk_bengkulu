@@ -13,7 +13,7 @@ export const jenisLayananSchema = z.object({
   estimasi_hari: z.coerce
     .number({ error: () => ({ message: "Estimasi harus angka" }) })
     .min(1, { message: "Minimal 1 hari" }),
-  is_active: z.enum(["true", "false"]).transform((value) => value === "true"),
+  is_active: z.string().min(1, { message: "Status wajib diisi" }),
 });
 
 export type JenisLayananSchema = z.infer<typeof jenisLayananSchema>;
@@ -28,7 +28,7 @@ const useJenisLayanan = () => {
       nama: "",
       kode: "",
       estimasi_hari: 1,
-      is_active: "true", // Default true biar UX lebih enak
+      is_active: "",
     },
     resolver: zodResolver(jenisLayananSchema),
   });
@@ -156,7 +156,7 @@ const useJenisLayanan = () => {
       nama: "",
       kode: "",
       estimasi_hari: 1,
-      is_active: "true",
+      is_active: "",
     });
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -164,6 +164,14 @@ const useJenisLayanan = () => {
   const handleEditClick = (item: any) => {
     setIsCreating(false);
     setEditData({ ...item });
+
+    form.reset({
+      kode: item.kode,
+      nama: item.nama,
+      estimasi_hari: item.estimasi_hari,
+      is_active: item.is_active ? "true" : "false",
+    });
+
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -174,7 +182,7 @@ const useJenisLayanan = () => {
       nama: "",
       kode: "",
       estimasi_hari: 1,
-      is_active: "true",
+      is_active: "",
     });
   };
 

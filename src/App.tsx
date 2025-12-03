@@ -73,6 +73,12 @@ const AdminBerkas = lazy(() => import("./components/view/Admin/Berkas"));
 const JenisPermohonanAdmin = lazy(
   () => import("./components/view/Admin/JenisPermohonan")
 );
+const JenisKategoriFungsiBangunan = lazy(
+  () => import("./components/view/Admin/KategoriFungsiBangunan")
+);
+const JenisFungsiBangunan = lazy(
+  () => import("./components/view/Admin/JenisFungsiBangunan")
+);
 
 // operator
 // const DasboardAdmin = lazy(() => import("./components/view/Operator/Dasboard"));
@@ -215,6 +221,16 @@ const router = createBrowserRouter([
         path: "jenis-permohonan",
         loader: adminLoader,
         element: <JenisPermohonanAdmin />,
+      },
+      {
+        path: "jenis-kategori-fungsi-bangunan",
+        loader: adminLoader,
+        element: <JenisKategoriFungsiBangunan />,
+      },
+      {
+        path: "fungsi-bangunan",
+        loader: adminLoader,
+        element: <JenisFungsiBangunan />,
       },
     ],
   },

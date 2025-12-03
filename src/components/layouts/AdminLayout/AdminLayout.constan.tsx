@@ -8,6 +8,12 @@ const SIDEBAR_ADMIN = [
     icon: <FaFileSignature />,
   },
   {
+    key: "kategoriFungsiBangunan",
+    label: "Kategori Fungsi Bangunan",
+    href: "/admin/jenis-kategori-fungsi-bangunan",
+    icon: <FaFileSignature />,
+  },
+  {
     key: "fungsiBangunan",
     label: "Fungsi Bangunan",
     href: "/admin/fungsi-bangunan",

@@ -16,9 +16,12 @@ const BerkasLampiranCard = ({ attachments }: BerkasLampiranCardProps) => {
   } | null>(null);
 
   const getFileUrl = (filePath: string) => {
-    const BASE_URL = environment.API_URL_PDF;
+    const BASE_URL = environment.API_URL;
+    console.log(filePath);
+
     const cleanPath = filePath.replace("public/", "");
-    return `${BASE_URL}/${cleanPath}`;
+
+    return `${BASE_URL}attachments/profile`;
   };
 
   const handlePreview = (attachment: any) => {
@@ -54,7 +57,6 @@ const BerkasLampiranCard = ({ attachments }: BerkasLampiranCardProps) => {
                 </div>
 
                 <div className="flex gap-2">
-                  {/* Tombol Lihat PDF */}
                   <Button
                     variant="secondary"
                     size="sm"
@@ -70,7 +72,6 @@ const BerkasLampiranCard = ({ attachments }: BerkasLampiranCardProps) => {
         </CardContent>
       </Card>
 
-      {/* Panggil Modal PDF disini */}
       <PdfPreviewDialog
         isOpen={!!selectedFile}
         onClose={handleClose}

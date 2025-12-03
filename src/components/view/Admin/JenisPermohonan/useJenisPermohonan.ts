@@ -10,7 +10,7 @@ import { z } from "zod";
 export const jenisPermohonanSchema = z.object({
   kode: z.string().min(1, { message: "Kode permohonan wajib diisi" }),
   nama: z.string().min(1, { message: "Nama permohonan wajib diisi" }),
-  is_active: z.enum(["true", "false"]).transform((value) => value === "true"),
+  is_active: z.string().min(1, { message: "Status wajib diisi" }),
 });
 
 export type JenisPermohonanSchema = z.infer<typeof jenisPermohonanSchema>;
@@ -24,7 +24,7 @@ const useJenisPermohonan = () => {
     defaultValues: {
       nama: "",
       kode: "",
-      is_active: "true",
+      is_active: "",
     },
     // @ts-ignore
     resolver: zodResolver(jenisPermohonanSchema),
@@ -152,7 +152,7 @@ const useJenisPermohonan = () => {
     form.reset({
       nama: "",
       kode: "",
-      is_active: "true",
+      is_active: "",
     });
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -160,6 +160,13 @@ const useJenisPermohonan = () => {
   const handleEditClick = (item: any) => {
     setIsCreating(false);
     setEditData({ ...item });
+
+    form.reset({
+      kode: item.kode,
+      nama: item.nama,
+      is_active: item.is_active ? "true" : "false",
+    });
+
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -169,7 +176,7 @@ const useJenisPermohonan = () => {
     form.reset({
       nama: "",
       kode: "",
-      is_active: "true",
+      is_active: "",
     });
   };
 
