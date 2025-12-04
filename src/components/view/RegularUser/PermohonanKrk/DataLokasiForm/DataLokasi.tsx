@@ -17,7 +17,6 @@ type PropTypes = {
 const DataLokasi = (props: PropTypes) => {
   const { form } = props;
 
-  const [simbFile, setSimbFile] = useState<File | null>(null);
   const [sertifikatFile, setSertifikatFile] = useState<File | null>(null);
   const [PpbFile, setPpbFile] = useState<File | null>(null);
 
@@ -149,15 +148,6 @@ const DataLokasi = (props: PropTypes) => {
                 })
               ) || []
             }
-          />
-
-          <InputFile
-            form={form}
-            label="Upload SIMB"
-            name="SIMB"
-            accept=".pdf"
-            selectedFile={simbFile}
-            setSelectedFile={setSimbFile}
           />
 
           <FormFieldSelect

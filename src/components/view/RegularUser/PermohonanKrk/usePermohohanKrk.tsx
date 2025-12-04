@@ -43,6 +43,7 @@ const permohonanSchema = z.object({
 
   file_ktp_pemohon: fileSchema,
 
+  nama_pemilik: z.string().min(1, "Nama pemohon harus diisi"),
   no_ktp_pemilik: z
     .string()
     .min(16, "No KTP harus 16 digit")
@@ -77,7 +78,6 @@ const permohonanSchema = z.object({
   no_sertifikat_tanah: z.string().min(1, "No sertifikat tanah harus diisi"),
   hasil_ukur: z.string().min(1, "Hasil ukur harus diisi"),
 
-  SIMB: fileSchema,
   file_sertifikat_tanah: fileSchema,
   PBB: fileSchema,
 });
@@ -105,6 +105,7 @@ const usePermohohanKrk = () => {
       kecamatan_pemohon: "",
       kelurahan_pemohon: "",
 
+      nama_pemilik: "",
       no_ktp_pemilik: "",
       email_pemilik: "",
       no_hp_pemilik: "",
@@ -157,14 +158,15 @@ const usePermohohanKrk = () => {
   });
 
   const handleCreatePermohonan = (values: PermohonanFormValues) => {
+    console.log(values);
+
     const formData = new FormData();
 
     Object.entries(values).forEach(([key, value]) => {
       if (
         key !== "file_ktp_pemohon" &&
-        key !== "file_pbb" &&
+        key !== "PBB" &&
         key !== "file_sertifikat_tanah" &&
-        key !== "file_simb" &&
         value !== undefined &&
         value !== null
       ) {
@@ -181,10 +183,6 @@ const usePermohohanKrk = () => {
     if (values.file_sertifikat_tanah) {
       formData.append("Sertifikat-Tanah", values.file_sertifikat_tanah);
     }
-    if (values.SIMB) {
-      formData.append("SIMB", values.SIMB);
-    }
-
     mutate(formData);
   };
 

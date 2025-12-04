@@ -72,6 +72,13 @@ const DataPemilik = (props: PropTypes) => {
           placeholder="Masukan No KTP Pemilik"
           type="text"
         />
+        <FormInput
+          form={form}
+          label="Nama Pemilik"
+          name="nama_pemilik"
+          placeholder="Masukan Nama Pemilik"
+          type="text"
+        />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

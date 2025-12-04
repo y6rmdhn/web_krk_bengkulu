@@ -14,6 +14,7 @@ export default function PermohonanKrk() {
     if (isChecked) {
       const values = form.getValues();
 
+      form.setValue("nama_pemilik", values.nama_pemohon);
       form.setValue("no_ktp_pemilik", values.no_ktp_pemohon);
       form.setValue("email_pemilik", values.email_pemohon);
       form.setValue("no_hp_pemilik", values.no_hp_pemohon);
