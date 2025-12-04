@@ -7,8 +7,10 @@ interface DataBangunanCardProps {
 }
 
 const DataBangunanCard = ({ data, formatAlamat }: DataBangunanCardProps) => {
-  // Pastikan data utama ada dulu (safety check tambahan)
   if (!data) return null;
+
+  const longitude = data.geom?.coordinates?.[0];
+  const latitude = data.geom?.coordinates?.[1];
 
   return (
     <Card>
@@ -75,11 +77,11 @@ const DataBangunanCard = ({ data, formatAlamat }: DataBangunanCardProps) => {
           <div className="grid grid-cols-2 gap-4">
             <div className="flex justify-between">
               <span className="text-gray-600">Latitude</span>
-              <span className="font-medium">{data.latitude}</span>
+              <span className="font-medium">{latitude}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Longitude</span>
-              <span className="font-medium">{data.longitude}</span>
+              <span className="font-medium">{longitude}</span>
             </div>
           </div>
         </div>
