@@ -33,6 +33,7 @@ interface SearchableMapProps {
   initialPosition?: [number, number];
   initialSearchQuery?: string;
   readonly?: boolean;
+  zoneName?: string;
 }
 
 interface NominatimResult {
@@ -74,6 +75,7 @@ const SearchableMap: React.FC<SearchableMapProps> = ({
   initialPosition = [-3.792286, 102.26238],
   initialSearchQuery = "",
   readonly = false,
+  zoneName,
 }) => {
   const [position, setPosition] = useState<[number, number]>(initialPosition);
 
@@ -297,7 +299,19 @@ const SearchableMap: React.FC<SearchableMapProps> = ({
           <Marker position={position}>
             <Popup>
               <div className="text-center">
-                <strong className="block mb-1">Lokasi</strong>
+                <strong className="block mb-1">Lokasi Terpilih</strong>
+
+                {zoneName && (
+                  <div className="mb-2 pb-2 border-b border-gray-100">
+                    <span className="text-[10px] text-gray-500 uppercase tracking-wider">
+                      Zona
+                    </span>
+                    <p className="text-sm font-bold text-blue-600 leading-tight">
+                      {zoneName}
+                    </p>
+                  </div>
+                )}
+
                 <span className="text-xs text-gray-500">
                   {position[0].toFixed(5)}, {position[1].toFixed(5)}
                 </span>
