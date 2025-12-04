@@ -1,12 +1,13 @@
 import SectionTitle from "../SectionTitle";
 import type { UseFormReturn } from "react-hook-form";
+import { useWatch } from "react-hook-form";
+import { useState, useEffect } from "react";
 import InputFile from "@/components/commons/InputFile";
 import FormInput from "@/components/commons/FormInput";
-import { useState } from "react";
 import FormFieldSelect from "@/components/commons/FormFieldSelect";
 import useDataLocation from "./useDataLocation";
-import type { PermohonanFormValues } from "../../PermohonanKrk/usePermohohanKrk";
 import WilayahForm from "../WilayahForm/WilayahForm";
+import type { PermohonanFormValues } from "../../PermohonanKrk/usePermohohanKrk";
 
 type PropTypes = {
   form: UseFormReturn<PermohonanFormValues>;
@@ -15,10 +16,31 @@ type PropTypes = {
 const DataLokasi = (props: PropTypes) => {
   const { form } = props;
 
-  const [simbFile, setSimbFile] = useState<File | null>(null);
   const [sertifikatFile, setSertifikatFile] = useState<File | null>(null);
   const [PpbFile, setPpbFile] = useState<File | null>(null);
-  const { dataJenisBangunan, isLoadingDataBangunan } = useDataLocation();
+
+  const {
+    dataJenisBangunan,
+    isLoadingDataBangunan,
+    dataJenisKategoriBangunan,
+    isLoadingDataKategoriBangunan,
+  } = useDataLocation();
+
+  const selectedKategoriId = useWatch({
+    control: form.control,
+    name: "kategori_bangunan_id",
+  });
+
+  const filteredFungsiBangunan =
+    dataJenisBangunan?.filter(
+      (item: any) => item.kategori_id === selectedKategoriId
+    ) || [];
+
+  useEffect(() => {
+    if (form.getValues("fungsi_bangunan_id")) {
+      form.setValue("fungsi_bangunan_id", "");
+    }
+  }, [selectedKategoriId, form]);
 
   return (
     <div className="space-y-6">
@@ -31,6 +53,7 @@ const DataLokasi = (props: PropTypes) => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-12 gap-y-6">
         {/* KOLOM KIRI */}
+
         <div className="space-y-6">
           <FormInput
             form={form}
@@ -83,35 +106,54 @@ const DataLokasi = (props: PropTypes) => {
             placeholder="Nama Jalan Sekunder (s/d Jalan)"
           />
 
+          {/* INPUT KATEGORI (PARENT) */}
+          <FormFieldSelect
+            form={form}
+            name="kategori_bangunan_id"
+            label="Jenis Kategori Bangunan"
+            placeholder={
+              isLoadingDataKategoriBangunan
+                ? "Memuat..."
+                : "--Pilih Kategori Fungsi Bangunan--"
+            }
+            options={
+              dataJenisKategoriBangunan?.map(
+                (item: { nama: string; id: string }) => ({
+                  label: item.nama,
+                  value: item.id,
+                })
+              ) || []
+            }
+          />
+
+          {/* INPUT FUNGSI (CHILD) - Sudah di filter & Disabled logic */}
           <FormFieldSelect
             form={form}
             name="fungsi_bangunan_id"
             label="Jenis Bangunan"
+            disabled={!selectedKategoriId || isLoadingDataBangunan}
             placeholder={
-              isLoadingDataBangunan ? "Memuat..." : "--Pilih Fungsi Bangunan--"
+              isLoadingDataBangunan
+                ? "Memuat..."
+                : !selectedKategoriId
+                  ? "--Pilih Kategori Terlebih Dahulu--"
+                  : "--Pilih Fungsi Bangunan--"
             }
             options={
-              dataJenisBangunan?.map((item: { nama: string; id: string }) => ({
-                label: item.nama,
-                value: item.id,
-              })) || []
+              filteredFungsiBangunan.map(
+                (item: { nama: string; id: string }) => ({
+                  label: item.nama,
+                  value: item.id,
+                })
+              ) || []
             }
-          />
-
-          <InputFile
-            form={form}
-            label="Upload SIMB"
-            name="SIMB"
-            accept=".pdf"
-            selectedFile={simbFile}
-            setSelectedFile={setSimbFile}
           />
 
           <FormFieldSelect
             form={form}
             name="persimpangan_jalan"
             label="Dipersimpangan Jalan?"
-            placeholder="--Pilih Fungsi Bangunan--"
+            placeholder="--Pilih Opsi--"
             options={[
               { label: "Ya", value: "Ya" },
               { label: "Tidak", value: "Tidak" },

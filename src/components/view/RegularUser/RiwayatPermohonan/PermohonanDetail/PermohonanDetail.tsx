@@ -42,6 +42,9 @@ const DetailPermohonan = () => {
     );
   }
 
+  const longitude = data.geom?.coordinates?.[0];
+  const latitude = data.geom?.coordinates?.[1];
+
   return (
     <div className="p-4 sm:p-6 lg:p-8">
       {/* Back Button for Mobile */}
@@ -73,10 +76,7 @@ const DetailPermohonan = () => {
           <div className="xl:col-span-2 space-y-4 sm:space-y-6">
             {/* Map Section */}
             <div className="relative w-full rounded-lg overflow-hidden z-0 border border-gray-200">
-              <LocationMap
-                latitude={data.latitude}
-                longitude={data.longitude}
-              />
+              <LocationMap latitude={latitude} longitude={longitude} />
             </div>
 
             {/* Cards Section */}

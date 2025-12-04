@@ -8,41 +8,33 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import z from "zod";
 
-const fileSchemaRequired = z
-  .instanceof(File, { message: "File wajib diunggah" })
-  .refine((file) => file.size <= 5 * 1024 * 1024, "Ukuran file maksimal 5MB")
-  .refine(
-    (file) =>
-      ["application/pdf", "image/jpeg", "image/png"].includes(file.type),
-    "Format file harus PDF, JPG, atau PNG"
-  );
-
-const fileSchemaOptional = z
-  .instanceof(File)
-  .refine((file) => file.size <= 5 * 1024 * 1024, "Ukuran file maksimal 5MB")
-  .refine(
-    (file) =>
-      ["application/pdf", "image/jpeg", "image/png"].includes(file.type),
-    "Format file harus PDF, JPG, atau PNG"
-  )
-  .optional();
+const fileSchemaEdit = z
+  .union([z.instanceof(File), z.string(), z.null(), z.undefined()])
+  .optional()
+  .refine((val) => {
+    if (val instanceof File) {
+      return (
+        val.size <= 5 * 1024 * 1024 &&
+        ["application/pdf", "image/jpeg", "image/png"].includes(val.type)
+      );
+    }
+    return true;
+  }, "Format harus PDF/JPG/PNG dan maksimal 5MB");
 
 const baseSchemaFields = {
   jenis_layanan_id: z.string().min(1, "Layanan harus diisi"),
   latitude: z.string().min(1, "Koordinat harus diisi"),
   longitude: z.string().min(1, "Koordinat harus diisi"),
 
+  // Data Pemohon
   no_ktp_pemohon: z
     .string()
-    .min(16, "No KTP harus 16 digit")
-    .max(16, "No KTP harus 16 digit")
-    .regex(/^\d+$/, "No KTP harus berupa angka"),
+    .min(16)
+    .max(16)
+    .regex(/^\d+$/, "No KTP harus angka"),
   nama_pemohon: z.string().min(1, "Nama pemohon harus diisi"),
   email_pemohon: z.string().email("Format email tidak valid"),
-  no_hp_pemohon: z
-    .string()
-    .min(10, "No telepon minimal 10 digit")
-    .regex(/^\d+$/, "No telepon harus berupa angka"),
+  no_hp_pemohon: z.string().min(10).regex(/^\d+$/, "No telepon harus angka"),
   alamat_pemohon: z.string().min(1, "Alamat pemohon harus diisi"),
   no_lokasi_pemohon: z.string().min(1, "No harus diisi"),
   rt_lokasi_pemohon: z.string().regex(/^\d+$/, "RT harus angka"),
@@ -52,16 +44,15 @@ const baseSchemaFields = {
   kecamatan_pemohon: z.string().min(1, "Kecamatan pemohon harus diisi"),
   kelurahan_pemohon: z.string().min(1, "Kelurahan pemohon harus diisi"),
 
+  // Data Pemilik
+  nama_pemilik: z.string().min(1, "Nama pemilik harus diisi"),
   no_ktp_pemilik: z
     .string()
-    .min(16, "No KTP harus 16 digit")
-    .max(16, "No KTP harus 16 digit")
-    .regex(/^\d+$/, "No KTP harus berupa angka"),
+    .min(16)
+    .max(16)
+    .regex(/^\d+$/, "No KTP harus angka"),
   email_pemilik: z.string().email("Format email tidak valid"),
-  no_hp_pemilik: z
-    .string()
-    .min(10, "No telepon minimal 10 digit")
-    .regex(/^\d+$/, "No telepon harus berupa angka"),
+  no_hp_pemilik: z.string().min(10).regex(/^\d+$/, "No telepon harus angka"),
   alamat_pemilik: z.string().min(1, "Alamat pemilik harus diisi"),
   no_lokasi_pemilik: z.string().min(1, "No harus diisi"),
   rt_lokasi_pemilik: z.string().regex(/^\d+$/, "RT harus angka"),
@@ -71,6 +62,7 @@ const baseSchemaFields = {
   kecamatan_pemilik: z.string().min(1, "Kecamatan pemilik harus diisi"),
   kelurahan_pemilik: z.string().min(1, "Kelurahan pemilik harus diisi"),
 
+  // Data Bangunan & Tanah
   alamat_bangunan: z.string().min(1, "Alamat bangunan harus diisi"),
   no_lokasi: z.string().min(1, "No bangunan harus diisi"),
   rt_lokasi: z.string().regex(/^\d+$/, "RT harus angka"),
@@ -79,127 +71,67 @@ const baseSchemaFields = {
   letak_jalan_utama: z.string().min(1, "Letak antar jalan harus diisi"),
   letak_jalan_sekunder: z.string().min(1, "s/d jalan harus diisi"),
   fungsi_bangunan_id: z.string().min(1, "Fungsi bangunan harus diisi"),
+  kategori_bangunan_id: z
+    .string()
+    .min(1, "Kategori Fungsi bangunan harus diisi"),
   persimpangan_jalan: z.string().min(1, "Field ini harus diisi"),
   no_sertifikat_tanah: z.string().min(1, "No sertifikat tanah harus diisi"),
   hasil_ukur: z.string().min(1, "Hasil ukur harus diisi"),
 };
 
-const permohonanSchemaCreate = z.object({
+// Schema Final untuk Edit
+const permohonanSchema = z.object({
   ...baseSchemaFields,
-  file_ktp_pemohon: fileSchemaRequired,
-  SIMB: fileSchemaRequired,
-  file_sertifikat_tanah: fileSchemaRequired,
-  PBB: fileSchemaRequired,
+  file_ktp_pemohon: fileSchemaEdit,
+  file_sertifikat_tanah: fileSchemaEdit,
+  PBB: fileSchemaEdit,
 });
 
-const permohonanSchemaEdit = z.object({
-  ...baseSchemaFields,
-  file_ktp_pemohon: fileSchemaOptional,
-  SIMB: fileSchemaOptional,
-  file_sertifikat_tanah: fileSchemaOptional,
-  PBB: fileSchemaOptional,
-});
-
-const createPermohonanSchema = (isEdit: boolean) => {
-  return isEdit ? permohonanSchemaEdit : permohonanSchemaCreate;
-};
-
-const usePermohonanKrkEdit = (id?: string) => {
-  const isEdit = !!id;
+const usePermohonanKrkEdit = (id: string) => {
+  const navigate = useNavigate();
 
   const form = useForm({
-    resolver: zodResolver(createPermohonanSchema(isEdit)),
+    resolver: zodResolver(permohonanSchema),
     defaultValues: {
-      jenis_layanan_id: "",
       latitude: "",
       longitude: "",
-      no_ktp_pemohon: "",
-      nama_pemohon: "",
-      email_pemohon: "",
-      no_hp_pemohon: "",
-      alamat_pemohon: "",
-      no_lokasi_pemohon: "",
-      rt_lokasi_pemohon: "",
-      rw_lokasi_pemohon: "",
-      provinsi_pemohon: "",
-      kota_pemohon: "",
-      kecamatan_pemohon: "",
-      kelurahan_pemohon: "",
-      no_ktp_pemilik: "",
-      email_pemilik: "",
-      no_hp_pemilik: "",
-      alamat_pemilik: "",
-      no_lokasi_pemilik: "",
-      rt_lokasi_pemilik: "",
-      rw_lokasi_pemilik: "",
-      provinsi_pemilik: "",
-      kota_pemilik: "",
-      kecamatan_pemilik: "",
-      kelurahan_pemilik: "",
-      alamat_bangunan: "",
-      no_lokasi: "",
-      rt_lokasi: "",
-      rw_lokasi: "",
-      luas_tanah_m2: "",
-      letak_jalan_utama: "",
-      letak_jalan_sekunder: "",
-      fungsi_bangunan_id: "",
-      persimpangan_jalan: "",
-      no_sertifikat_tanah: "",
-      hasil_ukur: "",
     },
   });
 
-  const navigate = useNavigate();
-
-  const getById = async (id: string) => {
-    const result = await permohonanKrkServices.getDetailPermohonanKrk(id);
-    return result.data.data;
-  };
-
   const { data, isLoading } = useQuery({
-    queryKey: ["permohonan-krk", id],
-    queryFn: () => getById(id!),
+    queryKey: ["permohonan-krk-detail", id],
+    queryFn: async () => {
+      if (!id) throw new Error("ID Permohonan tidak ditemukan");
+      const result = await permohonanKrkServices.getDetailPermohonanKrk(id);
+      return result.data.data;
+    },
     enabled: !!id,
   });
 
   useEffect(() => {
-    if (data && isEdit) {
-      const textFields = [
-        "jenis_layanan_id",
-        "latitude",
-        "longitude",
-        "no_ktp_pemohon",
-        "nama_pemohon",
-        "email_pemohon",
-        "no_hp_pemohon",
-        "alamat_pemohon",
-        "no_lokasi_pemohon",
-        "rt_lokasi_pemohon",
-        "rw_lokasi_pemohon",
-        "no_ktp_pemilik",
-        "email_pemilik",
-        "no_hp_pemilik",
-        "alamat_pemilik",
-        "no_lokasi_pemilik",
-        "rt_lokasi_pemilik",
-        "rw_lokasi_pemilik",
-        "alamat_bangunan",
-        "no_lokasi",
-        "rt_lokasi",
-        "rw_lokasi",
-        "luas_tanah_m2",
-        "letak_jalan_utama",
-        "letak_jalan_sekunder",
-        "fungsi_bangunan_id",
-        "persimpangan_jalan",
-        "no_sertifikat_tanah",
-        "hasil_ukur",
-      ];
+    if (data) {
+      let lat = "";
+      let lng = "";
 
-      textFields.forEach((field) => {
-        // @ts-ignore - ignore type check for dynamic loop
-        form.setValue(field, data[field]?.toString() || "");
+      if (data.geom && data.geom.coordinates) {
+        lng = data.geom.coordinates[0];
+        lat = data.geom.coordinates[1];
+      } else {
+        lat = data.latitude;
+        lng = data.longitude;
+      }
+
+      form.setValue("latitude", lat?.toString() || "");
+      form.setValue("longitude", lng?.toString() || "");
+
+      Object.keys(baseSchemaFields).forEach((key) => {
+        if (key !== "latitude" && key !== "longitude") {
+          // @ts-ignore
+          if (data[key] !== undefined && data[key] !== null) {
+            // @ts-ignore
+            form.setValue(key, data[key].toString());
+          }
+        }
       });
 
       form.setValue(
@@ -237,22 +169,36 @@ const usePermohonanKrkEdit = (id?: string) => {
           data.kelurahan_pemilik?.toString() || ""
         );
       }, 3000);
-    }
-  }, [data, isEdit, form]);
 
-  const permohonan = async (payload: FormData) => {
-    const result = await permohonanKrkServices.editPermohonan(id!, payload);
-    return result;
-  };
+      const getFilePath = (kode: string) => {
+        if (!data.attachments || !Array.isArray(data.attachments)) return "";
+        const file = data.attachments.find(
+          (item: any) => item.masterBerkas?.kode === kode
+        );
+        return file?.file_path || "";
+      };
+
+      const ktpPath = getFilePath("KTP-Pemohon");
+      const pbbPath = getFilePath("PBB");
+      const sertifikatPath = getFilePath("Sertifikat-Tanah");
+
+      if (ktpPath) form.setValue("file_ktp_pemohon", ktpPath);
+      if (pbbPath) form.setValue("PBB", pbbPath);
+      if (sertifikatPath)
+        form.setValue("file_sertifikat_tanah", sertifikatPath);
+    }
+  }, [data, form]);
 
   const { mutate, isPending } = useMutation({
-    mutationFn: permohonan,
+    mutationFn: async (payload: FormData) => {
+      return await permohonanKrkServices.editPermohonan(id, payload);
+    },
     onError(error) {
       if (error instanceof AxiosError) {
         const message = error.response?.data?.message || "Terjadi kesalahan";
         toast.error(message);
       } else {
-        toast.error(error.message);
+        toast.error((error as any).message);
       }
     },
     onSuccess: () => {
@@ -261,15 +207,25 @@ const usePermohonanKrkEdit = (id?: string) => {
     },
   });
 
-  const handleCreatePermohonan = (values: any) => {
+  const handleEditPermohonan = (values: any) => {
     const formData = new FormData();
+
+    const lng = parseFloat(values.longitude);
+    const lat = parseFloat(values.latitude);
+    const geoJsonData = {
+      type: "Point",
+      coordinates: [lng, lat],
+    };
+
+    formData.append("lokasi", JSON.stringify(geoJsonData));
 
     Object.entries(values).forEach(([key, value]) => {
       if (
         key !== "file_ktp_pemohon" &&
         key !== "PBB" &&
         key !== "file_sertifikat_tanah" &&
-        key !== "SIMB" &&
+        key !== "latitude" &&
+        key !== "longitude" &&
         value !== undefined &&
         value !== null
       ) {
@@ -286,9 +242,6 @@ const usePermohonanKrkEdit = (id?: string) => {
     if (values.file_sertifikat_tanah instanceof File) {
       formData.append("Sertifikat-Tanah", values.file_sertifikat_tanah);
     }
-    if (values.SIMB instanceof File) {
-      formData.append("SIMB", values.SIMB);
-    }
 
     mutate(formData);
   };
@@ -297,12 +250,11 @@ const usePermohonanKrkEdit = (id?: string) => {
 
   return {
     form,
-    onSubmit: handleCreatePermohonan,
+    onSubmit: handleEditPermohonan,
     handleRefreshCaptcha,
     isPending,
     data,
     isLoading,
-    isEdit,
   };
 };
 

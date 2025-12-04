@@ -158,15 +158,25 @@ const usePermohohanKrk = () => {
   });
 
   const handleCreatePermohonan = (values: PermohonanFormValues) => {
-    console.log(values);
-
     const formData = new FormData();
+
+    const lng = parseFloat(values.longitude);
+    const lat = parseFloat(values.latitude);
+
+    const geoJsonData = {
+      type: "Point",
+      coordinates: [lng, lat],
+    };
+
+    formData.append("lokasi", JSON.stringify(geoJsonData));
 
     Object.entries(values).forEach(([key, value]) => {
       if (
         key !== "file_ktp_pemohon" &&
         key !== "PBB" &&
         key !== "file_sertifikat_tanah" &&
+        key !== "latitude" &&
+        key !== "longitude" &&
         value !== undefined &&
         value !== null
       ) {
@@ -174,15 +184,16 @@ const usePermohohanKrk = () => {
       }
     });
 
-    if (values.file_ktp_pemohon) {
+    if (values.file_ktp_pemohon instanceof File) {
       formData.append("KTP-Pemohon", values.file_ktp_pemohon);
     }
-    if (values.PBB) {
+    if (values.PBB instanceof File) {
       formData.append("PBB", values.PBB);
     }
-    if (values.file_sertifikat_tanah) {
+    if (values.file_sertifikat_tanah instanceof File) {
       formData.append("Sertifikat-Tanah", values.file_sertifikat_tanah);
     }
+
     mutate(formData);
   };
 
