@@ -2,7 +2,7 @@ const MENU_ITEMS = [
   {
     title: "KRK",
     icon: "/img/persyaratan.png",
-    href: "/layanan-krk",
+    href: "/alur-pengajuan",
     description: "Pengajuan Keterangan Rencana Kota",
     gradient: "from-blue-500/10 to-cyan-500/10",
     color: "text-blue-600",
