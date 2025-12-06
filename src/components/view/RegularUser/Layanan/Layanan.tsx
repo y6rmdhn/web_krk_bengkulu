@@ -40,7 +40,7 @@ export default function Layanan() {
           {/* Menu Grid */}
           <Card className="relative overflow-hidden border-0 shadow-2xl bg-white/80 backdrop-blur-sm rounded-3xl">
             <CardContent className="p-8">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {MENU_ITEMS.map((item, index) => (
                   <MenuItem
                     key={item.title}

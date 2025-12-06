@@ -15,14 +15,14 @@ const MENU_ITEMS = [
     gradient: "from-green-500/10 to-emerald-500/10",
     color: "text-green-600",
   },
-  {
-    title: "Hasil IKM",
-    icon: "/img/monitoring.png",
-    href: "#",
-    description: "Indeks Kepuasan Masyarakat",
-    gradient: "from-purple-500/10 to-pink-500/10",
-    color: "text-purple-600",
-  },
+  // {
+  //   title: "Hasil IKM",
+  //   icon: "/img/monitoring.png",
+  //   href: "#",
+  //   description: "Indeks Kepuasan Masyarakat",
+  //   gradient: "from-purple-500/10 to-pink-500/10",
+  //   color: "text-purple-600",
+  // },
 ];
 
 export { MENU_ITEMS };
