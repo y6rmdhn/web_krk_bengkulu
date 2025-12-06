@@ -163,21 +163,21 @@ const JenisPermohonan = () => {
       </span>,
       <FormInput
         key={`${mode}-kode`}
-        form={form as any}
+        form={form}
         name="kode"
         placeholder="Kode"
         className="min-w-[100px]"
       />,
       <FormInput
         key={`${mode}-nama`}
-        form={form as any}
+        form={form}
         name="nama"
         placeholder="Masukan Nama Permohonan"
         className="min-w-[250px]"
       />,
       <SelectFilter
         key={`${mode}-kategori-${editData?.id || "new"}-${categoryOptions.length}`}
-        form={form as any}
+        form={form}
         name="kategori_id"
         options={categoryOptions}
         placeholder={

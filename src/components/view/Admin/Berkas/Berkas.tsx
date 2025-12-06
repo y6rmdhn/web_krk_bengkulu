@@ -124,14 +124,14 @@ const Berkas = () => {
       </span>,
       <FormInput
         key={`${mode}-kode`}
-        form={form as any}
+        form={form}
         name="kode"
         placeholder="Kode"
         className="min-w-[100px]"
       />,
       <FormInput
         key={`${mode}-nama`}
-        form={form as any}
+        form={form}
         name="nama"
         placeholder="Masukan Nama Berkas"
         className="min-w-[200px]"
