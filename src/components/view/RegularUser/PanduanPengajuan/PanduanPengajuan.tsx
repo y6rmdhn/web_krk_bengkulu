@@ -3,10 +3,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function PanduanPengajuan() {
   const navigate = useNavigate();
+  const [isChecked, setIsChecked] = useState(false);
 
   return (
     <MainLayout title="Panduan Pengajuan | KRK Bengkulu" isBgGray>
@@ -35,7 +37,13 @@ export default function PanduanPengajuan() {
                 </div>
 
                 <div className="flex items-center justify-center space-x-2 pt-4">
-                  <Checkbox id="terms-checkbox" />
+                  <Checkbox
+                    id="terms-checkbox"
+                    checked={isChecked}
+                    onCheckedChange={(checked) =>
+                      setIsChecked(checked === true)
+                    }
+                  />
                   <Label
                     htmlFor="terms-checkbox"
                     className="font-medium text-gray-700 cursor-pointer"
@@ -46,7 +54,12 @@ export default function PanduanPengajuan() {
 
                 <div className="flex justify-center pt-2">
                   <Button
-                    onClick={() => navigate("/permohonan-krk")}
+                    onClick={() => {
+                      if (isChecked) {
+                        navigate("/permohonan-krk");
+                      }
+                    }}
+                    disabled={!isChecked}
                     className="bg-[#1D4ED8] hover:bg-[#1E40AF] px-10 py-6 text-base"
                   >
                     Buat Permohonan
