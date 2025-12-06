@@ -13,6 +13,8 @@ const useRiwayatPermohonan = () => {
       queryFn: getListPermohonan,
     });
 
+  console.log(dataListPermohonanKrk);
+
   return {
     dataListPermohonanKrk,
     isLoadingListPermohonanKrk,

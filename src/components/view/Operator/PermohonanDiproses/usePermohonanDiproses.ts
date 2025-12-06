@@ -1,9 +1,9 @@
 import permohonanKrkServices from "@/services/api/permohonanKrk";
 import { useQuery } from "@tanstack/react-query";
 
-const usePermohonanSkTTE = () => {
+const usePermohonan = () => {
   const getListPermohonan = async () => {
-    const status = "";
+    const status = "PENDING_OPERATOR_FINAL";
 
     const result = await permohonanKrkServices.getPermohonanKrk(status);
 
@@ -22,4 +22,4 @@ const usePermohonanSkTTE = () => {
   };
 };
 
-export default usePermohonanSkTTE;
+export default usePermohonan;

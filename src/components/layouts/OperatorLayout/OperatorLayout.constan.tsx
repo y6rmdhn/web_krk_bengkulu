@@ -1,24 +1,42 @@
 import { FaInbox } from "react-icons/fa";
 
 const SIDEBAR_ADMIN = [
-  // {
-  //   key: "dasboard",
-  //   label: "Dasboard",
-  //   href: "/operator/dashboard",
-  //   icon: <FaChartPie />,
-  // },
   {
     key: "permohonan Masuk",
     label: "Permohonan Masuk",
     href: "/operator/permohonan-krk",
     icon: <FaInbox />,
   },
-  // {
-  //   key: "trackingPermohonan",
-  //   label: "Tracking permohonan",
-  //   href: "/operator/riwayat-permohonan-krk",
-  //   icon: <IoLayers />,
-  // },
+  {
+    key: "permohonan diproses",
+    label: "Permohonan Diproses",
+    href: "/operator/permohonan-diproses",
+    icon: <FaInbox />,
+  },
+  {
+    key: "permohonan dikembalikan",
+    label: "Permohonan Dikembalikan",
+    href: "/operator/permohonan-dikembalikan",
+    icon: <FaInbox />,
+  },
+  {
+    key: "permohonan ditolak",
+    label: "Permohonan Ditolak",
+    href: "/operator/permohonan-ditolak",
+    icon: <FaInbox />,
+  },
+  {
+    key: "permohonan selesai",
+    label: "Permohonan Selesai",
+    href: "/operator/permohonan-selesai",
+    icon: <FaInbox />,
+  },
+  {
+    key: "tracting permohonan",
+    label: "Tracking Permohonan",
+    href: "/operator/tracking-permohonan",
+    icon: <FaInbox />,
+  },
 ];
 
 export { SIDEBAR_ADMIN };

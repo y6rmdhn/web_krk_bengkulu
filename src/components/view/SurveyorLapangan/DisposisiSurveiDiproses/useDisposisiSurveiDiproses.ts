@@ -1,7 +1,7 @@
 import permohonanKrkServices from "@/services/api/permohonanKrk";
 import { useQuery } from "@tanstack/react-query";
 
-const usePermohonanSkTTE = () => {
+const useDisposisiSurveiMasuk = () => {
   const getListPermohonan = async () => {
     const status = "";
 
@@ -22,4 +22,4 @@ const usePermohonanSkTTE = () => {
   };
 };
 
-export default usePermohonanSkTTE;
+export default useDisposisiSurveiMasuk;

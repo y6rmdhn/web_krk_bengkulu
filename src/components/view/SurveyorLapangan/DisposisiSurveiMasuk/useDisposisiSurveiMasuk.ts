@@ -3,7 +3,9 @@ import { useQuery } from "@tanstack/react-query";
 
 const useDisposisiSurveiMasuk = () => {
   const getListPermohonan = async () => {
-    const result = await permohonanKrkServices.getPermohonanKrk();
+    const status = "PENDING_SURVEYOR";
+
+    const result = await permohonanKrkServices.getPermohonanKrk(status);
 
     return result.data.data;
   };
@@ -13,6 +15,8 @@ const useDisposisiSurveiMasuk = () => {
       queryKey: ["permohonan-krk"],
       queryFn: getListPermohonan,
     });
+
+  console.log(dataListPermohonanKrk);
 
   return {
     dataListPermohonanKrk,

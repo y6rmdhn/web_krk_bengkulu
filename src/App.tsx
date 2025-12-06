@@ -81,20 +81,34 @@ const JenisFungsiBangunan = lazy(
 );
 
 // operator
-// const DasboardAdmin = lazy(() => import("./components/view/Operator/Dasboard"));
 const PermohonanAdminPage = lazy(
   () => import("./components/view/Operator/Permohonan")
+);
+const PermohonanSelesai = lazy(
+  () => import("./components/view/Operator/PermohonanSelesai")
+);
+const PermohonanDitolak = lazy(
+  () => import("./components/view/Operator/PermohonanDitolak")
+);
+const PermohonanDikembalikan = lazy(
+  () => import("./components/view/Operator/PermohonanDikembalikan")
+);
+const PermohonanDiProses = lazy(
+  () => import("./components/view/Operator/PermohonanDiproses")
 );
 const DetailPermohonanAdminPage = lazy(
   () => import("./components/view/Operator/PermohonanDetail")
 );
-// const RiwayatPermohonanAdminPage = lazy(
-//   () => import("./components/view/Operator/RiwayatPermohonan")
-// );
 
 // Surveyor Lapangan
 const DisposisiSurveiMasuk = lazy(
   () => import("./components/view/SurveyorLapangan/DisposisiSurveiMasuk")
+);
+const DisposisiSurveiDiproses = lazy(
+  () => import("./components/view/SurveyorLapangan/DisposisiSurveiDiproses")
+);
+const DisposisiSurveiSelesai = lazy(
+  () => import("./components/view/SurveyorLapangan/DisposisiSurveiSelesai")
 );
 const DisposisiSurveiMasukDetail = lazy(
   () => import("./components/view/SurveyorLapangan/DetailDisposisiSurveiMasuk")
@@ -103,6 +117,12 @@ const DisposisiSurveiMasukDetail = lazy(
 // Kepala Dinas
 const PermohonanSkTTE = lazy(
   () => import("./components/view/KepalaDinas/PermohonanSKTTE")
+);
+const SkTTEDiproses = lazy(
+  () => import("./components/view/KepalaDinas/SKTTEDiproses")
+);
+const SkTTESelesai = lazy(
+  () => import("./components/view/KepalaDinas/SKTTESelesai")
 );
 const PermohonanSkTTEDetail = lazy(
   () => import("./components/view/KepalaDinas/DetailPermohonanSkTTE")
@@ -237,21 +257,31 @@ const router = createBrowserRouter([
   {
     path: "/operator",
     children: [
-      // {
-      //   path: "dashboard",
-      //   loader: operatorLoader,
-      //   element: <DasboardAdmin />,
-      // },
       {
         path: "permohonan-krk",
         loader: operatorLoader,
         element: <PermohonanAdminPage />,
       },
-      // {
-      //   path: "riwayat-permohonan-krk",
-      //   loader: operatorLoader,
-      //   element: <RiwayatPermohonanAdminPage />,
-      // },
+      {
+        path: "permohonan-selesai",
+        loader: operatorLoader,
+        element: <PermohonanSelesai />,
+      },
+      {
+        path: "permohonan-ditolak",
+        loader: operatorLoader,
+        element: <PermohonanDitolak />,
+      },
+      {
+        path: "permohonan-dikembalikan",
+        loader: operatorLoader,
+        element: <PermohonanDikembalikan />,
+      },
+      {
+        path: "permohonan-diproses",
+        loader: operatorLoader,
+        element: <PermohonanDiProses />,
+      },
       {
         path: "detail/:id",
         loader: operatorLoader,
@@ -268,6 +298,16 @@ const router = createBrowserRouter([
         element: <DisposisiSurveiMasuk />,
       },
       {
+        path: "disposisi-survei-diproses",
+        loader: surveyorLoader,
+        element: <DisposisiSurveiDiproses />,
+      },
+      {
+        path: "disposisi-survei-selesai",
+        loader: surveyorLoader,
+        element: <DisposisiSurveiSelesai />,
+      },
+      {
         path: "detail/:id",
         loader: surveyorLoader,
         element: <DisposisiSurveiMasukDetail />,
@@ -281,6 +321,16 @@ const router = createBrowserRouter([
         path: "permohonan-sk-tte",
         loader: kepalaDinasLoader,
         element: <PermohonanSkTTE />,
+      },
+      {
+        path: "sk-tte-diproses",
+        loader: kepalaDinasLoader,
+        element: <SkTTEDiproses />,
+      },
+      {
+        path: "sk-tte-selesai",
+        loader: kepalaDinasLoader,
+        element: <SkTTESelesai />,
       },
       {
         path: "permohonan-sk-tte/detail/:id",

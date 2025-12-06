@@ -1,9 +1,9 @@
 import permohonanKrkServices from "@/services/api/permohonanKrk";
 import { useQuery } from "@tanstack/react-query";
 
-const usePermohonanSkTTE = () => {
+const usePermohonan = () => {
   const getListPermohonan = async () => {
-    const status = "";
+    const status = "APPROVED";
 
     const result = await permohonanKrkServices.getPermohonanKrk(status);
 
@@ -12,7 +12,7 @@ const usePermohonanSkTTE = () => {
 
   const { data: dataListPermohonanKrk, isLoading: isLoadingListPermohonanKrk } =
     useQuery({
-      queryKey: ["permohonan-krk"],
+      queryKey: ["PermohonanSelesai"],
       queryFn: getListPermohonan,
     });
 
@@ -22,4 +22,4 @@ const usePermohonanSkTTE = () => {
   };
 };
 
-export default usePermohonanSkTTE;
+export default usePermohonan;
