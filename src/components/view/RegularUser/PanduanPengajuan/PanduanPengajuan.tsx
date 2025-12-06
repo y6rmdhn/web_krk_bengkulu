@@ -28,7 +28,7 @@ export default function PanduanPengajuan() {
 
                 <div className="border rounded-md p-2 sm:p-4">
                   <img
-                    src="/img/flowchart-layanan.png"
+                    src="/img/general/Infograpis KRK.webp"
                     alt="Panduan Pengajuan Keterangan Rencana Kota"
                     width={1200}
                     height={700}
