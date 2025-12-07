@@ -112,8 +112,8 @@ const PermohonanSkTTE = () => {
 
   return (
     <KepalaDinasLayout
-      title="Admin Permohonan Masuk | KRK Kota Bengkulu"
-      desc="Permohonan Masuk"
+      title="Permohonan SK TTE | KRK Kota Bengkulu"
+      desc="Permohonan SK TTE"
     >
       <div className="mt-10 flex flex-col gap-6">
         <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-start">
@@ -157,7 +157,7 @@ const PermohonanSkTTE = () => {
           <CardHeader>
             <div className="flex justify-between items-center">
               <h1 className="text-lg font-semibold">
-                Daftar Permohonan KRK ({filteredResult.length})
+                Daftar Permohonan SK TTE ({filteredResult.length})
               </h1>
             </div>
           </CardHeader>
