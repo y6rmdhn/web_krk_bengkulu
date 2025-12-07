@@ -14,7 +14,7 @@ import DropdownActions from "@/components/commons/DropdownActions";
 import { Badge } from "@/components/ui/badge";
 import DataTable from "@/components/commons/DataTable";
 import { useNavigate } from "react-router-dom";
-import usePermohonanSkTTE from "./useSKTTEDiproses";
+import usePermohonanSkTTE from "./useSKTTEDitolak";
 import KepalaDinasLayout from "@/components/layouts/KepalaDinas";
 
 const PermohonanSkTTE = () => {
@@ -87,7 +87,7 @@ const PermohonanSkTTE = () => {
           variant="outline"
           className={badgeColor}
         >
-          {item.current_step_name || item.status}
+          {item.status}
         </Badge>,
 
         <DropdownActions

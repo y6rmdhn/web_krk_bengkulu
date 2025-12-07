@@ -87,7 +87,7 @@ const DisposisiSurveiMasuk = () => {
           variant="outline"
           className={badgeColor}
         >
-          {item.current_step_name || item.status}
+          {item.status}
         </Badge>,
 
         <DropdownActions

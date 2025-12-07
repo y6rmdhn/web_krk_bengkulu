@@ -3,7 +3,9 @@ import { useQuery } from "@tanstack/react-query";
 
 const usePermohonanSkTTE = () => {
   const getListPermohonan = async () => {
-    const result = await permohonanKrkServices.getPermohonanKrk();
+    const status = "REJECTED";
+
+    const result = await permohonanKrkServices.getPermohonanKrk(status);
 
     return result.data.data;
   };

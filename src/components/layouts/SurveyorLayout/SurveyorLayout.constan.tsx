@@ -8,9 +8,9 @@ const SIDEBAR_ADMIN = [
     icon: <FaInbox />,
   },
   {
-    key: "disposisiSurveiDiproses",
-    label: "Disposisi Survei Diproses",
-    href: "/jf/disposisi-survei-diproses",
+    key: "disposisiSurveiDitolak",
+    label: "Disposisi Survei Ditolak",
+    href: "/jf/disposisi-survei-ditolak",
     icon: <FaInbox />,
   },
   {

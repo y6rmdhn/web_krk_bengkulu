@@ -105,7 +105,7 @@ const DisposisiSurveiMasuk = lazy(
   () => import("./components/view/SurveyorLapangan/DisposisiSurveiMasuk")
 );
 const DisposisiSurveiDiproses = lazy(
-  () => import("./components/view/SurveyorLapangan/DisposisiSurveiDiproses")
+  () => import("./components/view/SurveyorLapangan/DisposisiSurveiDitolak")
 );
 const DisposisiSurveiSelesai = lazy(
   () => import("./components/view/SurveyorLapangan/DisposisiSurveiSelesai")
@@ -119,7 +119,7 @@ const PermohonanSkTTE = lazy(
   () => import("./components/view/KepalaDinas/PermohonanSKTTE")
 );
 const SkTTEDiproses = lazy(
-  () => import("./components/view/KepalaDinas/SKTTEDiproses")
+  () => import("./components/view/KepalaDinas/SKTTEDitolak")
 );
 const SkTTESelesai = lazy(
   () => import("./components/view/KepalaDinas/SKTTESelesai")
@@ -278,7 +278,7 @@ const router = createBrowserRouter([
         element: <PermohonanDikembalikan />,
       },
       {
-        path: "permohonan-diproses",
+        path: "draft-final",
         loader: operatorLoader,
         element: <PermohonanDiProses />,
       },
@@ -298,7 +298,7 @@ const router = createBrowserRouter([
         element: <DisposisiSurveiMasuk />,
       },
       {
-        path: "disposisi-survei-diproses",
+        path: "disposisi-survei-ditolak",
         loader: surveyorLoader,
         element: <DisposisiSurveiDiproses />,
       },
@@ -323,7 +323,7 @@ const router = createBrowserRouter([
         element: <PermohonanSkTTE />,
       },
       {
-        path: "sk-tte-diproses",
+        path: "sk-tte-ditolak",
         loader: kepalaDinasLoader,
         element: <SkTTEDiproses />,
       },

@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 
 const useDisposisiSurveiMasuk = () => {
   const getListPermohonan = async () => {
-    const status = "";
+    const status = "REJECTED";
 
     const result = await permohonanKrkServices.getPermohonanKrk(status);
 

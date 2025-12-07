@@ -8,12 +8,6 @@ const SIDEBAR_ADMIN = [
     icon: <FaInbox />,
   },
   {
-    key: "permohonan diproses",
-    label: "Permohonan Diproses",
-    href: "/operator/permohonan-diproses",
-    icon: <FaInbox />,
-  },
-  {
     key: "permohonan dikembalikan",
     label: "Permohonan Dikembalikan",
     href: "/operator/permohonan-dikembalikan",
@@ -23,6 +17,12 @@ const SIDEBAR_ADMIN = [
     key: "permohonan ditolak",
     label: "Permohonan Ditolak",
     href: "/operator/permohonan-ditolak",
+    icon: <FaInbox />,
+  },
+  {
+    key: "permohonan diproses",
+    label: "Draft Final Operator",
+    href: "/operator/draft-final",
     icon: <FaInbox />,
   },
   {

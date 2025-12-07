@@ -8,9 +8,9 @@ const SIDEBAR_ADMIN = [
     icon: <FaFileSignature />,
   },
   {
-    key: "SKTTEDiproses",
-    label: "SK TTE Diproses",
-    href: "/kepala-dinas/sk-tte-diproses",
+    key: "SKTTEDitolak",
+    label: "SK TTE Ditolak",
+    href: "/kepala-dinas/sk-tte-ditolak",
     icon: <FaFileSignature />,
   },
   {
