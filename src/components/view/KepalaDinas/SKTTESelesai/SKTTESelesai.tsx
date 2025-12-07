@@ -1,12 +1,5 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Eye, Search } from "lucide-react";
 import useDataTable from "@/hooks/useDataTable";
 import { useMemo, useState } from "react";
@@ -25,7 +18,6 @@ const SKTTESelesai = () => {
   const navigate = useNavigate();
 
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
 
   const filteredResult = useMemo(() => {
     const data = dataListPermohonanKrk || [];
@@ -38,12 +30,9 @@ const SKTTESelesai = () => {
         (item.nama_pemilik && item.nama_pemilik.toLowerCase().includes(term)) ||
         (item.user?.name && item.user.name.toLowerCase().includes(term));
 
-      const matchesStatus =
-        statusFilter === "all" || item.status === statusFilter;
-
-      return matchesSearch && matchesStatus;
+      return matchesSearch;
     });
-  }, [dataListPermohonanKrk, searchTerm, statusFilter]);
+  }, [dataListPermohonanKrk, searchTerm]);
 
   const totalPages = Math.ceil(filteredResult.length / currentLimit);
 
@@ -130,26 +119,6 @@ const SKTTESelesai = () => {
                 }}
               />
             </div>
-
-            <Select
-              value={statusFilter}
-              onValueChange={(val) => {
-                setStatusFilter(val);
-                handleChangePage(1);
-              }}
-            >
-              <SelectTrigger className="w-full lg:w-[180px]">
-                <SelectValue placeholder="Filter Status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Semua Status</SelectItem>
-                <SelectItem value="PENDING_OPERATOR">
-                  Menunggu Verifikasi
-                </SelectItem>
-                <SelectItem value="APPROVED">Disetujui</SelectItem>
-                <SelectItem value="REJECTED">Ditolak</SelectItem>
-              </SelectContent>
-            </Select>
           </div>
         </div>
 
