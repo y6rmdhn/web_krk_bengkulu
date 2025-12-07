@@ -111,7 +111,7 @@ const PermohonanSelesai = () => {
 
   return (
     <OperatorLayout
-      title="Operator Permohonan Selesai | KRK Kota Bengkulu"
+      title="Permohonan Selesai | KRK Kota Bengkulu"
       desc="Permohonan Selesai"
     >
       <div className="mt-10 flex flex-col gap-6">
@@ -156,7 +156,7 @@ const PermohonanSelesai = () => {
           <CardHeader>
             <div className="flex justify-between items-center">
               <h1 className="text-lg font-semibold">
-                Daftar Permohonan KRK ({filteredResult.length})
+                Daftar Permohonan Selesai ({filteredResult.length})
               </h1>
             </div>
           </CardHeader>

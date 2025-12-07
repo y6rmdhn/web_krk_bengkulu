@@ -111,7 +111,7 @@ const Permohonan = () => {
 
   return (
     <OperatorLayout
-      title="Operator Permohonan Masuk | KRK Kota Bengkulu"
+      title="Permohonan Masuk | KRK Kota Bengkulu"
       desc="Permohonan Masuk"
     >
       <div className="mt-10 flex flex-col gap-6">

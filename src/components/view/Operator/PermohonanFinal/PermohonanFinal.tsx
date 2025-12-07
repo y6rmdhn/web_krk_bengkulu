@@ -111,8 +111,8 @@ const PermohonanDiproses = () => {
 
   return (
     <OperatorLayout
-      title="Operator Permohonan Masuk | KRK Kota Bengkulu"
-      desc="Permohonan Masuk"
+      title="Final Permohonan | KRK Kota Bengkulu"
+      desc="Permohonan Final"
     >
       <div className="mt-10 flex flex-col gap-6">
         <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-start">
@@ -156,7 +156,7 @@ const PermohonanDiproses = () => {
           <CardHeader>
             <div className="flex justify-between items-center">
               <h1 className="text-lg font-semibold">
-                Daftar Permohonan KRK ({filteredResult.length})
+                Daftar Permohonan Final ({filteredResult.length})
               </h1>
             </div>
           </CardHeader>
