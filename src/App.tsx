@@ -94,7 +94,7 @@ const PermohonanDikembalikan = lazy(
   () => import("./components/view/Operator/PermohonanDikembalikan")
 );
 const PermohonanDiProses = lazy(
-  () => import("./components/view/Operator/PermohonanDiproses")
+  () => import("./components/view/Operator/PermohonanFinal")
 );
 const DetailPermohonanAdminPage = lazy(
   () => import("./components/view/Operator/PermohonanDetail")

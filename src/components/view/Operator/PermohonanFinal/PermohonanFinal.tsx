@@ -11,7 +11,7 @@ import {
 import { Eye, Search } from "lucide-react";
 import useDataTable from "@/hooks/useDataTable";
 import { useMemo, useState } from "react";
-import usePermohonan from "./usePermohonanDiproses";
+import usePermohonan from "./usePermohonanFinal";
 import DropdownActions from "@/components/commons/DropdownActions";
 import { Badge } from "@/components/ui/badge";
 import DataTable from "@/components/commons/DataTable";

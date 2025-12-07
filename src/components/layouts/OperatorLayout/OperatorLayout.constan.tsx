@@ -21,7 +21,7 @@ const SIDEBAR_ADMIN = [
   },
   {
     key: "permohonan diproses",
-    label: "Draft Final Operator",
+    label: "Final Operator",
     href: "/operator/draft-final",
     icon: <FaInbox />,
   },
