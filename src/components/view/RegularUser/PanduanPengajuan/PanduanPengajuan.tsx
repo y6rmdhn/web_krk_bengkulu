@@ -5,6 +5,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { cn } from "@/lib/utils";
 
 export default function PanduanPengajuan() {
   const navigate = useNavigate();
@@ -26,30 +27,40 @@ export default function PanduanPengajuan() {
                   Berikut adalah Panduan Pengajuan Keterangan Rencana Kota
                 </p>
 
-                <div className="border rounded-md p-2 sm:p-4">
+                <div className="border rounded-md p-2 sm:p-4 bg-gray-50/50">
                   <img
                     src="/img/general/Infograpis KRK.webp"
                     alt="Panduan Pengajuan Keterangan Rencana Kota"
                     width={1200}
                     height={700}
-                    className="w-full h-auto"
+                    className="w-full h-auto rounded-sm mix-blend-multiply"
                   />
                 </div>
 
-                <div className="flex items-center justify-center space-x-2 pt-4">
-                  <Checkbox
-                    id="terms-checkbox"
-                    checked={isChecked}
-                    onCheckedChange={(checked) =>
-                      setIsChecked(checked === true)
-                    }
-                  />
-                  <Label
-                    htmlFor="terms-checkbox"
-                    className="font-medium text-gray-700 cursor-pointer"
+                <div className="flex justify-center pt-2">
+                  <div
+                    onClick={() => setIsChecked(!isChecked)}
+                    className={cn(
+                      "flex items-start space-x-4 border rounded-xl p-4 w-full max-w-xl cursor-pointer transition-all duration-200 select-none",
+                      isChecked
+                        ? "border-blue-600 bg-blue-50/50 shadow-sm"
+                        : "border-gray-200 hover:border-blue-300 hover:bg-gray-50"
+                    )}
                   >
-                    Saya mengerti dengan persyaratan permohonan
-                  </Label>
+                    <Checkbox
+                      checked={isChecked}
+                      className="mt-0.5 h-6 w-6 border-2 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600 pointer-events-none"
+                    />
+                    <div className="grid gap-1.5 leading-none">
+                      <Label className="text-base font-medium text-gray-900 cursor-pointer pointer-events-none">
+                        Saya mengerti persyaratan permohonan
+                      </Label>
+                      <p className="text-sm text-gray-500">
+                        Dengan mencentang ini, Anda menyatakan telah membaca dan
+                        memahami alur pengajuan KRK di atas.
+                      </p>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="flex justify-center pt-2">
@@ -60,7 +71,7 @@ export default function PanduanPengajuan() {
                       }
                     }}
                     disabled={!isChecked}
-                    className="bg-[#1D4ED8] hover:bg-[#1E40AF] px-10 py-6 text-base"
+                    className="bg-[#1D4ED8] hover:bg-[#1E40AF] px-10 py-6 text-base shadow-lg transition-all hover:shadow-xl disabled:opacity-50"
                   >
                     Buat Permohonan
                   </Button>
