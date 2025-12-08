@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import MainLayout from "@/components/layouts/MainLayout/MainLayout";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,7 @@ import {
   Download,
   Printer,
   FileText,
+  ExternalLink,
 } from "lucide-react";
 import { usePreviewSk } from "./usePreviewSk";
 import { Separator } from "@/components/ui/separator";
@@ -17,74 +18,47 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-// Import komponen dokumen yang sudah Anda bersihkan sebelumnya
-import KRKPage from "@/components/commons/KrkDocument";
 
 const PreviewSk = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  // Asumsi: usePreviewSk sekarang mengembalikan Data JSON (objek), bukan Blob PDF lagi.
   const { dataSk, isLoadingSk, isError } = usePreviewSk(`${id}`);
 
-  // Ref untuk membungkus area yang akan di-print
-  const printAreaRef = useRef<HTMLDivElement>(null);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const [blobUrl, setBlobUrl] = useState<string | null>(null);
 
-  // --- FUNGSI CETAK / DOWNLOAD ---
-  const handlePrint = () => {
-    if (!printAreaRef.current) return;
-
-    const printContent = printAreaRef.current.innerHTML;
-    // Membuka jendela baru untuk print agar CSS Sidebar/Layout tidak ikut tercetak
-    const WindowPrint = window.open("", "", "width=900,height=650");
-
-    // FIX: Check if window failed to open (e.g., popup blocker)
-    if (!WindowPrint) {
-      console.error("Popup window blocked. Please allow popups for this site.");
-      return;
+  useEffect(() => {
+    if (dataSk && dataSk instanceof Blob) {
+      const url = URL.createObjectURL(dataSk);
+      setBlobUrl(url);
+      return () => {
+        URL.revokeObjectURL(url);
+      };
     }
+  }, [dataSk]);
 
-    WindowPrint.document.write(`
-      <html>
-        <head>
-          <title>Cetak SK KRK - ${id}</title>
-          <script src="https://cdn.tailwindcss.com"></script>
-          <style>
-            @page { size: A4; margin: 0; }
-            body { margin: 0; -webkit-print-color-adjust: exact; }
-          </style>
-        </head>
-        <body>
-          ${printContent}
-        </body>
-      </html>
-    `);
-
-    WindowPrint.document.close();
-    WindowPrint.focus();
-
-    // Delay sedikit agar script Tailwind sempat ter-load sebelum dialog print muncul
-    setTimeout(() => {
-      // Need to check again inside timeout because closure might capture old state,
-      // but WindowPrint is const so strictly speaking it's fine,
-      // however strict TS might want optional chaining or non-null assertion here too.
-      WindowPrint.print();
-      WindowPrint.close();
-    }, 1000);
+  const handlePrint = () => {
+    if (iframeRef.current && iframeRef.current.contentWindow) {
+      try {
+        iframeRef.current.contentWindow.print();
+      } catch (e) {
+        if (blobUrl) {
+          const pdfWindow = window.open(blobUrl);
+          pdfWindow?.print();
+        }
+      }
+    }
   };
 
-  // Data Mockup untuk Fallback jika dataSk belum siap (Opsional)
-  const dummyData = {
-    nomorSurat: "Loading...",
-    namaPemohon: "Loading...",
-    // ... isi default lainnya
+  const handleOpenNewTab = () => {
+    if (blobUrl) window.open(blobUrl, "_blank");
   };
 
   return (
     <MainLayout title="Preview SK | KRK Bengkulu" isBgGray={false}>
-      <div className="flex flex-col h-[calc(100vh-64px)] bg-slate-50">
-        {/* --- HEADER --- */}
-        <div className="bg-white border-b border-gray-200 px-6 py-3 flex justify-between items-center shadow-sm z-10">
+      <div className="flex flex-col h-[calc(100vh-64px)] bg-zinc-100">
+        <div className="bg-white border-b border-gray-200 px-6 py-3 flex justify-between items-center shadow-sm z-20 sticky top-0">
           <div className="flex items-center gap-4">
             <Button
               variant="ghost"
@@ -95,34 +69,47 @@ const PreviewSk = () => {
               <ArrowLeft size={18} className="mr-2" />
               Kembali
             </Button>
-            <Separator orientation="vertical" className="h-6" />
-            <div className="flex items-center gap-2">
-              <div className="p-1.5 bg-red-50 rounded-md">
-                <FileText size={18} className="text-red-600" />
+            <Separator orientation="vertical" className="h-6 hidden sm:block" />
+
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-blue-50 text-blue-600 rounded-lg">
+                <FileText size={20} />
               </div>
-              <div>
-                <h1 className="text-sm font-bold text-gray-800 leading-none">
-                  Surat Keputusan (SK)
+              <div className="hidden sm:block">
+                <h1 className="text-sm font-bold text-gray-800 leading-tight">
+                  Preview Dokumen SK
                 </h1>
-                <p className="text-xs text-gray-500 mt-0.5">
-                  Dokumen Resmi KRK Online
+                <p className="text-xs text-gray-500">
+                  ID:{" "}
+                  <span className="font-mono">{id?.substring(0, 8)}...</span>
                 </p>
               </div>
             </div>
           </div>
 
-          {/* Tombol Aksi (Print & Download) */}
           <div className="flex items-center gap-2">
-            {!isLoadingSk && !isError && (
+            {!isLoadingSk && !isError && blobUrl && (
               <>
-                <TooltipProvider>
+                <TooltipProvider delayDuration={100}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={handleOpenNewTab}
+                      >
+                        <ExternalLink size={18} className="text-gray-600" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Buka di Tab Baru</TooltipContent>
+                  </Tooltip>
+
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Button
                         variant="outline"
                         size="icon"
                         onClick={handlePrint}
-                        className="hidden sm:flex"
                       >
                         <Printer size={18} className="text-gray-600" />
                       </Button>
@@ -131,31 +118,49 @@ const PreviewSk = () => {
                   </Tooltip>
                 </TooltipProvider>
 
-                <Button
-                  className="bg-blue-600 hover:bg-blue-700 shadow-md gap-2"
-                  onClick={handlePrint} // Fungsi sama, karena browser "Save as PDF" ada di dialog print
+                <Separator orientation="vertical" className="h-6 mx-1" />
+
+                <a
+                  href={blobUrl}
+                  download={`SK_KRK_${id}.pdf`}
+                  className="no-underline"
                 >
-                  <Download size={18} />
-                  <span className="hidden sm:inline">Download PDF</span>
-                </Button>
+                  <Button className="bg-slate-900 hover:bg-slate-800 text-white shadow-md gap-2 px-5">
+                    <Download size={18} />
+                    <span className="hidden sm:inline font-medium">
+                      Download
+                    </span>
+                  </Button>
+                </a>
               </>
             )}
           </div>
         </div>
 
-        {/* --- CONTENT AREA --- */}
-        <div className="flex-1 overflow-auto p-4 md:p-8 flex justify-center bg-gray-200/50">
+        <div className="flex-1 overflow-hidden relative w-full h-full flex justify-center bg-zinc-100">
           {isLoadingSk ? (
-            /* Loading State */
-            <div className="flex flex-col items-center justify-center h-full gap-4">
-              <div className="w-12 h-12 border-4 border-blue-100 rounded-full animate-spin border-t-blue-600"></div>
-              <p className="text-gray-500 font-medium">Menyiapkan Dokumen...</p>
+            <div className="flex flex-col items-center justify-center h-full gap-4 animate-in fade-in zoom-in duration-300">
+              <div className="relative">
+                <div className="w-16 h-16 border-4 border-slate-200 rounded-full"></div>
+                <div className="w-16 h-16 border-4 border-blue-600 rounded-full animate-spin absolute top-0 border-t-transparent"></div>
+              </div>
+              <p className="text-slate-500 font-medium animate-pulse">
+                Memuat Dokumen...
+              </p>
             </div>
           ) : isError ? (
-            /* Error State */
-            <div className="flex flex-col items-center justify-center h-full gap-4">
-              <FileWarning size={48} className="text-red-400" />
-              <p className="text-gray-500">Gagal memuat data dokumen.</p>
+            <div className="flex flex-col items-center justify-center h-full gap-5">
+              <div className="p-4 bg-red-50 rounded-full">
+                <FileWarning size={48} className="text-red-500" />
+              </div>
+              <div className="text-center">
+                <h3 className="text-lg font-bold text-gray-800">
+                  Gagal Memuat Dokumen
+                </h3>
+                <p className="text-gray-500 text-sm mt-1">
+                  Terjadi kesalahan saat mengambil data dari server.
+                </p>
+              </div>
               <Button
                 variant="outline"
                 onClick={() => window.location.reload()}
@@ -164,11 +169,18 @@ const PreviewSk = () => {
               </Button>
             </div>
           ) : (
-            /* SUKSES: Render KRKPage */
-            /* Kita bungkus dengan div ref agar bisa diambil HTML-nya oleh fungsi handlePrint */
-            <div ref={printAreaRef} className="bg-white shadow-2xl">
-              {/* Pass dataSk ke komponen template */}
-              <KRKPage data={dataSk || dummyData} />
+            <div className="w-full h-full p-0 md:p-4 lg:p-6">
+              <div className="w-full h-full bg-white shadow-sm md:shadow-lg rounded-none md:rounded-lg overflow-hidden border border-gray-200">
+                {blobUrl && (
+                  <iframe
+                    ref={iframeRef}
+                    title="Preview SK"
+                    src={blobUrl}
+                    className="w-full h-full block"
+                    style={{ border: "none" }}
+                  />
+                )}
+              </div>
             </div>
           )}
         </div>
