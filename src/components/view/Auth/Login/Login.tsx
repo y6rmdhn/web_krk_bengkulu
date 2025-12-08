@@ -14,9 +14,11 @@ import useLogin from "./useLogin";
 import FormInput from "@/components/commons/FormInput";
 import { usePasswordToggle } from "@/hooks/usePasswordToggle";
 import { Spinner } from "@/components/ui/spinner";
+import ReCAPTCHA from "react-google-recaptcha";
+import environment from "@/config/environment";
 
 export default function LoginPage() {
-  const { form, handleLogin, isPendingLogin } = useLogin();
+  const { form, handleLogin, isPendingLogin, onCaptchaChange } = useLogin();
   const { showPassword, togglePassword } = usePasswordToggle();
 
   return (
@@ -86,6 +88,13 @@ export default function LoginPage() {
                           showPassword={showPassword}
                           onTogglePassword={togglePassword}
                         />
+
+                        <div className="flex justify-center transform scale-90 sm:scale-100 origin-center">
+                          <ReCAPTCHA
+                            sitekey={environment.SITE_KEY}
+                            onChange={onCaptchaChange}
+                          />
+                        </div>
 
                         <Button
                           type="submit"

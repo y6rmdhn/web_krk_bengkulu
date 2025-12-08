@@ -4,6 +4,7 @@ import session from "@/utils/session";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { AxiosError } from "axios";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -18,6 +19,8 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 
 const useLogin = () => {
   const navigate = useNavigate();
+  const [captchaValue, setCaptchaValue] = useState<string | null>(null);
+
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -56,13 +59,24 @@ const useLogin = () => {
   });
 
   const handleLogin = (values: ILogin) => {
+    if (!captchaValue) {
+      toast.error("Silakan centang Captcha terlebih dahulu!");
+      return;
+    }
+
     mutateLogin(values);
+  };
+
+  const onCaptchaChange = (value: string | null) => {
+    setCaptchaValue(value);
   };
 
   return {
     handleLogin,
     isPendingLogin,
     form,
+    onCaptchaChange,
+    captchaValue,
   };
 };
 
