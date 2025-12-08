@@ -34,7 +34,7 @@ const SIDEBAR_ADMIN = [
   {
     key: "tracting permohonan",
     label: "Tracking Permohonan",
-    href: "/operator/tracking-permohonan",
+    href: "/operator/tracking",
     icon: <FaInbox />,
   },
 ];

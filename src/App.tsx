@@ -66,6 +66,12 @@ const SuccessVerificationEmailPage = lazy(
 const PreviewSkPage = lazy(
   () => import("./components/view/RegularUser/PreviewSk")
 );
+const TrackingPage = lazy(
+  () => import("./components/view/RegularUser/Tracking")
+);
+const DetailTrackingPage = lazy(
+  () => import("./components/view/RegularUser/Tracking/PermohonanDetail")
+);
 
 // admin
 const JenisLayanan = lazy(() => import("./components/view/Admin/JenisLayanan"));
@@ -286,6 +292,16 @@ const router = createBrowserRouter([
         path: "detail/:id",
         loader: operatorLoader,
         element: <DetailPermohonanAdminPage />,
+      },
+      {
+        path: "tracking",
+        loader: operatorLoader,
+        element: <TrackingPage />,
+      },
+      {
+        path: "tracking/detail/:id",
+        loader: operatorLoader,
+        element: <DetailTrackingPage />,
       },
     ],
   },
