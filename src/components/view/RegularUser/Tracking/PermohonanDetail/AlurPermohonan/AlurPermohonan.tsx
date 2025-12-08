@@ -136,7 +136,7 @@ const AlurPermohonanCard = ({ data }: AlurPermohonanCardProps) => {
             {/* Garis Vertikal Latar Belakang */}
             <div className="absolute left-[19px] top-2 bottom-6 w-0.5 bg-slate-200" />
 
-            {data.map((item, index) => {
+            {data.map((item) => {
               const config = getStatusConfig(item.status_keputusan);
               const StepIcon = getStepIcon(item.step_name);
               // const isLast = index === data.length - 1;
