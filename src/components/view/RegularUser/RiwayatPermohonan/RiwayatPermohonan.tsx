@@ -66,34 +66,38 @@ export default function RiwayatPermohonan() {
     const paginatedData = filteredResult.slice(startIndex, endIndex);
 
     return paginatedData.map((item: any, index: number) => {
-      const menuActions = [
-        {
-          label: (
-            <span className="flex items-center gap-2">
-              <Eye size={16} /> Detail
-            </span>
-          ),
-          action: () => navigate(`/riwayat-permohonan/detail/${item.id}`),
-        },
-        {
-          label: (
-            <span className="flex items-center gap-2">
-              <Pencil size={16} /> Edit
-            </span>
-          ),
-          action: () => navigate(`/permohonan-krk/edit/${item.id}`),
-        },
-      ];
+      let menuActions = [];
 
       if (item.status === "APPROVED") {
-        menuActions.push({
-          label: (
-            <span className="flex items-center gap-2 text-blue-600 font-medium">
-              <FileCheck size={16} /> Lihat SK
-            </span>
-          ),
-          action: () => navigate(`/preview-sk/${item.id}`),
-        });
+        menuActions = [
+          {
+            label: (
+              <span className="flex items-center gap-2 text-blue-600 font-medium">
+                <FileCheck size={16} /> Lihat SK
+              </span>
+            ),
+            action: () => navigate(`/preview-sk/${item.id}`),
+          },
+        ];
+      } else {
+        menuActions = [
+          {
+            label: (
+              <span className="flex items-center gap-2">
+                <Eye size={16} /> Detail
+              </span>
+            ),
+            action: () => navigate(`/riwayat-permohonan/detail/${item.id}`),
+          },
+          {
+            label: (
+              <span className="flex items-center gap-2">
+                <Pencil size={16} /> Edit
+              </span>
+            ),
+            action: () => navigate(`/permohonan-krk/edit/${item.id}`),
+          },
+        ];
       }
 
       return [
@@ -123,6 +127,7 @@ export default function RiwayatPermohonan() {
         >
           {item.current_step_name || item.status}
         </Badge>,
+        // Render dropdown
         <DropdownActions key={`action-${item.id}`} menu={menuActions} />,
       ];
     });
