@@ -1,3 +1,4 @@
+// components/layouts/MainLayout/MainLayout.tsx
 import PageHead from "@/components/commons/PageHead";
 import { Fragment, type ReactNode } from "react";
 import MainLayoutNavbar from "./MainLayoutNavbar";
@@ -11,10 +12,11 @@ interface PropsType {
   children: ReactNode;
   isBgGray?: boolean;
   isPaddingY?: boolean;
+  isHomepage?: boolean;
 }
 
 const MainLayout = (props: PropsType) => {
-  const { title, children, isBgGray, isPaddingY } = props;
+  const { title, children, isBgGray, isPaddingY, isHomepage } = props;
 
   const isAuthenticated = session.getSession();
 
@@ -24,9 +26,10 @@ const MainLayout = (props: PropsType) => {
       <MainLayoutNavbar isAuth={isAuthenticated} />
       <MainLayoutSubHeader children={true} isAuth={isAuthenticated} />
       <div
-        className={cn("3xl:container max-w-screen", {
-          "bg-gray-100": isBgGray,
-          "py-10": isPaddingY,
+        className={cn("w-full", {
+          "bg-gray-100": isBgGray && !isHomepage,
+          "py-10": isPaddingY && !isHomepage,
+          "bg-transparent": isHomepage,
         })}
       >
         {children}

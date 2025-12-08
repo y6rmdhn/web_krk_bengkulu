@@ -1,6 +1,73 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+@import 'swiper/css';
+@import 'swiper/css/navigation';
+@import 'swiper/css/pagination';
+@import 'swiper/css/autoplay';
+
+/* Custom Swiper Pagination */
+        .swiper-pagination {
+          bottom: 20px !important;
+        }
+        
+        .swiper-pagination-bullet {
+          width: 8px !important;
+          height: 8px !important;
+          background: rgba(255, 255, 255, 0.6) !important;
+          opacity: 1 !important;
+          margin: 0 4px !important;
+          transition: all 0.3s ease !important;
+        }
+        
+        .swiper-pagination-bullet-active {
+          background: white !important;
+          transform: scale(1.3) !important;
+          box-shadow: 0 0 12px rgba(59, 130, 246, 0.8) !important;
+        }
+        
+        @media (min-width: 640px) {
+          .swiper-pagination {
+            bottom: 30px !important;
+          }
+          
+          .swiper-pagination-bullet {
+            width: 10px !important;
+            height: 10px !important;
+            margin: 0 5px !important;
+          }
+        }
+        
+        /* Responsive height untuk hero section */
+        @media (max-width: 640px) {
+          .hero-section {
+            height: 85vh !important;
+            min-height: 600px !important;
+          }
+        }
+        
+        /* Hide default navigation buttons */
+        .swiper-button-next,
+        .swiper-button-prev {
+          display: none !important;
+        }
+        
+        /* Animasi fade-in */
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        
+        .animate-fade-in {
+          animation: fadeIn 0.8s ease-out;
+        }
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
