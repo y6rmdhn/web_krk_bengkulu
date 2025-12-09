@@ -12,8 +12,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import useWilayahForm from "./useWilayahForm";
-import FormFieldSelect from "@/components/commons/FormFieldSelect";
 import FormInput from "@/components/commons/FormInput";
 
 type PropTypes = {
@@ -25,7 +23,7 @@ const BENGKULU_CITY_ID = "1771";
 
 const WilayahForm = (props: PropTypes) => {
   const { form } = props;
-  const { dataJenisLayanan, isLoadingDataLayanan } = useWilayahForm();
+  // const { dataJenisLayanan, isLoadingDataLayanan } = useWilayahForm();
 
   const currentLat = form.watch("latitude");
   const currentLng = form.watch("longitude");
@@ -90,7 +88,7 @@ const WilayahForm = (props: PropTypes) => {
     <div className="space-y-6">
       {/* <SectionTitle title="Pilih Wilayah" /> */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
-        <FormFieldSelect
+        {/* <FormFieldSelect
           form={form}
           name="jenis_layanan_id"
           label="Layanan"
@@ -101,7 +99,7 @@ const WilayahForm = (props: PropTypes) => {
               value: item.id,
             })) || []
           }
-        />
+        /> */}
 
         <div className="flex gap-5 items-center justify-between">
           <Label>Kecamatan</Label>

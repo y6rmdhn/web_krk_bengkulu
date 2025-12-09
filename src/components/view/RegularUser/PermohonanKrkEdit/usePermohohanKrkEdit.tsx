@@ -222,6 +222,7 @@ const usePermohonanKrkEdit = (id: string) => {
     Object.entries(values).forEach(([key, value]) => {
       if (
         key !== "file_ktp_pemohon" &&
+        key !== "jenis_layanan_id" &&
         key !== "PBB" &&
         key !== "file_sertifikat_tanah" &&
         key !== "latitude" &&

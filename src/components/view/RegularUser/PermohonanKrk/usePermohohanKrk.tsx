@@ -17,7 +17,7 @@ export const fileSchema = z
   );
 
 const permohonanSchema = z.object({
-  jenis_layanan_id: z.string().min(1, "Layanan harus diisi"),
+  jenis_layanan_id: z.string(),
   latitude: z.string().min(1, "Koordinat harus diisi"),
   longitude: z.string().min(1, "Koordinat harus diisi"),
 
@@ -173,6 +173,7 @@ const usePermohohanKrk = () => {
     Object.entries(values).forEach(([key, value]) => {
       if (
         key !== "file_ktp_pemohon" &&
+        key !== "jenis_layanan_id" &&
         key !== "PBB" &&
         key !== "file_sertifikat_tanah" &&
         key !== "latitude" &&

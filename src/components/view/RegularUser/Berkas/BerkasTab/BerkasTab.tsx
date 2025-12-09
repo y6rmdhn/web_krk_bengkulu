@@ -38,8 +38,19 @@ const BerkasTab = () => {
   const [isOpenUploadBerkas, setIsOpenUploadBerkas] = useState(false);
   const [file, setFile] = useState<File | null>(null);
 
+  // --- 1. STATE UNTUK PREVIEW IFRAME ---
+  const [isOpenPreview, setIsOpenPreview] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
   const { currentPage, currentLimit, handleChangePage, handleLimitChange } =
     useDataTable();
+
+  // --- 2. FUNGSI HANDLE CLICK LIHAT ---
+  const handlePreview = (filePath: string) => {
+    const url = `${environment.API_URL_PDF}/${filePath}`;
+    setPreviewUrl(url);
+    setIsOpenPreview(true);
+  };
 
   const filteredData = useMemo(() => {
     if (!dataListBerkas) return [];
@@ -65,13 +76,9 @@ const BerkasTab = () => {
         <Button
           variant="outline"
           size="sm"
-          onClick={() =>
-            window.open(
-              `${environment.API_URL_PDF}/${item.file_path}`,
-              "_blank"
-            )
-          }
-          className="gap-2 w-full md:w-auto"
+          // Ubah onClick untuk memanggil handlePreview
+          onClick={() => handlePreview(item.file_path)}
+          className="gap-2 w-full md:w-auto hover:bg-blue-50 hover:text-blue-600"
         >
           <Eye size={14} />
           <span className="md:inline">Lihat</span>
@@ -97,7 +104,7 @@ const BerkasTab = () => {
   return (
     <Card className="rounded-lg border shadow-sm">
       <CardContent className="p-4 md:p-6 space-y-4">
-        {/* Header Section: Stack on Mobile, Row on Desktop */}
+        {/* Header Section */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <h3 className="text-lg font-semibold text-gray-900">Daftar Berkas</h3>
           <Button
@@ -109,7 +116,7 @@ const BerkasTab = () => {
           </Button>
         </div>
 
-        {/* Tabel Data Wrapper for Horizontal Scroll */}
+        {/* Tabel Data Wrapper */}
         <div className="overflow-x-auto -mx-4 md:mx-0">
           <div className="min-w-[600px] px-4 md:px-0">
             <DataTable
@@ -124,6 +131,28 @@ const BerkasTab = () => {
             />
           </div>
         </div>
+
+        {/* --- 3. DIALOG PREVIEW PDF (IFRAME) --- */}
+        <Dialog open={isOpenPreview} onOpenChange={setIsOpenPreview}>
+          <DialogContent className="sm:max-w-[90vw] w-[90vw] h-[90vh] flex flex-col p-0">
+            <DialogHeader className="px-6 py-4 border-b">
+              <DialogTitle>Pratinjau Dokumen</DialogTitle>
+            </DialogHeader>
+            <div className="flex-1 w-full bg-gray-100 relative">
+              {previewUrl ? (
+                <iframe
+                  src={previewUrl}
+                  className="w-full h-full border-0"
+                  title="PDF Preview"
+                />
+              ) : (
+                <div className="flex items-center justify-center h-full text-gray-500">
+                  Dokumen tidak dapat dimuat.
+                </div>
+              )}
+            </div>
+          </DialogContent>
+        </Dialog>
 
         {/* Dialog Tambah Master Berkas */}
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
