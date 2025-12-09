@@ -18,9 +18,25 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { CheckCircle, XCircle, RefreshCcw, Loader2 } from "lucide-react";
 import useActionButton from "./useActionButton";
+
+const APPROVE_TEMPLATES = ["Sesuai (berkas sudah lengkap)", "Lainnya"];
+
+const REJECT_TEMPLATES = [
+  "Dokumen tidak terbaca",
+  "Lokasi tidak sesuai koordinat",
+  "Berkas persyaratan kurang lengkap",
+  "Lainnya",
+];
 
 const ActionButtons = ({ id }: { id: string }) => {
   const { formAccept, formRevisiReject, actions, state } = useActionButton(id);
@@ -28,6 +44,18 @@ const ActionButtons = ({ id }: { id: string }) => {
   const [openDialog, setOpenDialog] = useState<
     "accept" | "revisi" | "reject" | null
   >(null);
+
+  const handleTemplateChange = (
+    value: string,
+    form: any,
+    fieldName: string
+  ) => {
+    if (value === "Lainnya") {
+      form.setValue(fieldName, "");
+    } else {
+      form.setValue(fieldName, value);
+    }
+  };
 
   return (
     <Card>
@@ -48,8 +76,8 @@ const ActionButtons = ({ id }: { id: string }) => {
               <DialogHeader>
                 <DialogTitle>Setujui Permohonan</DialogTitle>
                 <DialogDescription>
-                  Apakah Anda yakin ingin menyetujui permohonan ini? Tambahkan
-                  catatan jika perlu.
+                  Apakah Anda yakin ingin menyetujui permohonan ini? Pilih
+                  template catatan atau ketik manual.
                 </DialogDescription>
               </DialogHeader>
               <Form {...formAccept}>
@@ -60,6 +88,28 @@ const ActionButtons = ({ id }: { id: string }) => {
                   }}
                   className="space-y-4"
                 >
+                  <FormItem>
+                    <FormLabel>Template Catatan</FormLabel>
+                    <Select
+                      onValueChange={(val) =>
+                        handleTemplateChange(val, formAccept, "catatan")
+                      }
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Pilih catatan template..." />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {APPROVE_TEMPLATES.map((item, idx) => (
+                          <SelectItem key={idx} value={item}>
+                            {item}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </FormItem>
+
                   <FormField
                     control={formAccept.control}
                     name="catatan"
@@ -126,6 +176,28 @@ const ActionButtons = ({ id }: { id: string }) => {
                   }}
                   className="space-y-4"
                 >
+                  <FormItem>
+                    <FormLabel>Template Revisi</FormLabel>
+                    <Select
+                      onValueChange={(val) =>
+                        handleTemplateChange(val, formAccept, "catatan")
+                      }
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Pilih alasan revisi..." />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {REJECT_TEMPLATES.map((item, idx) => (
+                          <SelectItem key={idx} value={item}>
+                            {item}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </FormItem>
+
                   <FormField
                     control={formAccept.control}
                     name="catatan"
@@ -198,6 +270,32 @@ const ActionButtons = ({ id }: { id: string }) => {
                   }}
                   className="space-y-4"
                 >
+                  <FormItem>
+                    <FormLabel>Template Penolakan</FormLabel>
+                    <Select
+                      onValueChange={(val) =>
+                        handleTemplateChange(
+                          val,
+                          formRevisiReject,
+                          "alasan_penolakan"
+                        )
+                      }
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Pilih alasan penolakan..." />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {REJECT_TEMPLATES.map((item, idx) => (
+                          <SelectItem key={idx} value={item}>
+                            {item}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </FormItem>
+
                   <FormField
                     control={formRevisiReject.control}
                     name="alasan_penolakan"
