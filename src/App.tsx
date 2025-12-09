@@ -37,6 +37,10 @@ const BerhasilBuatBaruPage = lazy(
 const MonitoringBerkasPage = lazy(
   () => import("./components/view/RegularUser/MonitoringBerkas")
 );
+const DetailMonitoringBerkasPage = lazy(
+  () =>
+    import("./components/view/RegularUser/MonitoringBerkas/PermohonanDetail")
+);
 const FAQPage = lazy(() => import("./components/view/RegularUser/Faq"));
 const RegulasiPage = lazy(
   () => import("./components/view/RegularUser/Regulasi")
@@ -213,6 +217,10 @@ const router = createBrowserRouter([
   {
     path: "/monitoring-berkas",
     element: <MonitoringBerkasPage />,
+  },
+  {
+    path: "/monitoring/detail/:id",
+    element: <DetailMonitoringBerkasPage />,
   },
   {
     path: "/faq",

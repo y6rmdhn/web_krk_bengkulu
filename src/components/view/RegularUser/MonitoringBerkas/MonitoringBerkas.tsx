@@ -4,21 +4,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import MainLayout from "@/components/layouts/MainLayout/MainLayout";
 import { Search, FileText, AlertCircle, Eye } from "lucide-react";
-import { useState } from "react";
 import { PENGUMUMAN_LIST } from "./MonitoringBerkas.constant";
 import SidebarInfo from "./SidebarInfo/SidebarInfo";
+import useMonitoringBerkas from "./useMonitoringBerkas";
 
 export default function MonitoringBerkasPage() {
-  const [noResi, setNoResi] = useState("");
-  const [isSearching, setIsSearching] = useState(false);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSearching(true);
-    setTimeout(() => {
-      setIsSearching(false);
-    }, 1500);
-  };
+  const { noResi, setNoResi, isSearching, handleSearch } =
+    useMonitoringBerkas();
 
   return (
     <MainLayout title="Monitoring Berkas | KRK Bengkulu">
@@ -87,8 +79,8 @@ export default function MonitoringBerkasPage() {
                     </div>
                   </div>
 
-                  {/* Search Form */}
-                  <form onSubmit={handleSubmit} className="space-y-6">
+                  {/* Search Form - Menggunakan handler dari Hook */}
+                  <form onSubmit={handleSearch} className="space-y-6">
                     <div className="text-center mb-8">
                       <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-cyan-100 rounded-3xl flex items-center justify-center mx-auto mb-4 shadow-lg">
                         <Search className="text-blue-600" size={32} />
