@@ -24,10 +24,52 @@ import {
 import { Loader2, Save } from "lucide-react";
 import useIdentitasTab from "./useIdentitas";
 import FormInput from "@/components/commons/FormInput";
+import { useWilayahData } from "@/hooks/useWilayah";
+
+// ID Provinsi Bengkulu (Standar BPS = 17).
+// Ganti value ini jika di database wilayahmu ID-nya beda.
+const BENGKULU_PROVINCE_ID = "17";
 
 const IdentitasTab = () => {
   const { identitasForm, handleUpdateProfile, isPendingUpdateProfile } =
     useIdentitasTab();
+
+  // 1. Watch perubahan value (Provinsi di-skip, langsung Kota)
+  const selectedKota = identitasForm.watch("kota");
+  const selectedKecamatan = identitasForm.watch("kecamatan");
+
+  // 2. Panggil Hook Wilayah
+  // Parameter pertama langsung kita isi ID Bengkulu
+  const { regencies, districts, villages } = useWilayahData(
+    BENGKULU_PROVINCE_ID,
+    selectedKota ? String(selectedKota) : "",
+    selectedKecamatan ? String(selectedKecamatan) : ""
+  );
+
+  // 3. Mapping Options (Province option dihapus karena tidak dipakai)
+  const regencyOptions = regencies.map((r) => ({ label: r.name, value: r.id }));
+  const districtOptions = districts.map((d) => ({
+    label: d.name,
+    value: d.id,
+  }));
+  const villageOptions = villages.map((v) => ({ label: v.name, value: v.id }));
+
+  // 4. Handle Logic Cascading
+  const handleSelectChange = (
+    value: string,
+    onChange: (val: any) => void,
+    options: { label: string; value: string | number }[],
+    resetFields: string[]
+  ) => {
+    // Reset field di bawahnya saat parent berubah
+    resetFields.forEach((field) => identitasForm.setValue(field as any, ""));
+
+    const matchedOption = options.find((opt) => opt.value.toString() === value);
+    const parsedValue =
+      typeof matchedOption?.value === "number" ? Number(value) : value;
+
+    onChange(parsedValue);
+  };
 
   return (
     <Card className="rounded-lg shadow-sm border-0 bg-white">
@@ -47,7 +89,7 @@ const IdentitasTab = () => {
             onSubmit={identitasForm.handleSubmit(handleUpdateProfile)}
             className="space-y-6"
           >
-            {/* Section Informasi Pribadi */}
+            {/* --- Section Informasi Pribadi (Tidak Berubah) --- */}
             <div className="space-y-4">
               <h3 className="text-base md:text-lg font-medium text-gray-900 border-b pb-2">
                 Informasi Pribadi
@@ -115,7 +157,7 @@ const IdentitasTab = () => {
               </div>
             </div>
 
-            {/* Section Alamat */}
+            {/* --- Section Alamat --- */}
             <div className="space-y-4">
               <h3 className="text-base md:text-lg font-medium text-gray-900 border-b pb-2">
                 Alamat Tempat Tinggal
@@ -131,7 +173,6 @@ const IdentitasTab = () => {
                 />
               </div>
 
-              {/* Responsif: 2 Kolom di HP, 4 di Desktop */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <FormInput
                   form={identitasForm}
@@ -153,29 +194,139 @@ const IdentitasTab = () => {
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <FormInput
-                  form={identitasForm}
-                  label="Kelurahan/Desa"
-                  name="kelurahan"
-                  placeholder="Nama Kelurahan"
-                />
-                <FormInput
-                  form={identitasForm}
-                  label="Kecamatan"
-                  name="kecamatan"
-                  placeholder="Nama Kecamatan"
-                />
-                <FormInput
-                  form={identitasForm}
-                  label="Kota/Kabupaten"
+              {/* Implementasi Wilayah Cascading (Mulai dari Kota) */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* 1. KOTA / KABUPATEN (Otomatis list kota di Bengkulu) */}
+                <FormField
+                  control={identitasForm.control}
                   name="kota"
-                  placeholder="Nama Kota/Kabupaten"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        Kota/Kabupaten <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <Select
+                        key={`kota-${regencyOptions.length}`}
+                        onValueChange={(val) =>
+                          handleSelectChange(
+                            val,
+                            field.onChange,
+                            regencyOptions,
+                            ["kecamatan", "kelurahan"]
+                          )
+                        }
+                        value={field.value?.toString()}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Pilih Kota/Kabupaten" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent className="max-h-[200px]">
+                          {regencyOptions.map((opt) => (
+                            <SelectItem
+                              key={opt.value}
+                              value={opt.value.toString()}
+                            >
+                              {opt.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* 2. KECAMATAN */}
+                <FormField
+                  control={identitasForm.control}
+                  name="kecamatan"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        Kecamatan <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <Select
+                        key={`kecamatan-${districtOptions.length}`}
+                        disabled={!selectedKota} // Disable kalau kota belum dipilih
+                        onValueChange={(val) =>
+                          handleSelectChange(
+                            val,
+                            field.onChange,
+                            districtOptions,
+                            ["kelurahan"]
+                          )
+                        }
+                        value={field.value?.toString()}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Pilih Kecamatan" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent className="max-h-[200px]">
+                          {districtOptions.map((opt) => (
+                            <SelectItem
+                              key={opt.value}
+                              value={opt.value.toString()}
+                            >
+                              {opt.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* 3. KELURAHAN */}
+                <FormField
+                  control={identitasForm.control}
+                  name="kelurahan"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        Kelurahan/Desa <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <Select
+                        key={`kelurahan-${villageOptions.length}`}
+                        disabled={!selectedKecamatan} // Disable kalau kecamatan belum dipilih
+                        onValueChange={(val) =>
+                          handleSelectChange(
+                            val,
+                            field.onChange,
+                            villageOptions,
+                            []
+                          )
+                        }
+                        value={field.value?.toString()}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Pilih Kelurahan/Desa" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent className="max-h-[200px]">
+                          {villageOptions.map((opt) => (
+                            <SelectItem
+                              key={opt.value}
+                              value={opt.value.toString()}
+                            >
+                              {opt.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
               </div>
             </div>
 
-            {/* Tombol Aksi: Stack vertikal di HP, horizontal di Desktop */}
+            {/* Tombol Aksi */}
             <div className="flex flex-col-reverse md:flex-row justify-end gap-3 pt-4 border-t">
               <Button
                 type="button"

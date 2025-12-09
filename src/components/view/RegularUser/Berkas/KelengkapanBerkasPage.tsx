@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import MainLayout from "@/components/layouts/MainLayout/MainLayout";
 import IdentitasTab from "./IdentitasTab";
 import BerkasTab from "./BerkasTab";
 
 export default function Berkas() {
+  // State untuk melacak tab mana yang aktif
   const [activeTab, setActiveTab] = useState("identitas");
 
   return (
@@ -15,6 +16,7 @@ export default function Berkas() {
             Kelengkapan Berkas
           </h2>
 
+          {/* Gunakan Tabs hanya untuk Navigasi/Trigger */}
           <Tabs
             defaultValue="identitas"
             className="w-full"
@@ -36,17 +38,15 @@ export default function Berkas() {
                 Berkas
               </TabsTrigger>
             </TabsList>
-
-            {/* Konten untuk Tab Identitas */}
-            <TabsContent value="identitas" className="mt-0">
-              <IdentitasTab />
-            </TabsContent>
-
-            {/* Konten untuk Tab Berkas */}
-            <TabsContent value="berkas" className="mt-0">
-              <BerkasTab />
-            </TabsContent>
           </Tabs>
+
+          <div className={activeTab === "identitas" ? "block" : "hidden"}>
+            <IdentitasTab />
+          </div>
+
+          <div className={activeTab === "berkas" ? "block" : "hidden"}>
+            <BerkasTab />
+          </div>
         </div>
       </div>
     </MainLayout>

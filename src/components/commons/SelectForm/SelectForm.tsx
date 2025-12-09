@@ -28,6 +28,7 @@ type FormFieldSelectProps = {
   selectStyle?: string;
   required?: boolean;
   options: Option[];
+  disabled?: boolean;
 };
 
 export const SelectFilter = ({
@@ -39,6 +40,7 @@ export const SelectFilter = ({
   selectStyle,
   required = false,
   options,
+  disabled,
 }: FormFieldSelectProps) => {
   return (
     <FormField
@@ -50,7 +52,11 @@ export const SelectFilter = ({
             {label} {required && <span className="text-red-500">*</span>}
           </FormLabel>
 
-          <Select onValueChange={field.onChange} defaultValue={field.value}>
+          <Select
+            onValueChange={field.onChange}
+            defaultValue={field.value}
+            disabled={disabled}
+          >
             <FormControl>
               <SelectTrigger className={`${selectStyle} w-full`}>
                 <SelectValue placeholder={placeholder} />

@@ -2,7 +2,7 @@ import authServices from "@/services/api/auth.services";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod";
@@ -64,6 +64,7 @@ export type IdentitasFormValues = z.infer<typeof identitasSchema>;
 
 const useIdentitasTab = () => {
   const queryClient = useQueryClient();
+  const isInitializedRef = useRef(false);
 
   const identitasForm = useForm<IdentitasFormValues>({
     resolver: zodResolver(identitasSchema),
@@ -85,39 +86,83 @@ const useIdentitasTab = () => {
 
   const getProfile = async () => {
     const result = await authServices.getProfile();
-
     return result.data.data;
   };
 
   const { data: dataProfile, isLoading: isLoadingProfile } = useQuery({
-    queryKey: ["GetProfile"],
+    queryKey: ["GetProfileBerkas"],
     queryFn: getProfile,
+    staleTime: 0,
+    refetchOnMount: "always",
   });
+
+  useEffect(() => {
+    if (dataProfile && !isInitializedRef.current) {
+      const { kota, kecamatan, kelurahan, ...restData } = dataProfile;
+
+      // Set semua field non-cascade
+      Object.entries(restData).forEach(([key, value]) => {
+        identitasForm.setValue(key as any, value?.toString() || "");
+      });
+
+      if (kota) {
+        identitasForm.setValue("kota", kota.toString());
+      }
+
+      isInitializedRef.current = true;
+    }
+  }, [dataProfile]);
+
+  useEffect(() => {
+    if (
+      dataProfile?.kota &&
+      dataProfile?.kecamatan &&
+      isInitializedRef.current
+    ) {
+      const kotaValue = identitasForm.watch("kota");
+
+      if (kotaValue === dataProfile.kota?.toString()) {
+        const timer = setTimeout(() => {
+          identitasForm.setValue("kecamatan", dataProfile.kecamatan.toString());
+        }, 100);
+
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [dataProfile?.kota, dataProfile?.kecamatan, identitasForm.watch("kota")]);
+
+  useEffect(() => {
+    if (
+      dataProfile?.kecamatan &&
+      dataProfile?.kelurahan &&
+      isInitializedRef.current
+    ) {
+      const kecamatanValue = identitasForm.watch("kecamatan");
+
+      if (kecamatanValue === dataProfile.kecamatan?.toString()) {
+        const timer = setTimeout(() => {
+          identitasForm.setValue("kelurahan", dataProfile.kelurahan.toString());
+        }, 200);
+
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [
+    dataProfile?.kecamatan,
+    dataProfile?.kelurahan,
+    identitasForm.watch("kecamatan"),
+  ]);
+
+  useEffect(() => {
+    return () => {
+      isInitializedRef.current = false;
+    };
+  }, []);
 
   const updateProfile = async (values: IdentitasFormValues) => {
     const result = await authServices.updateProfile(values);
-
     return result.data;
   };
-
-  useEffect(() => {
-    if (dataProfile) {
-      identitasForm.reset({
-        nik: dataProfile.nik || "",
-        name: dataProfile.name || "",
-        email: dataProfile.email || "",
-        phone: dataProfile.phone || "",
-        alamat: dataProfile.alamat || "",
-        rt: dataProfile.rt || "",
-        rw: dataProfile.rw || "",
-        no_rumah: dataProfile.no_rumah || "",
-        kelurahan: dataProfile.kelurahan || "",
-        kecamatan: dataProfile.kecamatan || "",
-        kota: dataProfile.kota || "",
-        jenis_kelamin: dataProfile.jenis_kelamin || "Laki-laki",
-      });
-    }
-  }, [dataProfile, identitasForm]);
 
   const { mutate: mutateUpdateProfile, isPending: isPendingUpdateProfile } =
     useMutation({
@@ -127,11 +172,10 @@ const useIdentitasTab = () => {
           const message = error.response?.data?.message;
           toast.error(message);
         } else {
-          toast.error(error.message);
+          toast.error((error as any).message);
         }
       },
       onSuccess: () => {
-        identitasForm.reset();
         queryClient.invalidateQueries({ queryKey: ["GetProfile"] });
         toast.success("Update Profile Success");
       },
@@ -145,7 +189,6 @@ const useIdentitasTab = () => {
     identitasForm,
     isPendingUpdateProfile,
     handleUpdateProfile,
-
     dataProfile,
     isLoadingProfile,
   };
