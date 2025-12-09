@@ -31,7 +31,6 @@ const useLogin = () => {
 
   const loginServices = async (payload: ILogin) => {
     const result = await authServices.login(payload);
-
     return result;
   };
 
@@ -45,16 +44,42 @@ const useLogin = () => {
         toast.error(error.message);
       }
     },
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       form.reset();
-      toast.success("Login Success", {
-        description: "Anda akan diarahkan ke halaman utama.",
-      });
-      session.setSession(data?.data?.data?.accessToken);
 
-      setTimeout(() => {
+      const token = data?.data?.data?.accessToken;
+      session.setSession(token);
+
+      toast.success("Login Success", {
+        description: "Memeriksa role akun anda...",
+      });
+
+      try {
+        const profileRes = await authServices.getProfile();
+        const roles = profileRes.data.data.roles.map((r: any) => r.name);
+
+        let targetPath = "/";
+
+        if (roles.includes("admin")) {
+          targetPath = "/admin/jenis-layanan";
+        } else if (roles.includes("Operator")) {
+          targetPath = "/operator/permohonan-krk";
+        } else if (roles.includes("Surveyor Lapangan")) {
+          targetPath = "/jf/disposisi-survei-masuk";
+        } else if (roles.includes("Kepala Dinas")) {
+          targetPath = "/kepala-dinas/permohonan-sk-tte";
+        } else {
+          targetPath = "/";
+        }
+
+        setTimeout(() => {
+          navigate(targetPath);
+        }, 1000);
+      } catch (error) {
+        console.error("Gagal mengambil profil user:", error);
+        toast.error("Gagal memuat data profil, mengalihkan ke halaman utama.");
         navigate("/");
-      }, 1000);
+      }
     },
   });
 

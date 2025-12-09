@@ -35,7 +35,7 @@ const heroSlides = [
     subtitle: "Kota Bengkulu",
     description:
       "Layanan digital terpadu untuk pengurusan Keterangan Rencana Kota dengan proses cepat, transparan, dan akuntabel",
-    image: "https://picsum.photos/id/237/800/400",
+    image: "https://picsum.photos/id/1020/800/400",
   },
   {
     id: 2,
@@ -51,7 +51,7 @@ const heroSlides = [
     subtitle: "dan Akuntabel",
     description:
       "Monitoring realtime status pengajuan Anda dengan sistem yang transparan",
-    image: "https://picsum.photos/id/1020/800/400",
+    image: "https://picsum.photos/id/237/800/400",
   },
   {
     id: 4,
