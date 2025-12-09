@@ -1,8 +1,13 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Eye } from "lucide-react";
-import PdfPreviewDialog from "@/components/commons/PdfPreviewDialog";
 import environment from "@/config/environment";
 
 interface BerkasLampiranCardProps {
@@ -16,12 +21,8 @@ const BerkasLampiranCard = ({ attachments }: BerkasLampiranCardProps) => {
   } | null>(null);
 
   const getFileUrl = (filePath: string) => {
-    const BASE_URL = environment.API_URL;
-    console.log(filePath);
-
-    // const cleanPath = filePath.replace("public/", "");
-
-    return `${BASE_URL}attachments/profile`;
+    const BASE_URL = environment.API_URL_PDF;
+    return `${BASE_URL}/${filePath}`;
   };
 
   const handlePreview = (attachment: any) => {
@@ -30,8 +31,8 @@ const BerkasLampiranCard = ({ attachments }: BerkasLampiranCardProps) => {
     setSelectedFile({ url, name });
   };
 
-  const handleClose = () => {
-    setSelectedFile(null);
+  const handleClose = (isOpen: boolean) => {
+    if (!isOpen) setSelectedFile(null);
   };
 
   return (
@@ -72,12 +73,23 @@ const BerkasLampiranCard = ({ attachments }: BerkasLampiranCardProps) => {
         </CardContent>
       </Card>
 
-      <PdfPreviewDialog
-        isOpen={!!selectedFile}
-        onClose={handleClose}
-        fileUrl={selectedFile?.url || null}
-        fileName={selectedFile?.name || ""}
-      />
+      <Dialog open={!!selectedFile} onOpenChange={handleClose}>
+        <DialogContent className="sm:max-w-[90vw] w-[90vw] h-[90vh] flex flex-col p-0">
+          <DialogHeader className="px-6 py-4 border-b">
+            <DialogTitle>Preview: {selectedFile?.name}</DialogTitle>
+          </DialogHeader>
+
+          <div className="flex-1 w-full bg-slate-100 p-0 overflow-hidden rounded-b-lg">
+            {selectedFile && (
+              <iframe
+                src={selectedFile.url}
+                className="w-full h-full border-none"
+                title="PDF Preview"
+              />
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };
