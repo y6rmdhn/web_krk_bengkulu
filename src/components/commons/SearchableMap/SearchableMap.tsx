@@ -7,10 +7,10 @@ import {
   useMapEvents,
   useMap,
   GeoJSON,
+  LayersControl,
 } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-
 import dataPolaRuang from "./pola_ruang.json";
 
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -23,17 +23,60 @@ L.Icon.Default.mergeOptions({
     "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
 });
 
+export const getZoneColor = (zoneName: string): string => {
+  if (!zoneName) return "#808080";
+  const name = zoneName.toLowerCase();
+
+  // 1. KUNING = PERUMAHAN / PEMUKIMAN
+  if (name.includes("perumahan") || name.includes("pemukiman"))
+    return "#FEEA3B";
+
+  // 2. MERAH = JASA / PERDAGANGAN
+  if (
+    name.includes("jasa") ||
+    name.includes("perdagangan") ||
+    name.includes("komersial") ||
+    name.includes("usaha")
+  )
+    return "#FF0000";
+
+  // 3. HIJAU = RTH / PERTANIAN / HUTAN
+  if (
+    name.includes("rth") ||
+    name.includes("taman") ||
+    name.includes("hijau") ||
+    name.includes("hutan")
+  )
+    return "#4CAF50";
+  if (name.includes("pertanian") || name.includes("perkebunan"))
+    return "#8BC34A";
+
+  // 4. UNGU = INDUSTRI / PERGUDANGAN
+  if (name.includes("industri") || name.includes("gudang")) return "#9C27B0";
+
+  // 5. COKLAT/ABU = PEMERINTAHAN / PERKANTORAN
+  if (name.includes("pemerintah") || name.includes("perkantoran"))
+    return "#795548";
+
+  // 6. BIRU/CYAN = PENDIDIKAN / KESEHATAN / SOSIAL
+  if (name.includes("pendidikan") || name.includes("sekolah")) return "#2196F3";
+  if (name.includes("kesehatan") || name.includes("rumah sakit"))
+    return "#00BCD4";
+  if (name.includes("sosial")) return "#03A9F4";
+
+  // 7. LAINNYA
+  if (name.includes("olahraga")) return "#CDDC39"; // Lime
+  if (name.includes("ibadah") || name.includes("agama")) return "#673AB7"; // Deep Purple
+  if (name.includes("transportasi") || name.includes("terminal"))
+    return "#FF5722"; // Deep Orange
+  if (name.includes("pertahanan")) return "#607D8B"; // Blue Grey
+
+  return "#9E9E9E"; // Default jika tidak dikenali
+};
+
 interface SearchResult {
   name: string;
   position: [number, number];
-}
-
-interface SearchableMapProps {
-  onCoordinateSelect?: (lat: number, lng: number, address: string) => void;
-  initialPosition?: [number, number];
-  initialSearchQuery?: string;
-  readonly?: boolean;
-  zoneName?: string;
 }
 
 interface NominatimResult {
@@ -43,6 +86,16 @@ interface NominatimResult {
   display_name: string;
 }
 
+interface SearchableMapProps {
+  onCoordinateSelect?: (lat: number, lng: number, address: string) => void;
+  initialPosition?: [number, number];
+  initialSearchQuery?: string;
+  readonly?: boolean;
+  zoneName?: string;
+  role?: "pemohon" | "operator" | "surveyor";
+}
+
+// --- SUB-COMPONENTS ---
 function ChangeView({
   center,
   zoom,
@@ -70,38 +123,48 @@ function MapClickHandler({
   return null;
 }
 
+// --- MAIN COMPONENT ---
 const SearchableMap: React.FC<SearchableMapProps> = ({
   onCoordinateSelect,
   initialPosition = [-3.792286, 102.26238],
   initialSearchQuery = "",
   readonly = false,
   zoneName,
+  role = "pemohon",
 }) => {
   const [position, setPosition] = useState<[number, number]>(initialPosition);
+
+  const isInternal = role === "operator" || role === "surveyor";
 
   useEffect(() => {
     setPosition(initialPosition);
   }, [initialPosition]);
 
   const [searchResult, setSearchResult] = useState<SearchResult | null>(null);
-
   const [searchText, setSearchText] = useState<string>(initialSearchQuery);
   const [searchResultsList, setSearchResultsList] = useState<NominatimResult[]>(
     []
   );
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [showDropdown, setShowDropdown] = useState<boolean>(false);
-
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const geoJsonStyle = (feature: any) => {
+    const infoNama =
+      feature.properties.NAMOBJ ||
+      feature.properties.KETERANGAN ||
+      feature.properties.REMARK ||
+      "";
+
+    const color = getZoneColor(infoNama);
+
     return {
-      fillColor: feature.properties?.warna || "#FF9800",
+      fillColor: color,
       weight: 1,
       opacity: 1,
       color: "white",
       dashArray: "3",
-      fillOpacity: 0.4,
+      fillOpacity: 0.6,
     };
   };
 
@@ -114,21 +177,14 @@ const SearchableMap: React.FC<SearchableMapProps> = ({
         "Zona Tanpa Nama";
 
       layer.bindPopup(`
-        <div class="text-sm">
-          <strong>Zona:</strong> ${infoNama}<br/>
-          ${feature.properties.LUAS ? `Luas: ${feature.properties.LUAS} Ha` : ""}
+        <div class="text-sm font-sans">
+          <strong class="block mb-1 text-blue-600 uppercase text-xs">Zona Pola Ruang</strong>
+          <span class="text-base font-bold">${infoNama}</span><br/>
+          ${feature.properties.LUAS ? `<span class="text-xs text-gray-500">Luas: ${feature.properties.LUAS} Ha</span>` : ""}
         </div>
       `);
 
       layer.on({
-        mouseover: (e: any) => {
-          const layer = e.target;
-          layer.setStyle({ fillOpacity: 0.7, weight: 3 });
-        },
-        mouseout: (e: any) => {
-          const layer = e.target;
-          layer.setStyle({ fillOpacity: 0.4, weight: 1 });
-        },
         click: (e: any) => {
           if (!readonly) {
             handleMapClick(e.latlng.lat, e.latlng.lng);
@@ -141,9 +197,7 @@ const SearchableMap: React.FC<SearchableMapProps> = ({
   useEffect(() => {
     if (initialSearchQuery && !readonly) {
       setSearchText(initialSearchQuery);
-      const timer = setTimeout(() => {
-        handleSearch();
-      }, 500);
+      const timer = setTimeout(() => handleSearch(), 500);
       return () => clearTimeout(timer);
     }
   }, [initialSearchQuery, readonly]);
@@ -167,9 +221,7 @@ const SearchableMap: React.FC<SearchableMapProps> = ({
     setShowDropdown(false);
     try {
       const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
-          searchText
-        )}&limit=5`
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchText)}&limit=5`
       );
       const data: NominatimResult[] = await response.json();
       if (data && data.length > 0) {
@@ -200,7 +252,6 @@ const SearchableMap: React.FC<SearchableMapProps> = ({
 
   const handleMapClick = (lat: number, lng: number) => {
     if (readonly) return;
-
     const newPosition: [number, number] = [lat, lng];
     setPosition(newPosition);
     const label = `Koordinat: ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
@@ -211,6 +262,7 @@ const SearchableMap: React.FC<SearchableMapProps> = ({
 
   return (
     <div className="space-y-4 z-0">
+      {/* Search Bar (Hanya tampil jika tidak readonly) */}
       {!readonly && (
         <div className="flex gap-2 mb-2 relative" ref={dropdownRef}>
           <div className="flex-1 relative">
@@ -218,22 +270,19 @@ const SearchableMap: React.FC<SearchableMapProps> = ({
               type="text"
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
-              onFocus={() =>
-                searchResultsList.length > 0 && setShowDropdown(true)
-              }
-              placeholder="Cari lokasi..."
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+              placeholder="Cari lokasi (nama jalan/gedung)..."
+              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
             />
             {showDropdown && searchResultsList.length > 0 && (
-              <div className="absolute z-[1000] w-full bg-white border shadow-lg max-h-60 overflow-y-auto mt-1">
+              <div className="absolute z-[1000] w-full bg-white border shadow-lg max-h-60 overflow-y-auto mt-1 rounded-md">
                 {searchResultsList.map((item) => (
                   <div
                     key={item.place_id}
                     onClick={() => handleSelectLocation(item)}
-                    className="px-4 py-2 hover:bg-blue-50 cursor-pointer border-b text-sm"
+                    className="px-4 py-2 hover:bg-blue-50 cursor-pointer border-b last:border-0 text-sm"
                   >
-                    <p className="font-semibold">
+                    <p className="font-semibold text-gray-800">
                       {item.display_name.split(",")[0]}
                     </p>
                     <p className="text-xs text-gray-500 truncate">
@@ -248,31 +297,25 @@ const SearchableMap: React.FC<SearchableMapProps> = ({
             type="button"
             onClick={handleSearch}
             disabled={isLoading}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm"
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm font-medium transition-colors"
           >
             {isLoading ? "..." : "Cari"}
           </button>
         </div>
       )}
 
-      {readonly && (
-        <div className="flex gap-2 mb-2">
-          <span className="text-xs bg-gray-100 text-gray-500 px-2 py-1 rounded border">
-            Mode Lihat: Lokasi dikunci sesuai data.
+      {/* Info Mode untuk Operator */}
+      {isInternal && (
+        <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 text-xs px-3 py-2 rounded flex items-center gap-2">
+          <span>
+            🛠️ <strong>Mode Petugas:</strong> Layer RTRW aktif untuk validasi
+            zona.
           </span>
         </div>
       )}
 
-      {!readonly && (
-        <div className="bg-blue-50 border border-blue-100 rounded-md p-3 text-xs text-blue-700">
-          <p>
-            💡 <strong>Tips:</strong> Peta berwarna menunjukkan Pola Ruang Kota
-            Bengkulu.
-          </p>
-        </div>
-      )}
-
-      <div className="relative rounded-lg overflow-hidden border border-gray-300 shadow-sm">
+      {/* Container Peta */}
+      <div className="relative rounded-lg overflow-hidden border border-gray-300 shadow-md">
         <MapContainer
           center={position}
           zoom={15}
@@ -281,38 +324,65 @@ const SearchableMap: React.FC<SearchableMapProps> = ({
           dragging={true}
         >
           <ChangeView center={position} zoom={15} />
-
           {!readonly && <MapClickHandler onMapClick={handleMapClick} />}
 
-          <TileLayer
-            attribution="&copy; OpenStreetMap"
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          />
+          {/* --- LAYER CONTROL --- */}
+          <LayersControl position="topright">
+            {/* Base Layer: Hybrid (Pemohon Default) */}
+            <LayersControl.BaseLayer
+              checked={!isInternal}
+              name="Google Satellite (Detail)"
+            >
+              <TileLayer
+                attribution="&copy; Google Maps"
+                url="http://mt0.google.com/vt/lyrs=y&x={x}&y={y}&z={z}"
+              />
+            </LayersControl.BaseLayer>
 
-          <GeoJSON
-            key="pola-ruang-layer"
-            data={dataPolaRuang as any}
-            style={geoJsonStyle}
-            onEachFeature={onEachFeature}
-          />
+            {/* Base Layer: Roadmap (Operator Default agar warna zona jelas) */}
+            <LayersControl.BaseLayer
+              checked={isInternal}
+              name="Google Streets (Bersih)"
+            >
+              <TileLayer
+                attribution="&copy; Google Maps"
+                url="http://mt0.google.com/vt/lyrs=m&x={x}&y={y}&z={z}"
+              />
+            </LayersControl.BaseLayer>
+
+            <LayersControl.BaseLayer name="OpenStreetMap">
+              <TileLayer
+                attribution="&copy; OpenStreetMap"
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              />
+            </LayersControl.BaseLayer>
+
+            {/* Overlay: Pola Ruang (RTRW) */}
+            <LayersControl.Overlay
+              checked={isInternal}
+              name="Peta Pola Ruang (RTRW)"
+            >
+              <GeoJSON
+                key="pola-ruang-layer"
+                data={dataPolaRuang as any}
+                style={geoJsonStyle}
+                onEachFeature={onEachFeature}
+              />
+            </LayersControl.Overlay>
+          </LayersControl>
 
           <Marker position={position}>
             <Popup>
               <div className="text-center">
-                <strong className="block mb-1">Lokasi Terpilih</strong>
-
+                <strong className="block mb-1 text-gray-800">
+                  Lokasi Terpilih
+                </strong>
                 {zoneName && (
-                  <div className="mb-2 pb-2 border-b border-gray-100">
-                    <span className="text-[10px] text-gray-500 uppercase tracking-wider">
-                      Zona
-                    </span>
-                    <p className="text-sm font-bold text-blue-600 leading-tight">
-                      {zoneName}
-                    </p>
-                  </div>
+                  <p className="text-sm font-bold text-blue-600 mb-1">
+                    {zoneName}
+                  </p>
                 )}
-
-                <span className="text-xs text-gray-500">
+                <span className="text-xs text-gray-500 font-mono bg-gray-100 px-1 rounded">
                   {position[0].toFixed(5)}, {position[1].toFixed(5)}
                 </span>
               </div>
@@ -322,12 +392,14 @@ const SearchableMap: React.FC<SearchableMapProps> = ({
       </div>
 
       {!readonly && searchResult && (
-        <div className="p-3 bg-gray-50 border rounded-md">
-          <p className="text-xs font-bold text-gray-500">Koordinat Terpilih</p>
-          <p className="font-mono text-sm">
+        <div className="p-3 bg-blue-50 border border-blue-100 rounded-md flex justify-between items-center">
+          <span className="text-xs font-bold text-blue-700">
+            📍 Koordinat Terpilih:
+          </span>
+          <span className="font-mono text-sm text-gray-700">
             {searchResult.position[0].toFixed(6)},{" "}
             {searchResult.position[1].toFixed(6)}
-          </p>
+          </span>
         </div>
       )}
     </div>
