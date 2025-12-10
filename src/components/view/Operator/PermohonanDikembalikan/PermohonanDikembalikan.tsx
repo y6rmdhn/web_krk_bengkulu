@@ -68,8 +68,6 @@ const PermohonanDikembalikan = () => {
 
         item.nama_pemilik || item.user?.name || "-",
 
-        item.jenisLayanan?.nama || "-",
-
         <Badge
           key={`badge-${item.id}`}
           variant="outline"
@@ -136,7 +134,6 @@ const PermohonanDikembalikan = () => {
                 "No. Pengajuan",
                 "Tanggal Masuk",
                 "Nama Pemohon",
-                "Jenis Layanan",
                 "Status",
                 "Aksi",
               ]}

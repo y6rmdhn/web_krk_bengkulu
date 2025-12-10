@@ -119,7 +119,6 @@ export default function RiwayatPermohonan() {
         <span className="whitespace-nowrap">
           {item.nama_pemilik || item.user?.name || "-"}
         </span>,
-        item.jenisLayanan?.nama || "-",
         <Badge
           key={`badge-${item.id}`}
           variant="outline"
@@ -231,7 +230,6 @@ export default function RiwayatPermohonan() {
                     "No. Pengajuan",
                     "Tanggal Masuk",
                     "Nama Pemohon",
-                    "Jenis Layanan",
                     "Status",
                     "Aksi",
                   ]}

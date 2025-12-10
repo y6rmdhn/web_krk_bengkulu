@@ -6,6 +6,7 @@ import { toast } from "sonner";
 
 export interface AcceptPayload {
   catatan: string;
+  nextAction?: string;
 }
 
 export interface RevisiAndRejectPayload {
@@ -21,7 +22,7 @@ const useActionButton = (id: string) => {
   };
 
   const formAccept = useForm<AcceptPayload>({
-    defaultValues: { catatan: "" },
+    defaultValues: { catatan: "", nextAction: "DEFAULT" },
   });
 
   const formRevisiReject = useForm<RevisiAndRejectPayload>({
@@ -30,7 +31,13 @@ const useActionButton = (id: string) => {
 
   const { mutate: acceptAction, isPending: isPendingAccept } = useMutation({
     mutationFn: async (payload: AcceptPayload) => {
-      return await disposisiServices.approve(id, payload);
+      const finalPayload = { ...payload };
+
+      if (finalPayload.nextAction === "DEFAULT") {
+        finalPayload.nextAction = "";
+      }
+
+      return await disposisiServices.approve(id, finalPayload);
     },
     onError: (error) => {
       const msg =
@@ -41,14 +48,15 @@ const useActionButton = (id: string) => {
     },
     onSuccess: () => {
       toast.success("Berhasil menyetujui disposisi!");
-      formAccept.reset();
+      formAccept.reset({ catatan: "", nextAction: "DEFAULT" });
       refreshData();
     },
   });
 
   const { mutate: revisiAction, isPending: isPendingRevisi } = useMutation({
     mutationFn: async (payload: AcceptPayload) => {
-      return await disposisiServices.revisi(id, payload);
+      const { nextAction, ...revisiPayload } = payload;
+      return await disposisiServices.revisi(id, revisiPayload as AcceptPayload);
     },
     onError: (error) => {
       const msg =
@@ -59,7 +67,7 @@ const useActionButton = (id: string) => {
     },
     onSuccess: () => {
       toast.success("Berhasil mengirim revisi!");
-      formRevisiReject.reset();
+      formAccept.reset({ catatan: "", nextAction: "DEFAULT" });
       refreshData();
     },
   });

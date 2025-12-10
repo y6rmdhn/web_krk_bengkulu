@@ -38,6 +38,11 @@ const REJECT_TEMPLATES = [
   "Lainnya",
 ];
 
+const NEXT_ACTION_OPTIONS = [
+  { label: "Lanjut ke Surveyor (Default)", value: "DEFAULT" },
+  { label: "Lanjut ke Kepala Dinas", value: "TO_KADIS" },
+];
+
 const ActionButtons = ({ id }: { id: string }) => {
   const { formAccept, formRevisiReject, actions, state } = useActionButton(id);
 
@@ -77,7 +82,7 @@ const ActionButtons = ({ id }: { id: string }) => {
                 <DialogTitle>Setujui Permohonan</DialogTitle>
                 <DialogDescription>
                   Apakah Anda yakin ingin menyetujui permohonan ini? Pilih
-                  template catatan atau ketik manual.
+                  tujuan disposisi dan catatan.
                 </DialogDescription>
               </DialogHeader>
               <Form {...formAccept}>
@@ -88,6 +93,36 @@ const ActionButtons = ({ id }: { id: string }) => {
                   }}
                   className="space-y-4"
                 >
+                  {/* FIELD SELECT NEXT ACTION */}
+                  <FormField
+                    control={formAccept.control}
+                    name="nextAction"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Tindak Lanjut Ke</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Pilih tujuan..." />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {NEXT_ACTION_OPTIONS.map((opt) => (
+                              <SelectItem key={opt.value} value={opt.value}>
+                                {opt.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* FIELD SELECT TEMPLATE */}
                   <FormItem>
                     <FormLabel>Template Catatan</FormLabel>
                     <Select
@@ -110,6 +145,7 @@ const ActionButtons = ({ id }: { id: string }) => {
                     </Select>
                   </FormItem>
 
+                  {/* FIELD TEXTAREA CATATAN */}
                   <FormField
                     control={formAccept.control}
                     name="catatan"

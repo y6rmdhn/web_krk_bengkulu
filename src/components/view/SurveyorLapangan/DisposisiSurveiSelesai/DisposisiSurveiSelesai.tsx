@@ -69,8 +69,6 @@ const DisposisiSurveiSelesai = () => {
 
         item.nama_pemilik || item.user?.name || "-",
 
-        item.jenisLayanan?.nama || "-",
-
         <Badge
           key={`badge-${item.id}`}
           variant="outline"
@@ -137,7 +135,6 @@ const DisposisiSurveiSelesai = () => {
                 "No. Pengajuan",
                 "Tanggal Masuk",
                 "Nama Pemohon",
-                "Jenis Layanan",
                 "Status",
                 "Aksi",
               ]}
