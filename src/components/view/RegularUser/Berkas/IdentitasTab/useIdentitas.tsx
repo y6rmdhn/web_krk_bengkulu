@@ -65,6 +65,11 @@ export type IdentitasFormValues = z.infer<typeof identitasSchema>;
 const useIdentitasTab = () => {
   const queryClient = useQueryClient();
   const isInitializedRef = useRef(false);
+  const cascadeSetRef = useRef({
+    kota: false,
+    kecamatan: false,
+    kelurahan: false,
+  });
 
   const identitasForm = useForm<IdentitasFormValues>({
     resolver: zodResolver(identitasSchema),
@@ -96,6 +101,7 @@ const useIdentitasTab = () => {
     refetchOnMount: "always",
   });
 
+  // Effect 1: Set data non-wilayah PERTAMA KALI
   useEffect(() => {
     if (dataProfile && !isInitializedRef.current) {
       const { kota, kecamatan, kelurahan, ...restData } = dataProfile;
@@ -105,57 +111,88 @@ const useIdentitasTab = () => {
         identitasForm.setValue(key as any, value?.toString() || "");
       });
 
-      if (kota) {
-        identitasForm.setValue("kota", kota.toString());
-      }
-
       isInitializedRef.current = true;
     }
-  }, [dataProfile]);
+  }, [dataProfile, identitasForm]);
 
+  // Effect 2: Set KOTA setelah data profile loaded
   useEffect(() => {
     if (
       dataProfile?.kota &&
-      dataProfile?.kecamatan &&
-      isInitializedRef.current
+      isInitializedRef.current &&
+      !cascadeSetRef.current.kota
     ) {
-      const kotaValue = identitasForm.watch("kota");
+      // Delay sedikit untuk memastikan regencies sudah loaded
+      const timer = setTimeout(() => {
+        identitasForm.setValue("kota", dataProfile.kota.toString());
+        cascadeSetRef.current.kota = true;
+      }, 100);
 
-      if (kotaValue === dataProfile.kota?.toString()) {
-        const timer = setTimeout(() => {
-          identitasForm.setValue("kecamatan", dataProfile.kecamatan.toString());
-        }, 100);
-
-        return () => clearTimeout(timer);
-      }
+      return () => clearTimeout(timer);
     }
-  }, [dataProfile?.kota, dataProfile?.kecamatan, identitasForm.watch("kota")]);
+  }, [dataProfile?.kota, isInitializedRef.current, identitasForm]);
 
+  // Effect 3: Set KECAMATAN setelah kota di-set
   useEffect(() => {
     if (
       dataProfile?.kecamatan &&
-      dataProfile?.kelurahan &&
-      isInitializedRef.current
+      cascadeSetRef.current.kota &&
+      !cascadeSetRef.current.kecamatan
     ) {
-      const kecamatanValue = identitasForm.watch("kecamatan");
+      const kotaValue = identitasForm.watch("kota");
 
-      if (kecamatanValue === dataProfile.kecamatan?.toString()) {
+      // Pastikan kota sudah sesuai baru set kecamatan
+      if (kotaValue === dataProfile.kota?.toString()) {
         const timer = setTimeout(() => {
-          identitasForm.setValue("kelurahan", dataProfile.kelurahan.toString());
-        }, 200);
+          identitasForm.setValue("kecamatan", dataProfile.kecamatan.toString());
+          cascadeSetRef.current.kecamatan = true;
+        }, 300);
 
         return () => clearTimeout(timer);
       }
     }
   }, [
     dataProfile?.kecamatan,
-    dataProfile?.kelurahan,
-    identitasForm.watch("kecamatan"),
+    dataProfile?.kota,
+    cascadeSetRef.current.kota,
+    identitasForm,
   ]);
 
+  // Effect 4: Set KELURAHAN setelah kecamatan di-set
+  useEffect(() => {
+    if (
+      dataProfile?.kelurahan &&
+      cascadeSetRef.current.kecamatan &&
+      !cascadeSetRef.current.kelurahan
+    ) {
+      const kecamatanValue = identitasForm.watch("kecamatan");
+
+      // Pastikan kecamatan sudah sesuai baru set kelurahan
+      if (kecamatanValue === dataProfile.kecamatan?.toString()) {
+        const timer = setTimeout(() => {
+          identitasForm.setValue("kelurahan", dataProfile.kelurahan.toString());
+          cascadeSetRef.current.kelurahan = true;
+        }, 500);
+
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [
+    dataProfile?.kelurahan,
+    dataProfile?.kecamatan,
+    cascadeSetRef.current.kecamatan,
+    identitasForm,
+  ]);
+
+  // Reset refs saat component unmount
   useEffect(() => {
     return () => {
       isInitializedRef.current = false;
+      cascadeSetRef.current = {
+        kota: false,
+        kecamatan: false,
+        kelurahan: false,
+      };
     };
   }, []);
 
