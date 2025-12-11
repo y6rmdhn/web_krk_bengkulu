@@ -77,6 +77,9 @@ const permohonanSchema = z.object({
   persimpangan_jalan: z.string().min(1, "Field ini harus diisi"),
   no_sertifikat_tanah: z.string().min(1, "No sertifikat tanah harus diisi"),
   hasil_ukur: z.string().min(1, "Hasil ukur harus diisi"),
+  no_pbb: z.string().min(1, "No pbb harus diisi"),
+  kecamatan_lokasi: z.string().min(1, "Kecamatan lokasi harus diisi"),
+  kelurahan_lokasi: z.string().min(1, "Kelurahan lokasi harus diisi"),
 
   file_sertifikat_tanah: fileSchema,
   PBB: fileSchema,
@@ -130,6 +133,9 @@ const usePermohohanKrk = () => {
       persimpangan_jalan: "",
       no_sertifikat_tanah: "",
       hasil_ukur: "",
+      no_pbb: "",
+      kecamatan_lokasi: "",
+      kelurahan_lokasi: "",
     },
   });
 

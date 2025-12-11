@@ -43,7 +43,13 @@ const NEXT_ACTION_OPTIONS = [
   { label: "Lanjut ke Kepala Dinas", value: "TO_KADIS" },
 ];
 
-const ActionButtons = ({ id }: { id: string }) => {
+const ActionButtons = ({
+  id,
+  isFinal = true,
+}: {
+  id: string;
+  isFinal?: boolean;
+}) => {
   const { formAccept, formRevisiReject, actions, state } = useActionButton(id);
 
   const [openDialog, setOpenDialog] = useState<
@@ -94,33 +100,35 @@ const ActionButtons = ({ id }: { id: string }) => {
                   className="space-y-4"
                 >
                   {/* FIELD SELECT NEXT ACTION */}
-                  <FormField
-                    control={formAccept.control}
-                    name="nextAction"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Tindak Lanjut Ke</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Pilih tujuan..." />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {NEXT_ACTION_OPTIONS.map((opt) => (
-                              <SelectItem key={opt.value} value={opt.value}>
-                                {opt.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  {isFinal === true ? (
+                    <FormField
+                      control={formAccept.control}
+                      name="nextAction"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Tindak Lanjut Ke</FormLabel>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Pilih tujuan..." />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {NEXT_ACTION_OPTIONS.map((opt) => (
+                                <SelectItem key={opt.value} value={opt.value}>
+                                  {opt.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  ) : null}
 
                   {/* FIELD SELECT TEMPLATE */}
                   <FormItem>

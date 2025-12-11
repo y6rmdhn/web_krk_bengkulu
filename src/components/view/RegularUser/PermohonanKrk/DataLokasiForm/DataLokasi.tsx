@@ -180,6 +180,13 @@ const DataLokasi = (props: PropTypes) => {
             setSelectedFile={setSertifikatFile}
           />
 
+          <FormInput
+            form={form}
+            label="No Pbb"
+            name="no_pbb"
+            placeholder="Masukan No Pbb"
+          />
+
           <InputFile
             form={form}
             label="Upload PBB"

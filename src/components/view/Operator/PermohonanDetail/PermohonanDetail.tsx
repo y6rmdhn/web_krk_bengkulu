@@ -1,6 +1,6 @@
 import OperatorLayout from "@/components/layouts/OperatorLayout";
 import { Button } from "@/components/ui/button";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom"; // UPDATE: Import useLocation
 import useDetailPermohonan from "./usePermohonanDetail";
 import HeaderSection from "./HeaderSection";
 import DataPemohonCard from "./DataPemohonCard";
@@ -16,8 +16,11 @@ import LocationMap from "@/components/commons/LocationMap";
 
 const DetailPermohonan = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { id } = useParams();
   const { data, isLoading, dataDetailHistory } = useDetailPermohonan(id!);
+
+  const isFinal = location.state?.isFinal;
 
   if (isLoading) {
     return (
@@ -78,7 +81,8 @@ const DetailPermohonan = () => {
 
           <div className="lg:col-span-1 space-y-6">
             <AlurPermohonanCard data={dataDetailHistory} />
-            <ActionButtons id={`${id}`} />
+
+            <ActionButtons id={`${id}`} isFinal={isFinal} />
           </div>
         </div>
       </div>

@@ -1,10 +1,8 @@
 import SectionTitle from "../SectionTitle";
-import InputField from "@/components/commons/InputField";
 import type { UseFormReturn } from "react-hook-form";
 import SearchableMap from "@/components/commons/SearchableMap";
 import { useWilayahData } from "@/hooks/useWilayah";
-import { useEffect, useState, useMemo } from "react";
-import { Label } from "@/components/ui/label";
+import { useEffect, useMemo, useState } from "react";
 import {
   Select,
   SelectContent,
@@ -12,6 +10,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import FormInput from "@/components/commons/FormInput";
 import type { PermohonanFormValues } from "../../PermohonanKrk/usePermohohanKrk";
 
 type PropTypes = {
@@ -23,41 +29,53 @@ const BENGKULU_CITY_ID = "1771";
 
 const WilayahForm = (props: PropTypes) => {
   const { form } = props;
-  // const { dataJenisLayanan, isLoadingDataLayanan } = useWilayahForm();
 
+  // 1. Ambil NAMA dari form (karena sekarang kita simpan nama)
+  const kecamatanNama = form.watch("kecamatan_lokasi");
+  const kelurahanNama = form.watch("kelurahan_lokasi");
   const currentLat = form.watch("latitude");
   const currentLng = form.watch("longitude");
 
-  const [selectedKecamatan, setSelectedKecamatan] = useState<string>("");
-  const [selectedKelurahan, setSelectedKelurahan] = useState<string>("");
+  // 2. LOGIKA TAMBAHAN: Kita butuh ID untuk request API desa,
+  // tapi form nyimpannya Nama. Jadi kita cari ID-nya dulu.
+  // Note: districts diambil dari hook di bawah, jadi kita perlu trik sedikit
+  // agar tidak circular dependency, kita panggil hook dulu.
+
+  // Masalah: useWilayahData butuh kecamatanId untuk fetch villages.
+  // Solusi: Kita tidak bisa cari ID kalau districts belum ada.
+  // Jadi flow-nya:
+  // Load Districts -> User pilih Nama -> Kita cari ID dari Nama -> Load Villages
+
+  // State sementara untuk ID kecamatan agar hook villages jalan
+  const [activeKecamatanId, setActiveKecamatanId] = useState("");
 
   const { districts, villages, isDistrictsLoading, isVillagesLoading } =
-    useWilayahData(BENGKULU_PROVINCE_ID, BENGKULU_CITY_ID, selectedKecamatan);
+    useWilayahData(BENGKULU_PROVINCE_ID, BENGKULU_CITY_ID, activeKecamatanId);
+
+  // Effect: Setiap kali nama kecamatan di form berubah, cari ID-nya
+  useEffect(() => {
+    if (kecamatanNama && districts.length > 0) {
+      const selectedDist = districts.find((d) => d.name === kecamatanNama);
+      if (selectedDist) {
+        setActiveKecamatanId(selectedDist.id);
+      }
+    } else if (!kecamatanNama) {
+      setActiveKecamatanId("");
+    }
+  }, [kecamatanNama, districts]);
 
   const [searchQuery, setSearchQuery] = useState<string>("");
 
-  const handleKecamatanChange = (value: string) => {
-    setSelectedKecamatan(value);
-    setSelectedKelurahan("");
-  };
-
+  // Update query peta berdasarkan NAMA
   useEffect(() => {
-    if (selectedKecamatan && selectedKelurahan) {
-      const kecamatan = districts.find((d) => d.id === selectedKecamatan);
-      const kelurahan = villages.find((v) => v.id === selectedKelurahan);
-
-      if (kecamatan && kelurahan) {
-        const query = `${kelurahan.name}, ${kecamatan.name}, Kota Bengkulu`;
-        setSearchQuery(query);
-      }
-    } else if (selectedKecamatan) {
-      const kecamatan = districts.find((d) => d.id === selectedKecamatan);
-      if (kecamatan) {
-        const query = `${kecamatan.name}, Kota Bengkulu`;
-        setSearchQuery(query);
-      }
+    if (kecamatanNama && kelurahanNama) {
+      const query = `${kelurahanNama}, ${kecamatanNama}, Kota Bengkulu`;
+      setSearchQuery(query);
+    } else if (kecamatanNama) {
+      const query = `${kecamatanNama}, Kota Bengkulu`;
+      setSearchQuery(query);
     }
-  }, [selectedKecamatan, selectedKelurahan, districts, villages]);
+  }, [kecamatanNama, kelurahanNama]);
 
   const handleCoordinateSelect = (lat: number, lng: number) => {
     const latString = lat.toFixed(6);
@@ -75,7 +93,6 @@ const WilayahForm = (props: PropTypes) => {
     if (currentLat && currentLng) {
       const lat = parseFloat(currentLat);
       const lng = parseFloat(currentLng);
-
       if (!isNaN(lat) && !isNaN(lng)) {
         return [lat, lng];
       }
@@ -86,60 +103,72 @@ const WilayahForm = (props: PropTypes) => {
 
   return (
     <div className="space-y-6">
-      {/* <SectionTitle title="Pilih Wilayah" /> */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
-        {/* <FormFieldSelect
-          form={form}
-          name="jenis_layanan_id"
-          label="Layanan"
-          placeholder={isLoadingDataLayanan ? "Memuat..." : "--Pilih Layanan--"}
-          options={
-            dataJenisLayanan?.map((item: { nama: string; id: string }) => ({
-              label: item.nama,
-              value: item.id,
-            })) || []
-          }
-        /> */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative">
+        {/* FIELD KECAMATAN */}
+        <FormField
+          control={form.control}
+          name="kecamatan_lokasi"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Kecamatan</FormLabel>
+              <Select
+                disabled={isDistrictsLoading}
+                onValueChange={(value) => {
+                  field.onChange(value); // Simpan NAMA
+                  form.setValue("kelurahan_lokasi", ""); // Reset kelurahan
+                }}
+                value={field.value}
+              >
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Pilih Kecamatan" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent className="max-h-[200px]">
+                  {districts?.map((district) => (
+                    // PERUBAHAN DISINI: value={district.name}
+                    <SelectItem key={district.id} value={district.name}>
+                      {district.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-        <div className="flex gap-5 items-center justify-between">
-          <Label>Kecamatan</Label>
-          <Select
-            onValueChange={handleKecamatanChange}
-            value={selectedKecamatan}
-            disabled={isDistrictsLoading}
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Pilih Kecamatan" />
-            </SelectTrigger>
-            <SelectContent className="max-h-[200px]">
-              {districts?.map((district) => (
-                <SelectItem key={district.id} value={district.id}>
-                  {district.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="flex gap-5 items-center justify-between">
-          <Label>Kelurahan/Desa</Label>
-          <Select
-            onValueChange={setSelectedKelurahan}
-            value={selectedKelurahan}
-            disabled={!selectedKecamatan || isVillagesLoading}
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Pilih Kelurahan/Desa" />
-            </SelectTrigger>
-            <SelectContent className="max-h-[200px]">
-              {villages?.map((village) => (
-                <SelectItem key={village.id} value={village.id}>
-                  {village.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        {/* FIELD KELURAHAN */}
+        <FormField
+          control={form.control}
+          name="kelurahan_lokasi"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Kelurahan/Desa</FormLabel>
+              {/* Disable jika activeKecamatanId kosong (artinya nama kecamatan belum valid/dipilih) */}
+              <Select
+                disabled={!activeKecamatanId || isVillagesLoading}
+                onValueChange={field.onChange} // Simpan NAMA
+                value={field.value}
+              >
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Pilih Kelurahan/Desa" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent className="max-h-[200px]">
+                  {villages?.map((village) => (
+                    // PERUBAHAN DISINI: value={village.name}
+                    <SelectItem key={village.id} value={village.name}>
+                      {village.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
       </div>
 
       <div className="pt-6">
@@ -160,15 +189,13 @@ const WilayahForm = (props: PropTypes) => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <InputField
-          id="latitude"
+        <FormInput
           label="Latitude"
           form={form}
           name="latitude"
           placeholder="Latitude akan terisi otomatis"
         />
-        <InputField
-          id="longitude"
+        <FormInput
           label="Longitude"
           form={form}
           name="longitude"

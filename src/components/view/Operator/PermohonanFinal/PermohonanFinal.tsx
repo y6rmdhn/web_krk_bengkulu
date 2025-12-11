@@ -87,7 +87,10 @@ const PermohonanDiproses = () => {
                 </span>
               ),
               action: () => {
-                navigate(`/operator/detail/${item.id}`);
+                // UPDATE: Mengirim state isFinal: true
+                navigate(`/operator/detail/${item.id}`, {
+                  state: { isFinal: false },
+                });
               },
             },
           ]}
