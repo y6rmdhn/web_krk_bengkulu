@@ -49,21 +49,41 @@ const DataPemilik = (props: PropTypes) => {
 
   const handleSelectChange = (
     value: string,
-    onChange: (val: any) => void,
+    idKey: keyof PermohonanFormValues,
+    nameKey: keyof PermohonanFormValues, // Key untuk nama
     options: { label: string; value: string | number }[],
-    resetFields: (keyof PermohonanFormValues)[]
+    resetKeys: (keyof PermohonanFormValues)[]
   ) => {
-    resetFields.forEach((field) => form.setValue(field, ""));
-    const matchedOption = options.find((opt) => opt.value.toString() === value);
-    const parsedValue =
-      typeof matchedOption?.value === "number" ? Number(value) : value;
-    onChange(parsedValue);
+    // 1. Reset child fields (ID dan Nama)
+    resetKeys.forEach((key) => {
+      form.setValue(key, ""); // Reset ID
+      const childNameKey = `${key}_name` as keyof PermohonanFormValues;
+      form.setValue(childNameKey, ""); // Reset Nama
+    });
+
+    // 2. Set Value ID (Untuk Logic Cascading)
+    form.setValue(idKey, value);
+
+    // 3. Set Value NAMA (Untuk Dikirim ke API)
+    const selectedOption = options.find(
+      (opt) => opt.value.toString() === value
+    );
+    if (selectedOption) {
+      form.setValue(nameKey, selectedOption.label);
+    }
   };
 
   return (
     <div className="space-y-6">
+      {/* REGISTER HIDDEN FIELDS AGAR TIDAK HILANG SAAT SUBMIT */}
+      <input type="hidden" {...form.register("provinsi_pemilik_name")} />
+      <input type="hidden" {...form.register("kota_pemilik_name")} />
+      <input type="hidden" {...form.register("kecamatan_pemilik_name")} />
+      <input type="hidden" {...form.register("kelurahan_pemilik_name")} />
+
       <SectionTitle title="Data Pemilik Sesuai Sertifikat" />
 
+      {/* --- Input Text Biasa (KTP, Nama, dll) --- */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <FormInput
           form={form}
@@ -80,7 +100,6 @@ const DataPemilik = (props: PropTypes) => {
           type="text"
         />
       </div>
-
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <FormInput
           form={form}
@@ -97,7 +116,6 @@ const DataPemilik = (props: PropTypes) => {
           type="tel"
         />
       </div>
-
       <FormInput
         form={form}
         label="Alamat Lengkap"
@@ -105,7 +123,6 @@ const DataPemilik = (props: PropTypes) => {
         placeholder="Nama Jalan, Gang, dsb."
         type="text"
       />
-
       <div className="grid grid-cols-3 gap-4">
         <FormInput
           form={form}
@@ -127,7 +144,7 @@ const DataPemilik = (props: PropTypes) => {
         />
       </div>
 
-      {/* Wilayah Cascading Manual */}
+      {/* --- Wilayah Cascading Manual --- */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* 1. PROVINSI */}
         <FormField
@@ -140,14 +157,16 @@ const DataPemilik = (props: PropTypes) => {
               </FormLabel>
               <div className="w-full flex flex-col gap-1">
                 <Select
-                  key={`provinsi-${provinceOptions.length}`}
+                  key={`provinsi-${provinceOptions.length}`} // Force re-render options
                   disabled={isProvincesLoading}
                   onValueChange={(val) =>
-                    handleSelectChange(val, field.onChange, provinceOptions, [
-                      "kota_pemilik",
-                      "kecamatan_pemilik",
-                      "kelurahan_pemilik",
-                    ])
+                    handleSelectChange(
+                      val,
+                      "provinsi_pemilik",
+                      "provinsi_pemilik_name",
+                      provinceOptions,
+                      ["kota_pemilik", "kecamatan_pemilik", "kelurahan_pemilik"]
+                    )
                   }
                   value={field.value?.toString()}
                 >
@@ -182,11 +201,15 @@ const DataPemilik = (props: PropTypes) => {
               <div className="w-full flex flex-col gap-1">
                 <Select
                   key={`kota-${regencyOptions.length}`}
+                  disabled={!selectedProvinsi} // Disable jika provinsi belum pilih
                   onValueChange={(val) =>
-                    handleSelectChange(val, field.onChange, regencyOptions, [
-                      "kecamatan_pemilik",
-                      "kelurahan_pemilik",
-                    ])
+                    handleSelectChange(
+                      val,
+                      "kota_pemilik",
+                      "kota_pemilik_name",
+                      regencyOptions,
+                      ["kecamatan_pemilik", "kelurahan_pemilik"]
+                    )
                   }
                   value={field.value?.toString()}
                 >
@@ -221,10 +244,15 @@ const DataPemilik = (props: PropTypes) => {
               <div className="w-full flex flex-col gap-1">
                 <Select
                   key={`kecamatan-${districtOptions.length}`}
+                  disabled={!selectedKota}
                   onValueChange={(val) =>
-                    handleSelectChange(val, field.onChange, districtOptions, [
-                      "kelurahan_pemilik",
-                    ])
+                    handleSelectChange(
+                      val,
+                      "kecamatan_pemilik",
+                      "kecamatan_pemilik_name",
+                      districtOptions,
+                      ["kelurahan_pemilik"]
+                    )
                   }
                   value={field.value?.toString()}
                 >
@@ -259,8 +287,15 @@ const DataPemilik = (props: PropTypes) => {
               <div className="w-full flex flex-col gap-1">
                 <Select
                   key={`kelurahan-${villageOptions.length}`}
+                  disabled={!selectedKecamatan}
                   onValueChange={(val) =>
-                    handleSelectChange(val, field.onChange, villageOptions, [])
+                    handleSelectChange(
+                      val,
+                      "kelurahan_pemilik",
+                      "kelurahan_pemilik_name",
+                      villageOptions,
+                      []
+                    )
                   }
                   value={field.value?.toString()}
                 >

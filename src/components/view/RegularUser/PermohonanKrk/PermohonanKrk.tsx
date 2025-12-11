@@ -14,6 +14,7 @@ export default function PermohonanKrk() {
     if (isChecked) {
       const values = form.getValues();
 
+      // Salin data teks biasa
       form.setValue("nama_pemilik", values.nama_pemohon);
       form.setValue("no_ktp_pemilik", values.no_ktp_pemohon);
       form.setValue("email_pemilik", values.email_pemohon);
@@ -23,11 +24,15 @@ export default function PermohonanKrk() {
       form.setValue("rt_lokasi_pemilik", values.rt_lokasi_pemohon);
       form.setValue("rw_lokasi_pemilik", values.rw_lokasi_pemohon);
 
+      // Salin NAMA wilayah
+      // Ini akan men-trigger useEffect di DataPemilik.tsx
+      // yang akan otomatis mencari ID dan mengisi dropdown anak.
       form.setValue("provinsi_pemilik", values.provinsi_pemohon);
       form.setValue("kota_pemilik", values.kota_pemohon);
       form.setValue("kecamatan_pemilik", values.kecamatan_pemohon);
       form.setValue("kelurahan_pemilik", values.kelurahan_pemohon);
     }
+    // Jika uncheck, opsi untuk mengosongkan kembali bisa ditambahkan jika perlu
   };
 
   return (

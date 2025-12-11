@@ -3,17 +3,17 @@ import endpoint from "./endpoint";
 
 const disposisiServices = {
   approve: (id: string, payload: { catatan: string }) =>
-    axiosInstance.post(
+    axiosInstance.put(
       `${endpoint.STAF}/${endpoint.DISPOSISI}/${id}/approve`,
       payload
     ),
   reject: (id: string, payload: { alasan_penolakan: string }) =>
-    axiosInstance.post(
+    axiosInstance.put(
       `${endpoint.STAF}/${endpoint.DISPOSISI}/${id}/reject`,
       payload
     ),
   revisi: (id: string, payload: { catatan: string }) =>
-    axiosInstance.post(
+    axiosInstance.put(
       `${endpoint.STAF}/${endpoint.DISPOSISI}/${id}/revisi`,
       payload
     ),

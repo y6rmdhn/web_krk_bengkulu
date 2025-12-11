@@ -17,69 +17,74 @@ export const fileSchema = z
   );
 
 const permohonanSchema = z.object({
-  jenis_layanan_id: z.string(),
+  jenis_layanan_id: z.string().optional(),
   latitude: z.string().min(1, "Koordinat harus diisi"),
   longitude: z.string().min(1, "Koordinat harus diisi"),
 
-  no_ktp_pemohon: z
-    .string()
-    .min(16, "No KTP harus 16 digit")
-    .max(16, "No KTP harus 16 digit")
-    .regex(/^\d+$/, "No KTP harus berupa angka"),
+  // --- DATA PEMOHON ---
+  no_ktp_pemohon: z.string().min(16).max(16),
   nama_pemohon: z.string().min(1, "Nama pemohon harus diisi"),
-  email_pemohon: z.string().email("Format email tidak valid"),
-  no_hp_pemohon: z
-    .string()
-    .min(10, "No telepon minimal 10 digit")
-    .regex(/^\d+$/, "No telepon harus berupa angka"),
-  alamat_pemohon: z.string().min(1, "Alamat pemohon harus diisi"),
-  no_lokasi_pemohon: z.string().min(1, "No harus diisi"),
-  rt_lokasi_pemohon: z.string().regex(/^\d+$/, "RT harus angka"),
-  rw_lokasi_pemohon: z.string().regex(/^\d+$/, "RW harus angka"),
-  provinsi_pemohon: z.string().min(1, "Provinsi pemohon harus diisi"),
-  kota_pemohon: z.string().min(1, "Kota pemohon harus diisi"),
-  kecamatan_pemohon: z.string().min(1, "Kecamatan pemohon harus diisi"),
-  kelurahan_pemohon: z.string().min(1, "Kelurahan pemohon harus diisi"),
+  email_pemohon: z.string().email(),
+  no_hp_pemohon: z.string().min(10),
+  alamat_pemohon: z.string().min(1),
+  no_lokasi_pemohon: z.string().min(1),
+  rt_lokasi_pemohon: z.string(),
+  rw_lokasi_pemohon: z.string(),
+
+  // Field ID (Untuk Logic Cascading)
+  provinsi_pemohon: z.string().min(1),
+  kota_pemohon: z.string().min(1),
+  kecamatan_pemohon: z.string().min(1),
+  kelurahan_pemohon: z.string().min(1),
+
+  // Field Nama (Untuk Dikirim ke API) - Hidden Fields
+  provinsi_pemohon_name: z.string().optional(),
+  kota_pemohon_name: z.string().optional(),
+  kecamatan_pemohon_name: z.string().optional(),
+  kelurahan_pemohon_name: z.string().optional(),
 
   file_ktp_pemohon: fileSchema,
 
-  nama_pemilik: z.string().min(1, "Nama pemohon harus diisi"),
-  no_ktp_pemilik: z
-    .string()
-    .min(16, "No KTP harus 16 digit")
-    .max(16, "No KTP harus 16 digit")
-    .regex(/^\d+$/, "No KTP harus berupa angka"),
-  email_pemilik: z.string().email("Format email tidak valid"),
-  no_hp_pemilik: z
-    .string()
-    .min(10, "No telepon minimal 10 digit")
-    .regex(/^\d+$/, "No telepon harus berupa angka"),
-  alamat_pemilik: z.string().min(1, "Alamat pemilik harus diisi"),
-  no_lokasi_pemilik: z.string().min(1, "No harus diisi"),
-  rt_lokasi_pemilik: z.string().regex(/^\d+$/, "RT harus angka"),
-  rw_lokasi_pemilik: z.string().regex(/^\d+$/, "RW harus angka"),
-  provinsi_pemilik: z.string().min(1, "Provinsi pemilik harus diisi"),
-  kota_pemilik: z.string().min(1, "Kota pemilik harus diisi"),
-  kecamatan_pemilik: z.string().min(1, "Kecamatan pemilik harus diisi"),
-  kelurahan_pemilik: z.string().min(1, "Kelurahan pemilik harus diisi"),
+  // --- DATA PEMILIK ---
+  nama_pemilik: z.string().min(1),
+  no_ktp_pemilik: z.string().min(16).max(16),
+  email_pemilik: z.string().email(),
+  no_hp_pemilik: z.string().min(10),
+  alamat_pemilik: z.string().min(1),
+  no_lokasi_pemilik: z.string().min(1),
+  rt_lokasi_pemilik: z.string(),
+  rw_lokasi_pemilik: z.string(),
 
-  alamat_bangunan: z.string().min(1, "Alamat bangunan harus diisi"),
-  no_lokasi: z.string().min(1, "No bangunan harus diisi"),
-  rt_lokasi: z.string().regex(/^\d+$/, "RT harus angka"),
-  rw_lokasi: z.string().regex(/^\d+$/, "RW harus angka"),
-  luas_tanah_m2: z.string().min(1, "Luas tanah harus diisi"),
-  letak_jalan_utama: z.string().min(1, "Letak antar jalan harus diisi"),
-  letak_jalan_sekunder: z.string().min(1, "s/d jalan harus diisi"),
-  fungsi_bangunan_id: z.string().min(1, "Fungsi bangunan harus diisi"),
-  kategori_bangunan_id: z
-    .string()
-    .min(1, "Kategori Fungsi bangunan harus diisi"),
-  persimpangan_jalan: z.string().min(1, "Field ini harus diisi"),
-  no_sertifikat_tanah: z.string().min(1, "No sertifikat tanah harus diisi"),
-  hasil_ukur: z.string().min(1, "Hasil ukur harus diisi"),
-  no_pbb: z.string().min(1, "No pbb harus diisi"),
-  kecamatan_lokasi: z.string().min(1, "Kecamatan lokasi harus diisi"),
-  kelurahan_lokasi: z.string().min(1, "Kelurahan lokasi harus diisi"),
+  // Field ID (Untuk Logic Cascading)
+  provinsi_pemilik: z.string().min(1),
+  kota_pemilik: z.string().min(1),
+  kecamatan_pemilik: z.string().min(1),
+  kelurahan_pemilik: z.string().min(1),
+
+  // Field Nama (Untuk Dikirim ke API)
+  provinsi_pemilik_name: z.string().optional(),
+  kota_pemilik_name: z.string().optional(),
+  kecamatan_pemilik_name: z.string().optional(),
+  kelurahan_pemilik_name: z.string().optional(),
+
+  // --- DATA BANGUNAN ---
+  alamat_bangunan: z.string().min(1),
+  no_lokasi: z.string().min(1),
+  rt_lokasi: z.string(),
+  rw_lokasi: z.string(),
+  luas_tanah_m2: z.string().min(1),
+  letak_jalan_utama: z.string().min(1),
+  letak_jalan_sekunder: z.string().min(1),
+  fungsi_bangunan_id: z.string().min(1),
+  kategori_bangunan_id: z.string().min(1),
+  persimpangan_jalan: z.string().min(1),
+  no_sertifikat_tanah: z.string().min(1),
+  hasil_ukur: z.string().min(1),
+  no_pbb: z.string().min(1),
+
+  // Lokasi Bangunan (Biasanya ini juga perlu nama/ID, sesuaikan jika perlu)
+  kecamatan_lokasi: z.string().min(1),
+  kelurahan_lokasi: z.string().min(1),
 
   file_sertifikat_tanah: fileSchema,
   PBB: fileSchema,
@@ -91,51 +96,25 @@ const usePermohohanKrk = () => {
   const form = useForm<PermohonanFormValues>({
     resolver: zodResolver(permohonanSchema),
     defaultValues: {
-      jenis_layanan_id: "",
-      latitude: "",
-      longitude: "",
-
-      no_ktp_pemohon: "",
-      nama_pemohon: "",
-      email_pemohon: "",
-      no_hp_pemohon: "",
-      alamat_pemohon: "",
-      no_lokasi_pemohon: "",
-      rt_lokasi_pemohon: "",
-      rw_lokasi_pemohon: "",
+      // ... (nilai default lainnya sama)
       provinsi_pemohon: "",
       kota_pemohon: "",
       kecamatan_pemohon: "",
       kelurahan_pemohon: "",
+      provinsi_pemohon_name: "", // Init empty
+      kota_pemohon_name: "",
+      kecamatan_pemohon_name: "",
+      kelurahan_pemohon_name: "",
 
-      nama_pemilik: "",
-      no_ktp_pemilik: "",
-      email_pemilik: "",
-      no_hp_pemilik: "",
-      alamat_pemilik: "",
-      no_lokasi_pemilik: "",
-      rt_lokasi_pemilik: "",
-      rw_lokasi_pemilik: "",
       provinsi_pemilik: "",
       kota_pemilik: "",
       kecamatan_pemilik: "",
       kelurahan_pemilik: "",
-
-      alamat_bangunan: "",
-      no_lokasi: "",
-      rt_lokasi: "",
-      rw_lokasi: "",
-      luas_tanah_m2: "",
-      letak_jalan_utama: "",
-      letak_jalan_sekunder: "",
-      kategori_bangunan_id: "",
-      fungsi_bangunan_id: "",
-      persimpangan_jalan: "",
-      no_sertifikat_tanah: "",
-      hasil_ukur: "",
-      no_pbb: "",
-      kecamatan_lokasi: "",
-      kelurahan_lokasi: "",
+      provinsi_pemilik_name: "", // Init empty
+      kota_pemilik_name: "",
+      kecamatan_pemilik_name: "",
+      kelurahan_pemilik_name: "",
+      // ...
     },
   });
 
@@ -150,8 +129,7 @@ const usePermohohanKrk = () => {
     mutationFn: permohonan,
     onError(error) {
       if (error instanceof AxiosError) {
-        const message = error.response?.data?.message || "Terjadi kesalahan";
-        toast.error(message);
+        toast.error(error.response?.data?.message || "Terjadi kesalahan");
       } else {
         toast.error(error.message);
       }
@@ -162,7 +140,7 @@ const usePermohohanKrk = () => {
       navigate("/riwayat-permohonan");
     },
   });
-
+  console.log("Zod Errors:", form.formState.errors);
   const handleCreatePermohonan = (values: PermohonanFormValues) => {
     const formData = new FormData();
 
@@ -176,7 +154,20 @@ const usePermohohanKrk = () => {
 
     formData.append("lokasi", JSON.stringify(geoJsonData));
 
+    // List field wilayah yang perlu diganti ID-nya menjadi NAMA saat dikirim
+    const regionFields = [
+      "provinsi_pemohon",
+      "kota_pemohon",
+      "kecamatan_pemohon",
+      "kelurahan_pemohon",
+      "provinsi_pemilik",
+      "kota_pemilik",
+      "kecamatan_pemilik",
+      "kelurahan_pemilik",
+    ];
+
     Object.entries(values).forEach(([key, value]) => {
+      // Skip file dan field khusus
       if (
         key !== "file_ktp_pemohon" &&
         key !== "jenis_layanan_id" &&
@@ -184,13 +175,25 @@ const usePermohohanKrk = () => {
         key !== "file_sertifikat_tanah" &&
         key !== "latitude" &&
         key !== "longitude" &&
+        !key.includes("_name") && // Jangan kirim field _name mentah-mentah
         value !== undefined &&
         value !== null
       ) {
-        formData.append(key, value as string);
+        // LOGIKA UTAMA: Jika key adalah wilayah, ambil value dari field _name
+        if (regionFields.includes(key)) {
+          const nameKey = `${key}_name` as keyof PermohonanFormValues;
+          // Kirim Nama, fallback ke value asli jika nama kosong
+          formData.append(
+            key,
+            (values[nameKey] as string) || (value as string)
+          );
+        } else {
+          formData.append(key, value as string);
+        }
       }
     });
 
+    // Append Files
     if (values.file_ktp_pemohon instanceof File) {
       formData.append("KTP-Pemohon", values.file_ktp_pemohon);
     }
