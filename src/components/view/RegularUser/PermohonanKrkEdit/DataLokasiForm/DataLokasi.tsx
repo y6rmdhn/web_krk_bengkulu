@@ -7,15 +7,14 @@ import FormInput from "@/components/commons/FormInput";
 import FormFieldSelect from "@/components/commons/FormFieldSelect";
 import useDataLocation from "./useDataLocation";
 import WilayahForm from "../WilayahForm/WilayahForm";
-import type { PermohonanFormValues } from "../../PermohonanKrk/usePermohohanKrk";
+import type { PermohonanEditFormValues } from "../usePermohohanKrkEdit";
 
 type PropTypes = {
-  form: UseFormReturn<PermohonanFormValues>;
+  form: UseFormReturn<PermohonanEditFormValues>; // Gunakan Type Edit
 };
 
 const DataLokasi = (props: PropTypes) => {
   const { form } = props;
-
   const [sertifikatFile, setSertifikatFile] = useState<File | null>(null);
   const [PpbFile, setPpbFile] = useState<File | null>(null);
 
@@ -37,7 +36,9 @@ const DataLokasi = (props: PropTypes) => {
     ) || [];
 
   useEffect(() => {
-    if (form.getValues("fungsi_bangunan_id")) {
+    // Reset fungsi jika kategori berubah (kecuali saat initial load dimana data sudah terisi)
+    // Kita cek form state isDirty untuk tau ini user input atau load data
+    if (form.getFieldState("kategori_bangunan_id").isDirty) {
       form.setValue("fungsi_bangunan_id", "");
     }
   }, [selectedKategoriId, form]);
@@ -49,11 +50,10 @@ const DataLokasi = (props: PropTypes) => {
         Data harus sesuai dengan sertifikat
       </p>
 
+      {/* Wilayah Form (Kecamatan/Kelurahan Lokasi) */}
       <WilayahForm form={form} />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-12 gap-y-6">
-        {/* KOLOM KIRI */}
-
         <div className="space-y-6">
           <FormInput
             form={form}
@@ -62,7 +62,6 @@ const DataLokasi = (props: PropTypes) => {
             placeholder="Masukan alamat bangunan"
             type="text"
           />
-
           <div className="grid grid-cols-3 gap-4">
             <FormInput
               form={form}
@@ -83,7 +82,6 @@ const DataLokasi = (props: PropTypes) => {
               placeholder="00"
             />
           </div>
-
           <FormInput
             form={form}
             label="Luas Tanah (m²)"
@@ -91,14 +89,12 @@ const DataLokasi = (props: PropTypes) => {
             type="number"
             placeholder="0"
           />
-
           <FormInput
             form={form}
             label="Letak Jalan Utama"
             name="letak_jalan_utama"
             placeholder="Nama Jalan Utama"
           />
-
           <FormInput
             form={form}
             label="Letak Jalan Sekunder"
@@ -106,46 +102,34 @@ const DataLokasi = (props: PropTypes) => {
             placeholder="Nama Jalan Sekunder (s/d Jalan)"
           />
 
-          {/* INPUT KATEGORI (PARENT) */}
           <FormFieldSelect
             form={form}
             name="kategori_bangunan_id"
             label="Jenis Kategori Bangunan"
             placeholder={
-              isLoadingDataKategoriBangunan
-                ? "Memuat..."
-                : "--Pilih Kategori Fungsi Bangunan--"
+              isLoadingDataKategoriBangunan ? "Memuat..." : "--Pilih Kategori--"
             }
             options={
-              dataJenisKategoriBangunan?.map(
-                (item: { nama: string; id: string }) => ({
-                  label: item.nama,
-                  value: item.id,
-                })
-              ) || []
+              dataJenisKategoriBangunan?.map((item: any) => ({
+                label: item.nama,
+                value: item.id,
+              })) || []
             }
           />
 
-          {/* INPUT FUNGSI (CHILD) - Sudah di filter & Disabled logic */}
           <FormFieldSelect
             form={form}
             name="fungsi_bangunan_id"
             label="Jenis Bangunan"
             disabled={!selectedKategoriId || isLoadingDataBangunan}
             placeholder={
-              isLoadingDataBangunan
-                ? "Memuat..."
-                : !selectedKategoriId
-                  ? "--Pilih Kategori Terlebih Dahulu--"
-                  : "--Pilih Fungsi Bangunan--"
+              isLoadingDataBangunan ? "Memuat..." : "--Pilih Fungsi--"
             }
             options={
-              filteredFungsiBangunan.map(
-                (item: { nama: string; id: string }) => ({
-                  label: item.nama,
-                  value: item.id,
-                })
-              ) || []
+              filteredFungsiBangunan.map((item: any) => ({
+                label: item.nama,
+                value: item.id,
+              })) || []
             }
           />
 
@@ -161,7 +145,6 @@ const DataLokasi = (props: PropTypes) => {
           />
         </div>
 
-        {/* KOLOM KANAN */}
         <div className="space-y-6">
           <FormInput
             form={form}
@@ -169,7 +152,6 @@ const DataLokasi = (props: PropTypes) => {
             name="no_sertifikat_tanah"
             placeholder="Masukan No Sertifikat"
           />
-
           <InputFile
             form={form}
             label="Sertifikat/Surat Tanah"
@@ -178,14 +160,12 @@ const DataLokasi = (props: PropTypes) => {
             selectedFile={sertifikatFile}
             setSelectedFile={setSertifikatFile}
           />
-
           <FormInput
             form={form}
             label="No Pbb"
             name="no_pbb"
             placeholder="Masukan No Pbb"
           />
-
           <InputFile
             form={form}
             label="Upload PBB"
@@ -194,7 +174,6 @@ const DataLokasi = (props: PropTypes) => {
             selectedFile={PpbFile}
             setSelectedFile={setPpbFile}
           />
-
           <FormInput
             form={form}
             label="Hasil Ukur"
@@ -206,5 +185,4 @@ const DataLokasi = (props: PropTypes) => {
     </div>
   );
 };
-
 export default DataLokasi;

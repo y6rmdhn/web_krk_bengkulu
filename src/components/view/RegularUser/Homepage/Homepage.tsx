@@ -35,7 +35,9 @@ const heroSlides = [
     subtitle: "Kota Bengkulu",
     description:
       "Layanan digital terpadu untuk pengurusan Keterangan Rencana Kota dengan proses cepat, transparan, dan akuntabel",
-    image: "https://picsum.photos/id/1020/800/400",
+    // Gambar: Blueprint/Peta Rencana Kota di atas meja kerja (Relevan dengan KRK/Tata Ruang)
+    image:
+      "https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: 2,
@@ -43,7 +45,9 @@ const heroSlides = [
     subtitle: "Terintegrasi",
     description:
       "Akses layanan KRK kapan saja dan di mana saja melalui sistem online yang terintegrasi",
-    image: "https://picsum.photos/id/1003/800/400",
+    // Gambar: Tangan mengetik di Laptop dengan grafik data (Nuansa Digital & Sistem)
+    image:
+      "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: 3,
@@ -51,7 +55,9 @@ const heroSlides = [
     subtitle: "dan Akuntabel",
     description:
       "Monitoring realtime status pengajuan Anda dengan sistem yang transparan",
-    image: "https://picsum.photos/id/237/800/400",
+    // Gambar: Dokumen tertata dengan kacamata/pena (Nuansa Verifikasi & Akuntabilitas)
+    image:
+      "https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: 4,
@@ -59,7 +65,9 @@ const heroSlides = [
     subtitle: "24 Jam",
     description:
       "Ajukan permohonan KRK secara online tanpa batas waktu dan lokasi",
-    image: "https://picsum.photos/id/1015/800/400",
+    // Gambar: Setup meja kerja modern/clean (Nuansa aksesibilitas & layanan publik modern)
+    image:
+      "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?auto=format&fit=crop&w=800&q=80",
   },
 ];
 
