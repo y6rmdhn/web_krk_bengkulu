@@ -96,6 +96,10 @@ export type PermohonanEditFormValues = z.infer<typeof permohonanSchema>;
 
 // --- 2. MAIN HOOK ---
 
+// Konstanta untuk wilayah Bengkulu
+// const BENGKULU_PROVINCE_ID = "17";
+const BENGKULU_CITY_ID = "1771";
+
 const usePermohonanKrkEdit = (id: string) => {
   const navigate = useNavigate();
 
@@ -104,6 +108,8 @@ const usePermohonanKrkEdit = (id: string) => {
     defaultValues: {
       latitude: "",
       longitude: "",
+      kecamatan_lokasi: "",
+      kelurahan_lokasi: "",
     },
   });
 
@@ -117,11 +123,15 @@ const usePermohonanKrkEdit = (id: string) => {
     enabled: !!id,
   });
 
-  console.log(data);
-
   // --- LOGIC LOAD DATA ---
   useEffect(() => {
     if (data) {
+      console.log("Data dari API:", {
+        kecamatan_lokasi: data.kecamatan_lokasi,
+        kelurahan_lokasi: data.kelurahan_lokasi,
+        wilayah_lokasi: `${data.kelurahan_lokasi}, ${data.kecamatan_lokasi}`,
+      });
+
       // A. Koordinat
       let lat = data.latitude;
       let lng = data.longitude;
@@ -144,6 +154,8 @@ const usePermohonanKrkEdit = (id: string) => {
         "kota_pemilik",
         "kecamatan_pemilik",
         "kelurahan_pemilik",
+        "kecamatan_lokasi",
+        "kelurahan_lokasi",
       ];
 
       Object.keys(baseSchemaFields).forEach((key) => {
@@ -257,18 +269,118 @@ const usePermohonanKrkEdit = (id: string) => {
         }
       };
 
-      loadWilayahPemohon();
-      loadWilayahPemilik();
+      // E. LOGIC WILAYAH LOKASI (Kecamatan & Kelurahan Lokasi Bangunan)
+      const loadWilayahLokasi = async () => {
+        try {
+          const kecamatanLokasiNama = data.kecamatan_lokasi;
+          const kelurahanLokasiNama = data.kelurahan_lokasi;
 
-      // E. Sisa Data
-      form.setValue("kecamatan_lokasi", data.kecamatan_lokasi || "");
-      form.setValue("kelurahan_lokasi", data.kelurahan_lokasi || "");
+          console.log("Memproses wilayah lokasi:", {
+            kecamatan: kecamatanLokasiNama,
+            kelurahan: kelurahanLokasiNama,
+          });
 
+          if (!kecamatanLokasiNama) {
+            console.warn("Nama kecamatan lokasi tidak ditemukan di data API");
+            return;
+          }
+
+          // 1. Ambil semua kecamatan di Kota Bengkulu
+          const resKec = await wilayahServices.getDistricts(BENGKULU_CITY_ID);
+          console.log(
+            "Kecamatan tersedia:",
+            resKec.data.map((k: any) => k.name)
+          );
+
+          // 2. Cari kecamatan yang sesuai (case insensitive)
+          const kecamatanLokasi = resKec.data.find(
+            (kec: any) =>
+              kec.name.toLowerCase() === kecamatanLokasiNama.toLowerCase()
+          );
+
+          if (kecamatanLokasi) {
+            console.log("Kecamatan ditemukan:", kecamatanLokasi);
+
+            // Set nama kecamatan ke form (bukan ID)
+            setTimeout(() => {
+              form.setValue("kecamatan_lokasi", kecamatanLokasi.name);
+
+              // 3. Cari kelurahan jika ada nama kelurahan
+              if (kelurahanLokasiNama) {
+                wilayahServices
+                  .getVillages(kecamatanLokasi.id)
+                  .then((resKel) => {
+                    console.log(
+                      "Kelurahan tersedia:",
+                      resKel.data.map((k: any) => k.name)
+                    );
+
+                    const kelurahanLokasi = resKel.data.find(
+                      (kel: any) =>
+                        kel.name.toLowerCase() ===
+                        kelurahanLokasiNama.toLowerCase()
+                    );
+
+                    if (kelurahanLokasi) {
+                      console.log("Kelurahan ditemukan:", kelurahanLokasi);
+                      // Set nama kelurahan ke form (bukan ID)
+                      setTimeout(() => {
+                        form.setValue("kelurahan_lokasi", kelurahanLokasi.name);
+                      }, 100);
+                    } else {
+                      console.warn(
+                        "Kelurahan tidak ditemukan:",
+                        kelurahanLokasiNama
+                      );
+                    }
+                  })
+                  .catch((error) => {
+                    console.error("Error fetching kelurahan:", error);
+                  });
+              }
+            }, 200); // Delay untuk memastikan form siap
+          } else {
+            console.warn("Kecamatan tidak ditemukan:", kecamatanLokasiNama);
+            // Tetap set nama dari API jika tidak ditemukan match
+            setTimeout(() => {
+              form.setValue("kecamatan_lokasi", kecamatanLokasiNama);
+              if (kelurahanLokasiNama) {
+                form.setValue("kelurahan_lokasi", kelurahanLokasiNama);
+              }
+            }, 200);
+          }
+        } catch (error) {
+          console.error("Gagal mapping wilayah lokasi:", error);
+          // Fallback: set langsung dari data API
+          setTimeout(() => {
+            if (data.kecamatan_lokasi) {
+              form.setValue("kecamatan_lokasi", data.kecamatan_lokasi);
+            }
+            if (data.kelurahan_lokasi) {
+              form.setValue("kelurahan_lokasi", data.kelurahan_lokasi);
+            }
+          }, 200);
+        }
+      };
+
+      // Jalankan semua fungsi loading secara berurutan dengan delay
+      setTimeout(() => {
+        loadWilayahPemohon();
+        setTimeout(() => {
+          loadWilayahPemilik();
+          setTimeout(() => {
+            loadWilayahLokasi();
+          }, 300);
+        }, 300);
+      }, 300);
+
+      // F. Data Lainnya
       if (data.fungsiBangunan) {
-        form.setValue("fungsi_bangunan_id", data.fungsi_bangunan_id);
-        form.setValue("kategori_bangunan_id", data.fungsiBangunan.kategori_id);
+        form.setValue("fungsi_bangunan_id", data?.fungsi_bangunan_id);
+        form.setValue("kategori_bangunan_id", data?.fungsiBangunan.kategori_id);
       }
 
+      // G. File Attachments
       const getFilePath = (kode: string) => {
         if (!data.attachments || !Array.isArray(data.attachments)) return "";
         const file = data.attachments.find(
@@ -281,10 +393,13 @@ const usePermohonanKrkEdit = (id: string) => {
       const pbbPath = getFilePath("PBB");
       const sertifikatPath = getFilePath("Sertifikat-Tanah");
 
-      if (ktpPath) form.setValue("file_ktp_pemohon", ktpPath);
-      if (pbbPath) form.setValue("PBB", pbbPath);
-      if (sertifikatPath)
-        form.setValue("file_sertifikat_tanah", sertifikatPath);
+      // Set file paths dengan timeout untuk menghindari race condition
+      setTimeout(() => {
+        if (ktpPath) form.setValue("file_ktp_pemohon", ktpPath);
+        if (pbbPath) form.setValue("PBB", pbbPath);
+        if (sertifikatPath)
+          form.setValue("file_sertifikat_tanah", sertifikatPath);
+      }, 500);
     }
   }, [data, form]);
 
@@ -353,6 +468,14 @@ const usePermohonanKrkEdit = (id: string) => {
       values.kecamatan_pemohon
     );
 
+    // Append wilayah lokasi (kecamatan_lokasi dan kelurahan_lokasi sudah dalam bentuk nama)
+    if (values.kecamatan_lokasi) {
+      formData.append("kecamatan_lokasi", values.kecamatan_lokasi);
+    }
+    if (values.kelurahan_lokasi) {
+      formData.append("kelurahan_lokasi", values.kelurahan_lokasi);
+    }
+
     const excludeSubmitKeys = [
       "file_ktp_pemohon",
       "PBB",
@@ -364,6 +487,8 @@ const usePermohonanKrkEdit = (id: string) => {
       "kota_pemohon",
       "kecamatan_pemohon",
       "kelurahan_pemohon",
+      "kecamatan_lokasi",
+      "kelurahan_lokasi",
     ];
 
     Object.entries(values).forEach(([key, value]) => {

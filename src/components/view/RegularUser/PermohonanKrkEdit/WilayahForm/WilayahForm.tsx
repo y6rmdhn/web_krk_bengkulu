@@ -38,19 +38,72 @@ const WilayahForm = (props: PropTypes) => {
 
   // State untuk ID agar hook villages bisa jalan
   const [activeKecamatanId, setActiveKecamatanId] = useState("");
+  const [isInitialized, setIsInitialized] = useState(false);
 
   const { districts, villages, isDistrictsLoading, isVillagesLoading } =
     useWilayahData(BENGKULU_PROVINCE_ID, BENGKULU_CITY_ID, activeKecamatanId);
 
+  // Debug: Log data wilayah
+  useEffect(() => {
+    console.log("WilayahForm State:", {
+      kecamatanNama,
+      kelurahanNama,
+      activeKecamatanId,
+      districtsCount: districts.length,
+      villagesCount: villages.length,
+      villages: villages.map((v) => v.name),
+    });
+  }, [kecamatanNama, kelurahanNama, activeKecamatanId, districts, villages]);
+
   // LOGIK PENTING: Cari ID berdasarkan Nama yang ada di Form
   useEffect(() => {
     if (kecamatanNama && districts.length > 0) {
-      const selectedDist = districts.find((d) => d.name === kecamatanNama);
+      console.log(
+        "Mencari kecamatan:",
+        kecamatanNama,
+        "dari",
+        districts.length,
+        "kecamatan"
+      );
+
+      const selectedDist = districts.find(
+        (d) => d.name.toLowerCase() === kecamatanNama.toLowerCase()
+      );
+
       if (selectedDist) {
+        console.log("Kecamatan ditemukan, ID:", selectedDist.id);
         setActiveKecamatanId(selectedDist.id);
+
+        // Auto-select kelurahan jika ada dan belum di-set
+        if (kelurahanNama && villages.length > 0 && !isInitialized) {
+          const selectedVillage = villages.find(
+            (v) => v.name.toLowerCase() === kelurahanNama.toLowerCase()
+          );
+
+          if (selectedVillage) {
+            console.log("Kelurahan ditemukan:", selectedVillage.name);
+            // Periksa apakah nilai sudah sesuai, jika tidak baru di-set
+            const currentValue = form.getValues("kelurahan_lokasi");
+            if (currentValue !== selectedVillage.name) {
+              setTimeout(() => {
+                form.setValue("kelurahan_lokasi", selectedVillage.name);
+                setIsInitialized(true);
+              }, 100);
+            } else {
+              setIsInitialized(true);
+            }
+          } else {
+            console.warn("Kelurahan tidak ditemukan:", kelurahanNama);
+            setIsInitialized(true);
+          }
+        } else if (!kelurahanNama) {
+          setIsInitialized(true);
+        }
+      } else {
+        console.warn("Kecamatan tidak ditemukan di list:", kecamatanNama);
       }
     }
-  }, [kecamatanNama, districts]);
+  }, [kecamatanNama, districts, kelurahanNama, villages, form, isInitialized]);
 
   const [searchQuery, setSearchQuery] = useState<string>("");
 
@@ -89,14 +142,21 @@ const WilayahForm = (props: PropTypes) => {
               <Select
                 disabled={isDistrictsLoading}
                 onValueChange={(value) => {
+                  console.log("Kecamatan dipilih:", value);
                   field.onChange(value); // Simpan NAMA
-                  form.setValue("kelurahan_lokasi", ""); // Reset child
+                  form.setValue("kelurahan_lokasi", ""); // Reset kelurahan
+                  setActiveKecamatanId(""); // Reset ID kecamatan
+                  setIsInitialized(false); // Reset init flag
                 }}
-                value={field.value} // Value adalah NAMA
+                value={field.value || ""} // Value adalah NAMA
               >
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Pilih Kecamatan" />
+                    <SelectValue
+                      placeholder={
+                        isDistrictsLoading ? "Memuat..." : "Pilih Kecamatan"
+                      }
+                    />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
@@ -122,12 +182,23 @@ const WilayahForm = (props: PropTypes) => {
               <FormLabel>Kelurahan/Desa</FormLabel>
               <Select
                 disabled={!activeKecamatanId || isVillagesLoading}
-                onValueChange={field.onChange} // Simpan NAMA
-                value={field.value} // Value adalah NAMA
+                onValueChange={(value) => {
+                  console.log("Kelurahan dipilih:", value);
+                  field.onChange(value); // Simpan NAMA
+                }}
+                value={field.value || ""} // Value adalah NAMA
               >
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Pilih Kelurahan/Desa" />
+                    <SelectValue
+                      placeholder={
+                        !activeKecamatanId
+                          ? "Pilih kecamatan terlebih dahulu"
+                          : isVillagesLoading
+                            ? "Memuat..."
+                            : "Pilih Kelurahan/Desa"
+                      }
+                    />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
@@ -139,6 +210,11 @@ const WilayahForm = (props: PropTypes) => {
                 </SelectContent>
               </Select>
               <FormMessage />
+              {!activeKecamatanId && kelurahanNama && (
+                <p className="text-sm text-amber-600 mt-1">
+                  Pilih kecamatan terlebih dahulu untuk melihat daftar kelurahan
+                </p>
+              )}
             </FormItem>
           )}
         />
@@ -149,6 +225,12 @@ const WilayahForm = (props: PropTypes) => {
         {searchQuery && (
           <p className="text-sm text-gray-600 mt-2">
             Peta akan menampilkan lokasi: <strong>{searchQuery}</strong>
+          </p>
+        )}
+        {kecamatanNama && !kelurahanNama && (
+          <p className="text-sm text-amber-600 mt-1">
+            Untuk hasil pencarian yang lebih akurat, pilih kelurahan terlebih
+            dahulu
           </p>
         )}
       </div>
@@ -178,4 +260,5 @@ const WilayahForm = (props: PropTypes) => {
     </div>
   );
 };
+
 export default WilayahForm;
