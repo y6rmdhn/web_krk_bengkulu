@@ -122,6 +122,8 @@ const usePermohonanKrkEdit = (id: string) => {
     enabled: !!id,
   });
 
+  console.log(data);
+
   // --- LOGIC LOAD DATA ---
   useEffect(() => {
     if (data) {
@@ -217,26 +219,55 @@ const usePermohonanKrkEdit = (id: string) => {
         }
       };
 
-      // D. LOGIC PEMILIK
+      // D. LOGIC PEMILIK (PERBAIKAN)
       const loadWilayahPemilik = async () => {
         try {
+          // 1. Provinsi (Data dari API sudah ID: "17", jadi aman langsung dipakai)
           const provId = data.provinsi_pemilik?.toString();
+
           if (provId) {
             form.setValue("provinsi_pemilik", provId);
-            await wilayahServices.getRegencies(provId);
-            const kotaId = data.kota_pemilik?.toString();
+
+            // Ambil list kota berdasarkan ID Provinsi
+            const resKota = await wilayahServices.getRegencies(provId);
+
+            // 2. Kota (Data dari API adalah NAMA: "KABUPATEN KAUR")
+            // Kita harus cari ID-nya dulu dari list resKota berdasarkan namanya
+            const kotaId = findIdByName(resKota.data, data.kota_pemilik);
 
             if (kotaId) {
               setTimeout(async () => {
-                form.setValue("kota_pemilik", kotaId);
-                await wilayahServices.getDistricts(kotaId);
-                const kecId = data.kecamatan_pemilik?.toString();
+                form.setValue("kota_pemilik", kotaId); // Set value form pakai ID
+
+                // Ambil list kecamatan pakai ID Kota yang sudah ditemukan
+                const resKec = await wilayahServices.getDistricts(kotaId);
+
+                // 3. Kecamatan (Data dari API adalah NAMA: "TETAP")
+                // Cari ID-nya lagi
+                const kecId = findIdByName(resKec.data, data.kecamatan_pemilik);
 
                 if (kecId) {
                   setTimeout(async () => {
-                    form.setValue("kecamatan_pemilik", kecId);
-                    await wilayahServices.getVillages(kecId);
-                    const kelId = data.kelurahan_pemilik?.toString();
+                    form.setValue("kecamatan_pemilik", kecId); // Set value form pakai ID
+
+                    // Ambil list kelurahan pakai ID Kecamatan
+                    const resKel = await wilayahServices.getVillages(kecId);
+
+                    // 4. Kelurahan (Data dari API sudah ID: "1704031006")
+                    // Karena datanya sudah ID, kita cek apakah ID ini ada di list (validasi)
+                    // Atau langsung set saja jika yakin.
+                    // Namun findIdByName tidak bisa dipakai karena dia cari by Name.
+
+                    const kelData = data.kelurahan_pemilik?.toString();
+                    // Cek apakah kelData ini ID atau Nama.
+                    // Jika ID (angka), kita cari object yang id-nya sama.
+                    const foundKel = resKel.data.find(
+                      (k: any) =>
+                        k.id === kelData ||
+                        k.name.toLowerCase() === kelData.toLowerCase()
+                    );
+
+                    const kelId = foundKel ? foundKel.id : "";
 
                     if (kelId) {
                       setTimeout(() => {
