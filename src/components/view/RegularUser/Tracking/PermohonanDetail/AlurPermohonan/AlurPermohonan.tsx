@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils"; // Pastikan punya utility cn, atau gunakan template literals biasa
+import { cn } from "@/lib/utils";
 import {
   CheckCircle2,
   XCircle,
@@ -12,18 +12,24 @@ import {
   FileSignature,
   CornerDownRight,
   ShieldCheck,
+  Hourglass,
+  CalendarClock,
 } from "lucide-react";
-import { format } from "date-fns";
+import { format, differenceInDays } from "date-fns";
 import { id } from "date-fns/locale";
 
+// --- 1. SESUAIKAN INTERFACE DENGAN JSON API ---
 interface HistoryItem {
-  id: string;
   step_name: string;
-  status_keputusan: string;
-  actor_name: string;
+  status: string; // Mapping dari JSON: "status"
+  tanggal: string; // Mapping dari JSON: "tanggal"
+  durasi_proses?: string; // Mapping dari JSON: "durasi_proses"
+
+  // Field optional (jaga-jaga jika API update atau ada data tambahan)
+  id?: string;
+  actor_name?: string;
   keterangan?: string;
   tte_status?: string | null;
-  created_at?: string; // Optional karena tidak ada di sample JSON, tapi kita handle jaga-jaga
 }
 
 interface AlurPermohonanCardProps {
@@ -31,7 +37,7 @@ interface AlurPermohonanCardProps {
 }
 
 const AlurPermohonanCard = ({ data }: AlurPermohonanCardProps) => {
-  // Helper untuk memformat nama langkah menjadi Title Case yang rapi
+  // --- HELPER: Format Nama Tahap ---
   const formatStepName = (name: string) => {
     return name
       .replace(/_/g, " ")
@@ -39,7 +45,7 @@ const AlurPermohonanCard = ({ data }: AlurPermohonanCardProps) => {
       .replace(/\b\w/g, (char) => char.toUpperCase());
   };
 
-  // Konfigurasi Style berdasarkan Status
+  // --- HELPER: Konfigurasi Style Status ---
   const getStatusConfig = (status: string) => {
     const s = status?.toUpperCase() || "";
 
@@ -70,7 +76,13 @@ const AlurPermohonanCard = ({ data }: AlurPermohonanCardProps) => {
         icon: AlertTriangle,
         label: "Perlu Revisi",
       };
-    } else if (s === "PENDING" || s === "PROCESS") {
+    } else if (
+      s === "PENDING" ||
+      s === "PROCESS" ||
+      s === "PENDING_SURVEYOR" ||
+      s === "VERIFIKASI_OPERATOR"
+    ) {
+      // Note: Kadang status di API berupa nama step jika sedang pending, sesuaikan logika ini
       return {
         color: "text-blue-600",
         bgIcon: "bg-blue-100",
@@ -91,13 +103,49 @@ const AlurPermohonanCard = ({ data }: AlurPermohonanCardProps) => {
     }
   };
 
-  // Icon spesifik berdasarkan nama langkah
+  // --- HELPER: Icon Tahapan ---
   const getStepIcon = (stepName: string) => {
     const name = stepName?.toLowerCase() || "";
     if (name.includes("kadis") || name.includes("kepala")) return FileSignature;
     if (name.includes("survey") || name.includes("lapangan")) return Building2;
     if (name.includes("operator")) return UserCheck;
     return User;
+  };
+
+  // --- HELPER: Target Waktu (Untuk Logika Merah/Hijau) ---
+  const getTargetDays = (stepName: string): number => {
+    const name = stepName?.toLowerCase() || "";
+    if (name.includes("operator") || name.includes("verifikasi")) return 1; // Target 1 Hari
+    if (name.includes("survey") || name.includes("lapangan")) return 2; // Target 2 Hari
+    if (name.includes("dinas") || name.includes("kepala")) return 1; // Target 1 Hari
+    return 3; // Default
+  };
+
+  // --- HELPER: Logika Warna Durasi (Merah/Hijau) ---
+  const getDurationStyle = (
+    startDateStr: string | undefined,
+    targetDays: number,
+    status: string
+  ) => {
+    // Jika status sudah selesai (APPROVED/REJECTED), gunakan warna netral/hijau biasa
+    const s = status?.toUpperCase() || "";
+    if (s === "APPROVED" || s === "SELESAI") {
+      return "bg-slate-100 text-slate-600 border-slate-200";
+    }
+
+    if (!startDateStr) return "bg-slate-100 text-slate-600 border-slate-200";
+
+    const startDate = new Date(startDateStr);
+    const today = new Date();
+    const daysPassed = differenceInDays(today, startDate);
+
+    if (daysPassed > targetDays) {
+      return "bg-red-50 text-red-700 border-red-200 animate-pulse"; // TERLAMBAT -> MERAH
+    } else if (daysPassed === targetDays && daysPassed > 0) {
+      return "bg-amber-50 text-amber-700 border-amber-200"; // WARNING -> KUNING
+    }
+
+    return "bg-emerald-50 text-emerald-700 border-emerald-200"; // AMAN -> HIJAU
   };
 
   const formatTanggal = (dateString?: string) => {
@@ -136,14 +184,21 @@ const AlurPermohonanCard = ({ data }: AlurPermohonanCardProps) => {
             {/* Garis Vertikal Latar Belakang */}
             <div className="absolute left-[19px] top-2 bottom-6 w-0.5 bg-slate-200" />
 
-            {data.map((item) => {
-              const config = getStatusConfig(item.status_keputusan);
+            {data.map((item, index) => {
+              const config = getStatusConfig(item.status); // Gunakan item.status
               const StepIcon = getStepIcon(item.step_name);
-              // const isLast = index === data.length - 1;
+
+              // Hitung Style Durasi
+              const targetDays = getTargetDays(item.step_name);
+              const durationStyle = getDurationStyle(
+                item.tanggal,
+                targetDays,
+                item.status
+              );
 
               return (
                 <div
-                  key={item.id}
+                  key={item.id || index} // Fallback key index jika ID tidak ada
                   className="relative pl-12 pb-8 last:pb-0 group"
                 >
                   {/* Timeline Dot/Icon */}
@@ -165,35 +220,58 @@ const AlurPermohonanCard = ({ data }: AlurPermohonanCardProps) => {
                         <h4 className="font-bold text-slate-800 text-base leading-tight">
                           {formatStepName(item.step_name)}
                         </h4>
-                        <p className="text-sm text-slate-500 mt-1 flex items-center gap-1.5">
-                          <User className="w-3 h-3" />
-                          {item.actor_name}
-                        </p>
 
-                        {/* Tanggal (Jika ada di masa depan) */}
-                        {item.created_at && (
-                          <p className="text-xs text-slate-400 mt-0.5 ml-5">
-                            {formatTanggal(item.created_at)}
-                          </p>
-                        )}
+                        <div className="flex flex-col gap-1 mt-1">
+                          {item.actor_name ? (
+                            <p className="text-sm text-slate-500 flex items-center gap-1.5">
+                              <User className="w-3 h-3" />
+                              {item.actor_name}
+                            </p>
+                          ) : (
+                            <p className="text-sm text-slate-400 italic">
+                              Petugas terkait
+                            </p>
+                          )}
+
+                          {/* --- TAMPILKAN DURASI (Dari API) --- */}
+                          {item.durasi_proses && (
+                            <div
+                              className={cn(
+                                "flex items-center gap-1.5 w-fit px-2 py-0.5 rounded text-[10px] font-medium border mt-1",
+                                durationStyle
+                              )}
+                            >
+                              <Hourglass className="w-3 h-3" />
+                              {item.durasi_proses}
+                            </div>
+                          )}
+
+                          {/* Tanggal (Menggunakan item.tanggal) */}
+                          {item.tanggal && (
+                            <p className="text-xs text-slate-400 mt-1 flex items-center gap-1">
+                              <CalendarClock className="w-3 h-3" />
+                              {formatTanggal(item.tanggal)}
+                            </p>
+                          )}
+                        </div>
                       </div>
 
                       <Badge
                         variant="outline"
                         className={cn(
                           "w-fit h-fit px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wider border",
-                          config.bgIcon, // Menggunakan bgIcon untuk background badge yang soft
+                          config.bgIcon,
                           config.color,
                           "border-transparent"
                         )}
                       >
-                        {item.status_keputusan === "REVISED"
+                        {item.status === "REVISED"
                           ? "PERLU REVISI"
                           : config.label}
                       </Badge>
                     </div>
 
-                    {/* Keterangan Box */}
+                    {/* Keterangan Box (Jika ada) */}
                     {item.keterangan && (
                       <div
                         className={cn(
@@ -202,7 +280,7 @@ const AlurPermohonanCard = ({ data }: AlurPermohonanCardProps) => {
                           config.border
                         )}
                       >
-                        {/* Panah kecil menunjuk ke atas */}
+                        {/* Arrow */}
                         <div
                           className={cn(
                             "absolute -top-1.5 left-4 w-3 h-3 border-t border-l rotate-45 bg-inherit border-inherit",
@@ -223,7 +301,7 @@ const AlurPermohonanCard = ({ data }: AlurPermohonanCardProps) => {
                       </div>
                     )}
 
-                    {/* TTE Signed Badge */}
+                    {/* TTE Signed Badge (Optional field) */}
                     {item.tte_status === "SIGNED" && (
                       <div className="flex items-center gap-2 mt-1">
                         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-medium">

@@ -31,6 +31,9 @@ export default function InputFile({
       render={({ field: { value, onChange, ...fieldProps } }) => (
         <FormItem>
           <FormLabel>{label}</FormLabel>
+          <p className="text-[12px] text-gray-500 -mt-1 mb-2">
+            Format: PDF/JPG. Maksimal ukuran file: 5MB.
+          </p>
           <FormControl>
             <div className="flex flex-col gap-3">
               {!selectedFile ? (

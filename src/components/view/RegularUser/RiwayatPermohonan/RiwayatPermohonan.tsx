@@ -9,13 +9,22 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search, Filter, Eye, FileText, Pencil, FileCheck } from "lucide-react";
+import {
+  Search,
+  Filter,
+  Eye,
+  FileText,
+  Pencil,
+  FileCheck,
+  Bell,
+} from "lucide-react";
 import MainLayout from "@/components/layouts/MainLayout/MainLayout";
 import useDataTable from "@/hooks/useDataTable";
 import { useNavigate } from "react-router-dom";
 import useRiwayatPermohonan from "./useRiwayatPermohonan";
 import DropdownActions from "@/components/commons/DropdownActions";
 import DataTable from "@/components/commons/DataTable";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export default function RiwayatPermohonan() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -39,6 +48,7 @@ export default function RiwayatPermohonan() {
         (item.nomor_permohonan &&
           item.nomor_permohonan.toLowerCase().includes(term)) ||
         (item.nama_pemilik && item.nama_pemilik.toLowerCase().includes(term)) ||
+        (item.no_pbb && item.no_pbb.toLowerCase().includes(term)) || // Cari berdasarkan No PBB
         (item.user?.name && item.user.name.toLowerCase().includes(term));
       const matchesStatus =
         statusFilter === "semua" || item.status === statusFilter;
@@ -49,6 +59,11 @@ export default function RiwayatPermohonan() {
   }, [dataListPermohonanKrk, searchTerm, statusFilter, jenisFilter]);
 
   const totalPages = Math.ceil(filteredResult.length / currentLimit);
+
+  // Cek jika ada SK yang baru terbit (Status APPROVED)
+  const hasNewSK = useMemo(() => {
+    return filteredResult.some((item: any) => item.status === "APPROVED");
+  }, [filteredResult]);
 
   const getBadgeColor = (status: string) => {
     if (status === "PENDING_OPERATOR")
@@ -102,9 +117,15 @@ export default function RiwayatPermohonan() {
 
       return [
         startIndex + index + 1,
-        <span className="font-medium whitespace-nowrap">
-          {item.nomor_permohonan || "-"}
-        </span>,
+        <div className="flex flex-col">
+          <span className="font-medium whitespace-nowrap">
+            {item.nomor_permohonan || "-"}
+          </span>
+          {/* Tampilkan No PBB di sini */}
+          <span className="text-xs text-gray-500">
+            PBB: {item.no_pbb || "-"}
+          </span>
+        </div>,
         <span className="whitespace-nowrap">
           {item.submitted_at
             ? new Date(item.submitted_at).toLocaleDateString("id-ID", {
@@ -135,7 +156,19 @@ export default function RiwayatPermohonan() {
   return (
     <MainLayout title="Riwayat Permohonan | KRK Bengkulu" isBgGray isPaddingY>
       <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header & Filter (Sama seperti sebelumnya) */}
+        {/* Notifikasi SK Terbit */}
+        {hasNewSK && (
+          <Alert className="mb-6 bg-green-50 border-green-200 text-green-800">
+            <Bell className="h-4 w-4" />
+            <AlertTitle>Dokumen SK Terbit!</AlertTitle>
+            <AlertDescription>
+              Selamat! Salah satu atau beberapa permohonan Anda telah disetujui.
+              Silakan unduh dokumen SK pada tabel di bawah.
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {/* Header & Filter */}
         <div className="mb-6 md:mb-8">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
@@ -143,7 +176,7 @@ export default function RiwayatPermohonan() {
                 Riwayat Permohonan
               </h1>
               <p className="text-sm md:text-base text-gray-600 mt-1">
-                Kelola permohonan KRK yang diajukan
+                Kelola permohonan KRK dan PBB yang diajukan
               </p>
             </div>
             <div className="flex items-center self-start md:self-auto gap-2 bg-white/80 backdrop-blur-sm rounded-xl px-4 py-2 shadow-sm border border-gray-200">
@@ -164,7 +197,7 @@ export default function RiwayatPermohonan() {
                   size={18}
                 />
                 <Input
-                  placeholder="Cari No. Permohonan / Nama..."
+                  placeholder="Cari No. Permohonan / Nama / No. PBB..."
                   value={searchTerm}
                   onChange={(e) => {
                     setSearchTerm(e.target.value);
@@ -227,7 +260,7 @@ export default function RiwayatPermohonan() {
                 <DataTable
                   header={[
                     "No",
-                    "No. Pengajuan",
+                    "No. Pengajuan & PBB", // Update Header
                     "Tanggal Masuk",
                     "Nama Pemohon",
                     "Status",
