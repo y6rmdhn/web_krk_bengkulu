@@ -17,6 +17,7 @@ import {
   Pencil,
   FileCheck,
   Bell,
+  X, // Tambahkan import icon X
 } from "lucide-react";
 import MainLayout from "@/components/layouts/MainLayout/MainLayout";
 import useDataTable from "@/hooks/useDataTable";
@@ -30,6 +31,9 @@ export default function RiwayatPermohonan() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("semua");
   const [jenisFilter, setJenisFilter] = useState("semua");
+
+  // State baru untuk mengontrol visibilitas notifikasi
+  const [isAlertVisible, setIsAlertVisible] = useState(true);
 
   const navigate = useNavigate();
 
@@ -48,7 +52,7 @@ export default function RiwayatPermohonan() {
         (item.nomor_permohonan &&
           item.nomor_permohonan.toLowerCase().includes(term)) ||
         (item.nama_pemilik && item.nama_pemilik.toLowerCase().includes(term)) ||
-        (item.no_pbb && item.no_pbb.toLowerCase().includes(term)) || // Cari berdasarkan No PBB
+        (item.no_pbb && item.no_pbb.toLowerCase().includes(term)) ||
         (item.user?.name && item.user.name.toLowerCase().includes(term));
       const matchesStatus =
         statusFilter === "semua" || item.status === statusFilter;
@@ -121,7 +125,6 @@ export default function RiwayatPermohonan() {
           <span className="font-medium whitespace-nowrap">
             {item.nomor_permohonan || "-"}
           </span>
-          {/* Tampilkan No PBB di sini */}
           <span className="text-xs text-gray-500">
             PBB: {item.no_pbb || "-"}
           </span>
@@ -147,7 +150,6 @@ export default function RiwayatPermohonan() {
         >
           {item.current_step_name || item.status}
         </Badge>,
-        // Render dropdown
         <DropdownActions key={`action-${item.id}`} menu={menuActions} />,
       ];
     });
@@ -156,15 +158,23 @@ export default function RiwayatPermohonan() {
   return (
     <MainLayout title="Riwayat Permohonan | KRK Bengkulu" isBgGray isPaddingY>
       <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Notifikasi SK Terbit */}
-        {hasNewSK && (
-          <Alert className="mb-6 bg-green-50 border-green-200 text-green-800">
+        {/* Notifikasi SK Terbit (Updated) */}
+        {hasNewSK && isAlertVisible && (
+          <Alert className="mb-6 bg-green-50 border-green-200 text-green-800 pr-10 relative">
             <Bell className="h-4 w-4" />
             <AlertTitle>Dokumen SK Terbit!</AlertTitle>
             <AlertDescription>
               Selamat! Salah satu atau beberapa permohonan Anda telah disetujui.
               Silakan unduh dokumen SK pada tabel di bawah.
             </AlertDescription>
+            {/* Tombol Close */}
+            <button
+              onClick={() => setIsAlertVisible(false)}
+              className="absolute top-4 right-4 text-green-700 hover:text-green-900 transition-colors p-1 rounded-full hover:bg-green-100"
+              aria-label="Tutup notifikasi"
+            >
+              <X className="h-4 w-4" />
+            </button>
           </Alert>
         )}
 
@@ -187,6 +197,8 @@ export default function RiwayatPermohonan() {
             </div>
           </div>
         </div>
+
+        {/* ... Sisa komponen filter dan table sama seperti sebelumnya ... */}
 
         <Card className="mb-6 border-0 shadow-md bg-white rounded-2xl">
           <CardContent className="p-4 md:p-6">
@@ -260,7 +272,7 @@ export default function RiwayatPermohonan() {
                 <DataTable
                   header={[
                     "No",
-                    "No. Pengajuan & PBB", // Update Header
+                    "No. Pengajuan & PBB",
                     "Tanggal Masuk",
                     "Nama Pemohon",
                     "Status",

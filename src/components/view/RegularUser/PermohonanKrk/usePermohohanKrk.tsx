@@ -7,6 +7,14 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import z from "zod";
 
+// --- HELPER: Title Case (Huruf depan besar) ---
+const toTitleCase = (str: string) => {
+  if (!str) return "";
+  return str.toLowerCase().replace(/(?:^|\s)\w/g, function (a) {
+    return a.toUpperCase();
+  });
+};
+
 export const fileSchema = z
   .instanceof(File, { message: "File wajib diunggah" })
   .refine((file) => file.size <= 5 * 1024 * 1024, "Ukuran file maksimal 5MB")
@@ -96,7 +104,6 @@ const usePermohohanKrk = () => {
   const form = useForm<PermohonanFormValues>({
     resolver: zodResolver(permohonanSchema),
     defaultValues: {
-      // ... (nilai default lainnya sama)
       provinsi_pemohon: "",
       kota_pemohon: "",
       kecamatan_pemohon: "",
@@ -114,7 +121,6 @@ const usePermohohanKrk = () => {
       kota_pemilik_name: "",
       kecamatan_pemilik_name: "",
       kelurahan_pemilik_name: "",
-      // ...
     },
   });
 
@@ -140,7 +146,9 @@ const usePermohohanKrk = () => {
       navigate("/riwayat-permohonan");
     },
   });
+
   console.log("Zod Errors:", form.formState.errors);
+
   const handleCreatePermohonan = (values: PermohonanFormValues) => {
     const formData = new FormData();
 
@@ -179,14 +187,21 @@ const usePermohohanKrk = () => {
         value !== undefined &&
         value !== null
       ) {
-        // LOGIKA UTAMA: Jika key adalah wilayah, ambil value dari field _name
+        // LOGIKA UTAMA: Jika key adalah wilayah, ambil value dari field _name DAN FORMAT KE TITLE CASE
         if (regionFields.includes(key)) {
           const nameKey = `${key}_name` as keyof PermohonanFormValues;
-          // Kirim Nama, fallback ke value asli jika nama kosong
-          formData.append(
-            key,
-            (values[nameKey] as string) || (value as string)
-          );
+          const rawName = (values[nameKey] as string) || (value as string);
+
+          // FORMAT DI SINI
+          formData.append(key, toTitleCase(rawName));
+        }
+        // TAMBAHAN: FORMAT JUGA WILAYAH LOKASI
+        else if (key === "kecamatan_lokasi" || key === "kelurahan_lokasi") {
+          formData.append(key, toTitleCase(value as string));
+        }
+        // TAMBAHAN OPSIONAL: FORMAT ALAMAT DAN NAMA ORANG JUGA
+        else if (key.includes("nama") || key.includes("alamat")) {
+          formData.append(key, toTitleCase(value as string));
         } else {
           formData.append(key, value as string);
         }

@@ -1,4 +1,5 @@
 import authServices from "@/services/api/auth.services";
+import { wilayahServices } from "@/services/api/region.services"; // Pastikan import ini ada
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
@@ -6,6 +7,15 @@ import { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod";
+
+// --- 1. Helper Function: Title Case ---
+// Mengubah "KOTA BENGKULU" -> "Kota Bengkulu"
+const toTitleCase = (str: string) => {
+  if (!str) return "";
+  return str.toLowerCase().replace(/(?:^|\s)\w/g, function (a) {
+    return a.toUpperCase();
+  });
+};
 
 export const identitasSchema = z.object({
   nik: z
@@ -44,15 +54,9 @@ export const identitasSchema = z.object({
     .string()
     .min(1, "No. rumah harus diisi")
     .max(10, "No. rumah maksimal 10 karakter"),
-  kelurahan: z
-    .string()
-    .min(1, "Kelurahan harus diisi")
-    .min(3, "Kelurahan minimal 3 karakter"),
-  kecamatan: z
-    .string()
-    .min(1, "Kecamatan harus diisi")
-    .min(3, "Kecamatan minimal 3 karakter"),
-  kota: z.string().min(1, "Kota harus diisi").min(3, "Kota minimal 3 karakter"),
+  kelurahan: z.string().min(1, "Kelurahan harus diisi"),
+  kecamatan: z.string().min(1, "Kecamatan harus diisi"),
+  kota: z.string().min(1, "Kota harus diisi"),
   jenis_kelamin: z
     .string()
     .refine((value) => value === "Laki-laki" || value === "Perempuan", {
@@ -62,14 +66,12 @@ export const identitasSchema = z.object({
 
 export type IdentitasFormValues = z.infer<typeof identitasSchema>;
 
+// ID Provinsi Bengkulu (Default, sesuaikan jika user bisa dari luar provinsi)
+const PROVINSI_BENGKULU_ID = "17";
+
 const useIdentitasTab = () => {
   const queryClient = useQueryClient();
   const isInitializedRef = useRef(false);
-  const cascadeSetRef = useRef({
-    kota: false,
-    kecamatan: false,
-    kelurahan: false,
-  });
 
   const identitasForm = useForm<IdentitasFormValues>({
     resolver: zodResolver(identitasSchema),
@@ -101,103 +103,134 @@ const useIdentitasTab = () => {
     refetchOnMount: "always",
   });
 
-  // Effect 1: Set data non-wilayah PERTAMA KALI
+  // --- 2. Helper Logic: Cari ID Wilayah ---
+  // Mencari ID berdasarkan kecocokan ID (prioritas) atau Nama (fallback)
+  const findRegionId = (list: any[], value: any) => {
+    if (!value) return "";
+    const valString = value.toString().toLowerCase();
+
+    // 1. Cek by ID
+    const matchById = list.find((item) => item.id.toString() === valString);
+    if (matchById) return matchById.id;
+
+    // 2. Cek by Name
+    const matchByName = list.find(
+      (item) => item.name.toLowerCase() === valString
+    );
+    return matchByName ? matchByName.id : "";
+  };
+
+  // --- 3. LOAD DATA (Hanya sekali jalan saat data ready) ---
   useEffect(() => {
     if (dataProfile && !isInitializedRef.current) {
-      const { kota, kecamatan, kelurahan, ...restData } = dataProfile;
+      const loadDataWithRegions = async () => {
+        // A. Set Field Biasa
+        const { kota, kecamatan, kelurahan, ...restData } = dataProfile;
+        Object.entries(restData).forEach(([key, value]) => {
+          identitasForm.setValue(key as any, value?.toString() || "");
+        });
 
-      // Set semua field non-cascade
-      Object.entries(restData).forEach(([key, value]) => {
-        identitasForm.setValue(key as any, value?.toString() || "");
-      });
+        // B. Set Wilayah (Mapping Name -> ID agar dropdown jalan)
+        try {
+          // 1. Load Kota (Default Provinsi Bengkulu atau sesuaikan)
+          // Jika tidak ada provinsi di dataProfile, kita asumsikan Bengkulu (17)
+          const resKota =
+            await wilayahServices.getRegencies(PROVINSI_BENGKULU_ID);
+          const kotaId = findRegionId(resKota.data, dataProfile.kota);
 
+          if (kotaId) {
+            identitasForm.setValue("kota", kotaId);
+
+            // 2. Load Kecamatan
+            const resKec = await wilayahServices.getDistricts(kotaId);
+            const kecId = findRegionId(resKec.data, dataProfile.kecamatan);
+
+            if (kecId) {
+              // Delay sedikit agar React Hook Form mendeteksi perubahan state kota
+              setTimeout(async () => {
+                identitasForm.setValue("kecamatan", kecId);
+
+                // 3. Load Kelurahan
+                const resKel = await wilayahServices.getVillages(kecId);
+                const kelId = findRegionId(resKel.data, dataProfile.kelurahan);
+
+                if (kelId) {
+                  setTimeout(() => {
+                    identitasForm.setValue("kelurahan", kelId);
+                  }, 100);
+                }
+              }, 100);
+            }
+          }
+        } catch (error) {
+          console.error("Gagal load wilayah profile:", error);
+        }
+      };
+
+      loadDataWithRegions();
       isInitializedRef.current = true;
     }
   }, [dataProfile, identitasForm]);
 
-  // Effect 2: Set KOTA setelah data profile loaded
-  useEffect(() => {
-    if (
-      dataProfile?.kota &&
-      isInitializedRef.current &&
-      !cascadeSetRef.current.kota
-    ) {
-      // Delay sedikit untuk memastikan regencies sudah loaded
-      const timer = setTimeout(() => {
-        identitasForm.setValue("kota", dataProfile.kota.toString());
-        cascadeSetRef.current.kota = true;
-      }, 100);
-
-      return () => clearTimeout(timer);
-    }
-  }, [dataProfile?.kota, isInitializedRef.current, identitasForm]);
-
-  // Effect 3: Set KECAMATAN setelah kota di-set
-  useEffect(() => {
-    if (
-      dataProfile?.kecamatan &&
-      cascadeSetRef.current.kota &&
-      !cascadeSetRef.current.kecamatan
-    ) {
-      const kotaValue = identitasForm.watch("kota");
-
-      // Pastikan kota sudah sesuai baru set kecamatan
-      if (kotaValue === dataProfile.kota?.toString()) {
-        const timer = setTimeout(() => {
-          identitasForm.setValue("kecamatan", dataProfile.kecamatan.toString());
-          cascadeSetRef.current.kecamatan = true;
-        }, 300);
-
-        return () => clearTimeout(timer);
-      }
-    }
-  }, [
-    dataProfile?.kecamatan,
-    dataProfile?.kota,
-    cascadeSetRef.current.kota,
-    identitasForm,
-  ]);
-
-  // Effect 4: Set KELURAHAN setelah kecamatan di-set
-  useEffect(() => {
-    if (
-      dataProfile?.kelurahan &&
-      cascadeSetRef.current.kecamatan &&
-      !cascadeSetRef.current.kelurahan
-    ) {
-      const kecamatanValue = identitasForm.watch("kecamatan");
-
-      // Pastikan kecamatan sudah sesuai baru set kelurahan
-      if (kecamatanValue === dataProfile.kecamatan?.toString()) {
-        const timer = setTimeout(() => {
-          identitasForm.setValue("kelurahan", dataProfile.kelurahan.toString());
-          cascadeSetRef.current.kelurahan = true;
-        }, 500);
-
-        return () => clearTimeout(timer);
-      }
-    }
-  }, [
-    dataProfile?.kelurahan,
-    dataProfile?.kecamatan,
-    cascadeSetRef.current.kecamatan,
-    identitasForm,
-  ]);
-
-  // Reset refs saat component unmount
-  useEffect(() => {
-    return () => {
-      isInitializedRef.current = false;
-      cascadeSetRef.current = {
-        kota: false,
-        kecamatan: false,
-        kelurahan: false,
-      };
-    };
-  }, []);
-
   const updateProfile = async (values: IdentitasFormValues) => {
-    const result = await authServices.updateProfile(values);
+    // --- 4. PREPARE SUBMIT: Convert ID -> Title Case Name ---
+    const payload = { ...values };
+
+    // Helper untuk mencari nama dari ID & Format Title Case
+    const getRegionName = async (
+      id: string,
+      fetchFn: any,
+      parentId?: string
+    ) => {
+      try {
+        if (!id) return "";
+        const res = parentId ? await fetchFn(parentId) : await fetchFn();
+        const item = res.data.find((d: any) => d.id === id);
+        // Jika ketemu, return Nama (Title Case), jika tidak return value as is
+        return item ? toTitleCase(item.name) : toTitleCase(id);
+      } catch (e) {
+        return toTitleCase(id);
+      }
+    };
+
+    // Kita harus fetch ulang namanya berdasarkan ID yang dipilih di form
+    // Karena form menyimpan ID, tapi backend minta NAMA.
+
+    // A. Kota
+    if (values.kota) {
+      // Kita asumsikan provinsi default (17) untuk cari nama kota
+      payload.kota = await getRegionName(
+        values.kota,
+        wilayahServices.getRegencies,
+        PROVINSI_BENGKULU_ID
+      );
+    }
+
+    // B. Kecamatan
+    if (values.kecamatan) {
+      // Perlu ID kota (values.kota) untuk fetch kecamatan
+      payload.kecamatan = await getRegionName(
+        values.kecamatan,
+        wilayahServices.getDistricts,
+        values.kota // ID Kota yg ada di form saat ini
+      );
+    }
+
+    // C. Kelurahan
+    if (values.kelurahan) {
+      // Perlu ID kecamatan (values.kecamatan) untuk fetch kelurahan
+      payload.kelurahan = await getRegionName(
+        values.kelurahan,
+        wilayahServices.getVillages,
+        values.kecamatan // ID Kecamatan yg ada di form saat ini
+      );
+    }
+
+    // Format juga Nama Lengkap dan Alamat biar rapi (Opsional)
+    payload.name = toTitleCase(values.name);
+    payload.alamat = toTitleCase(values.alamat);
+
+    const result = await authServices.updateProfile(payload);
     return result.data;
   };
 

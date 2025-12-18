@@ -9,6 +9,14 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import z from "zod";
 
+// --- HELPER: Title Case (Huruf depan besar) ---
+const toTitleCase = (str: string) => {
+  if (!str) return "";
+  return str.toLowerCase().replace(/(?:^|\s)\w/g, function (a) {
+    return a.toUpperCase();
+  });
+};
+
 // --- 1. DEFINISI SCHEMA (Validasi) ---
 
 const fileSchemaEdit = z
@@ -122,7 +130,21 @@ const usePermohonanKrkEdit = (id: string) => {
     enabled: !!id,
   });
 
-  console.log(data);
+  // --- LOGIC HELPER PENCARIAN ID WILAYAH ---
+  const findRegionId = (list: any[], value: any) => {
+    if (!value) return "";
+    const valString = value.toString().toLowerCase();
+
+    // 1. Coba cari yang ID-nya persis sama
+    const matchById = list.find((item) => item.id.toString() === valString);
+    if (matchById) return matchById.id;
+
+    // 2. Kalau gak ketemu ID, cari yang NAMANYA mirip (Case Insensitive)
+    const matchByName = list.find(
+      (item) => item.name.toLowerCase() === valString
+    );
+    return matchByName ? matchByName.id : "";
+  };
 
   // --- LOGIC LOAD DATA ---
   useEffect(() => {
@@ -139,7 +161,7 @@ const usePermohonanKrkEdit = (id: string) => {
       form.setValue("latitude", lat?.toString() || "");
       form.setValue("longitude", lng?.toString() || "");
 
-      // B. Field Standar (Exclude wilayah & bangunan agar tidak bentrok)
+      // B. Field Standar
       const excludedFields = [
         "latitude",
         "longitude",
@@ -155,7 +177,7 @@ const usePermohonanKrkEdit = (id: string) => {
         // Exclude Wilayah Lokasi
         "kecamatan_lokasi",
         "kelurahan_lokasi",
-        // Exclude Bangunan (PENTING AGAR TIDAK RACE CONDITION)
+        // Exclude Bangunan
         "fungsi_bangunan_id",
         "kategori_bangunan_id",
       ];
@@ -170,36 +192,28 @@ const usePermohonanKrkEdit = (id: string) => {
         }
       });
 
-      // C. LOGIC PEMOHON (Reverse Lookup)
-      const findIdByName = (list: any[], name: string) => {
-        if (!name) return "";
-        const item = list.find(
-          (i) => i.name.toLowerCase() === name.toLowerCase()
-        );
-        return item ? item.id : "";
-      };
-
+      // C. LOGIC PEMOHON
       const loadWilayahPemohon = async () => {
         try {
           const resProv = await wilayahServices.getProvinces();
-          const provId = findIdByName(resProv.data, data.provinsi_pemohon);
+          const provId = findRegionId(resProv.data, data.provinsi_pemohon);
 
           if (provId) {
             form.setValue("provinsi_pemohon", provId);
             const resKota = await wilayahServices.getRegencies(provId);
-            const kotaId = findIdByName(resKota.data, data.kota_pemohon);
+            const kotaId = findRegionId(resKota.data, data.kota_pemohon);
 
             if (kotaId) {
               setTimeout(async () => {
                 form.setValue("kota_pemohon", kotaId);
                 const resKec = await wilayahServices.getDistricts(kotaId);
-                const kecId = findIdByName(resKec.data, data.kecamatan_pemohon);
+                const kecId = findRegionId(resKec.data, data.kecamatan_pemohon);
 
                 if (kecId) {
                   setTimeout(async () => {
                     form.setValue("kecamatan_pemohon", kecId);
                     const resKel = await wilayahServices.getVillages(kecId);
-                    const kelId = findIdByName(
+                    const kelId = findRegionId(
                       resKel.data,
                       data.kelurahan_pemohon
                     );
@@ -219,55 +233,32 @@ const usePermohonanKrkEdit = (id: string) => {
         }
       };
 
-      // D. LOGIC PEMILIK (PERBAIKAN)
+      // D. LOGIC PEMILIK
       const loadWilayahPemilik = async () => {
         try {
-          // 1. Provinsi (Data dari API sudah ID: "17", jadi aman langsung dipakai)
-          const provId = data.provinsi_pemilik?.toString();
+          const resProv = await wilayahServices.getProvinces();
+          const provId = findRegionId(resProv.data, data.provinsi_pemilik);
+          const finalProvId = provId || data.provinsi_pemilik?.toString();
 
-          if (provId) {
-            form.setValue("provinsi_pemilik", provId);
-
-            // Ambil list kota berdasarkan ID Provinsi
-            const resKota = await wilayahServices.getRegencies(provId);
-
-            // 2. Kota (Data dari API adalah NAMA: "KABUPATEN KAUR")
-            // Kita harus cari ID-nya dulu dari list resKota berdasarkan namanya
-            const kotaId = findIdByName(resKota.data, data.kota_pemilik);
+          if (finalProvId) {
+            form.setValue("provinsi_pemilik", finalProvId);
+            const resKota = await wilayahServices.getRegencies(finalProvId);
+            const kotaId = findRegionId(resKota.data, data.kota_pemilik);
 
             if (kotaId) {
               setTimeout(async () => {
-                form.setValue("kota_pemilik", kotaId); // Set value form pakai ID
-
-                // Ambil list kecamatan pakai ID Kota yang sudah ditemukan
+                form.setValue("kota_pemilik", kotaId);
                 const resKec = await wilayahServices.getDistricts(kotaId);
-
-                // 3. Kecamatan (Data dari API adalah NAMA: "TETAP")
-                // Cari ID-nya lagi
-                const kecId = findIdByName(resKec.data, data.kecamatan_pemilik);
+                const kecId = findRegionId(resKec.data, data.kecamatan_pemilik);
 
                 if (kecId) {
                   setTimeout(async () => {
-                    form.setValue("kecamatan_pemilik", kecId); // Set value form pakai ID
-
-                    // Ambil list kelurahan pakai ID Kecamatan
+                    form.setValue("kecamatan_pemilik", kecId);
                     const resKel = await wilayahServices.getVillages(kecId);
-
-                    // 4. Kelurahan (Data dari API sudah ID: "1704031006")
-                    // Karena datanya sudah ID, kita cek apakah ID ini ada di list (validasi)
-                    // Atau langsung set saja jika yakin.
-                    // Namun findIdByName tidak bisa dipakai karena dia cari by Name.
-
-                    const kelData = data.kelurahan_pemilik?.toString();
-                    // Cek apakah kelData ini ID atau Nama.
-                    // Jika ID (angka), kita cari object yang id-nya sama.
-                    const foundKel = resKel.data.find(
-                      (k: any) =>
-                        k.id === kelData ||
-                        k.name.toLowerCase() === kelData.toLowerCase()
+                    const kelId = findRegionId(
+                      resKel.data,
+                      data.kelurahan_pemilik
                     );
-
-                    const kelId = foundKel ? foundKel.id : "";
 
                     if (kelId) {
                       setTimeout(() => {
@@ -284,7 +275,7 @@ const usePermohonanKrkEdit = (id: string) => {
         }
       };
 
-      // E. LOGIC WILAYAH LOKASI (FIX: Case Insensitive)
+      // E. LOGIC WILAYAH LOKASI
       const loadWilayahLokasi = async () => {
         try {
           const kecamatanLokasiNama = data.kecamatan_lokasi;
@@ -292,26 +283,20 @@ const usePermohonanKrkEdit = (id: string) => {
 
           if (!kecamatanLokasiNama) return;
 
-          // 1. Ambil List Kecamatan
           const resKec = await wilayahServices.getDistricts(BENGKULU_CITY_ID);
-
-          // 2. Cari yang cocok (Case Insensitive)
           const kecamatanLokasi = resKec.data.find(
             (kec: any) =>
               kec.name.toLowerCase() === kecamatanLokasiNama.toLowerCase()
           );
 
           if (kecamatanLokasi) {
-            // Set Value Form menggunakan Nama dari API (agar dropdown mendeteksi)
             setTimeout(() => {
               form.setValue("kecamatan_lokasi", kecamatanLokasi.name);
 
-              // 3. Ambil List Kelurahan berdasarkan ID Kecamatan yang ditemukan
               if (kelurahanLokasiNama) {
                 wilayahServices
                   .getVillages(kecamatanLokasi.id)
                   .then((resKel) => {
-                    // 4. Cari kelurahan yang cocok (Case Insensitive)
                     const kelurahanLokasi = resKel.data.find(
                       (kel: any) =>
                         kel.name.toLowerCase() ===
@@ -323,19 +308,16 @@ const usePermohonanKrkEdit = (id: string) => {
                         form.setValue("kelurahan_lokasi", kelurahanLokasi.name);
                       }, 100);
                     } else {
-                      // Fallback jika tidak ketemu di API, pakai data DB
                       form.setValue("kelurahan_lokasi", kelurahanLokasiNama);
                     }
                   });
               }
             }, 200);
           } else {
-            // Fallback jika kecamatan tidak ketemu di API
             form.setValue("kecamatan_lokasi", kecamatanLokasiNama);
           }
         } catch (error) {
           console.error("Gagal mapping wilayah lokasi:", error);
-          // Fallback Error
           if (data.kecamatan_lokasi)
             form.setValue("kecamatan_lokasi", data.kecamatan_lokasi);
           if (data.kelurahan_lokasi)
@@ -343,25 +325,21 @@ const usePermohonanKrkEdit = (id: string) => {
         }
       };
 
-      // Jalankan Wilayah
       loadWilayahPemohon();
       setTimeout(loadWilayahPemilik, 300);
       setTimeout(loadWilayahLokasi, 600);
 
-      // F. DATA BANGUNAN (FIX: Dependent Dropdown)
+      // F. DATA BANGUNAN
       if (data.fungsiBangunan) {
-        // 1. Set Kategori dulu
         const kategoriId = data.fungsiBangunan.kategori_id;
         form.setValue("kategori_bangunan_id", kategoriId);
 
-        // 2. Beri jeda waktu agar state "List Fungsi" ter-fetch ulang karena perubahan Kategori
         setTimeout(() => {
           const fungsiId = data.fungsi_bangunan_id || data.fungsiBangunan.id;
-          // 3. Baru set Fungsi ID
           if (fungsiId) {
             form.setValue("fungsi_bangunan_id", fungsiId);
           }
-        }, 500); // 500ms agar aman dari reset effect
+        }, 500);
       }
 
       // G. FILE ATTACHMENTS
@@ -410,7 +388,7 @@ const usePermohonanKrkEdit = (id: string) => {
     const geoJsonData = { type: "Point", coordinates: [lng, lat] };
     formData.append("lokasi", JSON.stringify(geoJsonData));
 
-    // Helper untuk append ID atau Nama
+    // --- Helper Logic Submit: Convert ID -> Nama (Title Case) ---
     const appendWilayahByName = async (
       fieldKey: string,
       idValue: string,
@@ -421,14 +399,17 @@ const usePermohonanKrkEdit = (id: string) => {
       try {
         const res = parentId ? await serviceFn(parentId) : await serviceFn();
         const item = res.data.find((d: any) => d.id === idValue);
-        if (item) formData.append(fieldKey, item.name);
-        else formData.append(fieldKey, idValue);
+
+        // JIKA KETEMU, KIRIM NAMA (DIFORMAT TITLE CASE)
+        if (item) formData.append(fieldKey, toTitleCase(item.name));
+        // JIKA TIDAK KETEMU, KIRIM VALUE ASLI (DIFORMAT TITLE CASE)
+        else formData.append(fieldKey, toTitleCase(idValue));
       } catch (e) {
-        formData.append(fieldKey, idValue);
+        formData.append(fieldKey, toTitleCase(idValue));
       }
     };
 
-    // Wilayah Pemohon
+    // 1. Wilayah Pemohon (Fetch ulang nama berdasarkan ID)
     await appendWilayahByName(
       "provinsi_pemohon",
       values.provinsi_pemohon,
@@ -453,14 +434,40 @@ const usePermohonanKrkEdit = (id: string) => {
       values.kecamatan_pemohon
     );
 
-    // Wilayah Lokasi (Langsung append string karena value form sudah berupa NAMA)
+    // 2. Wilayah Pemilik (Fetch ulang nama berdasarkan ID - INI PENTING KARENA FORM NYIMPEN ID)
+    await appendWilayahByName(
+      "provinsi_pemilik",
+      values.provinsi_pemilik,
+      wilayahServices.getProvinces
+    );
+    await appendWilayahByName(
+      "kota_pemilik",
+      values.kota_pemilik,
+      wilayahServices.getRegencies,
+      values.provinsi_pemilik
+    );
+    await appendWilayahByName(
+      "kecamatan_pemilik",
+      values.kecamatan_pemilik,
+      wilayahServices.getDistricts,
+      values.kota_pemilik
+    );
+    await appendWilayahByName(
+      "kelurahan_pemilik",
+      values.kelurahan_pemilik,
+      wilayahServices.getVillages,
+      values.kecamatan_pemilik
+    );
+
+    // 3. Wilayah Lokasi (Value form sudah Nama, tinggal format Title Case)
     if (values.kecamatan_lokasi) {
-      formData.append("kecamatan_lokasi", values.kecamatan_lokasi);
+      formData.append("kecamatan_lokasi", toTitleCase(values.kecamatan_lokasi));
     }
     if (values.kelurahan_lokasi) {
-      formData.append("kelurahan_lokasi", values.kelurahan_lokasi);
+      formData.append("kelurahan_lokasi", toTitleCase(values.kelurahan_lokasi));
     }
 
+    // 4. Exclude Keys yang sudah di-handle manual di atas
     const excludeSubmitKeys = [
       "file_ktp_pemohon",
       "PBB",
@@ -468,20 +475,31 @@ const usePermohonanKrkEdit = (id: string) => {
       "latitude",
       "longitude",
       "jenis_layanan_id",
-      // Exclude pemohon yang sudah di-handle manual
+      // Exclude Pemohon
       "provinsi_pemohon",
       "kota_pemohon",
       "kecamatan_pemohon",
       "kelurahan_pemohon",
-      // Exclude lokasi yang sudah di-handle manual
+      // Exclude Pemilik (TAMBAHAN PENTING)
+      "provinsi_pemilik",
+      "kota_pemilik",
+      "kecamatan_pemilik",
+      "kelurahan_pemilik",
+      // Exclude Lokasi
       "kecamatan_lokasi",
       "kelurahan_lokasi",
     ];
 
+    // 5. Append Sisa Field (dan format Title Case jika string)
     Object.entries(values).forEach(([key, value]) => {
       if (excludeSubmitKeys.includes(key) || key.includes("_name")) return;
       if (value !== undefined && value !== null) {
-        formData.append(key, value as string);
+        // Opsional: Format nama orang dan alamat jadi Title Case juga
+        if (key.includes("nama") || key.includes("alamat")) {
+          formData.append(key, toTitleCase(value as string));
+        } else {
+          formData.append(key, value as string);
+        }
       }
     });
 
