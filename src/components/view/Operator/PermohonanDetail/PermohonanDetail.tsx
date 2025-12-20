@@ -15,13 +15,16 @@ import { Loader2 } from "lucide-react";
 import LocationMap from "@/components/commons/LocationMap";
 import { useState } from "react";
 import VerifikasiChecklist from "./VerifikasiChecklist";
+import { cn } from "@/lib/utils";
 
-const DetailPermohonan = () => {
+const DetailPermohonan = ({ isAction }: { isAction?: boolean }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { id } = useParams();
   const { data, isLoading, dataDetailHistory } = useDetailPermohonan(id!);
   const [isVerified, setIsVerified] = useState(false);
+
+  const shouldShowActionButtons = isAction ?? location.state?.isAction;
 
   const isFinal = location.state?.isFinal;
 
@@ -86,19 +89,25 @@ const DetailPermohonan = () => {
             )}
           </div>
 
-          <div className="lg:col-span-1 space-y-6">
-            <AlurPermohonanCard data={dataDetailHistory} />
+          <div className="lg:col-span-1">
+            <div className={cn(isFinal ? "sticky top-0 space-y-6" : null)}>
+              <AlurPermohonanCard data={dataDetailHistory} />
 
-            <VerifikasiChecklist
-              onVerificationChange={(isValid) => setIsVerified(isValid)}
-            />
+              {shouldShowActionButtons && isFinal && (
+                <VerifikasiChecklist
+                  onVerificationChange={(isValid) => setIsVerified(isValid)}
+                />
+              )}
 
-            <div className="mt-6">
-              <ActionButtons
-                id={id || ""}
-                isFinal={isFinal}
-                isVerificationComplete={isVerified}
-              />
+              {shouldShowActionButtons && (
+                <div className="mt-6">
+                  <ActionButtons
+                    id={id || ""}
+                    isFinal={isFinal}
+                    isVerificationComplete={isVerified}
+                  />
+                </div>
+              )}
             </div>
           </div>
         </div>

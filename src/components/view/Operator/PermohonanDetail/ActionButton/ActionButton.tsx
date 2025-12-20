@@ -80,17 +80,17 @@ const ActionButtons = ({
           >
             <DialogTrigger asChild>
               <Button
-                disabled={!isVerificationComplete}
+                disabled={!isVerificationComplete && isFinal}
                 className="w-full bg-green-600 hover:bg-green-700"
                 title={
-                  !isVerificationComplete
+                  !isVerificationComplete && isFinal
                     ? "Harap selesaikan checklist verifikasi dokumen terlebih dahulu"
                     : ""
                 }
               >
                 <CheckCircle className="h-4 w-4 mr-2" />
                 Setujui Permohonan
-                {!isVerificationComplete && " (Terkunci)"}
+                {!isVerificationComplete && isFinal && " (Terkunci)"}
               </Button>
             </DialogTrigger>
             <DialogContent>

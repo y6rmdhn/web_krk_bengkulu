@@ -16,7 +16,7 @@ const HeaderSection = ({
   getStatusText,
 }: HeaderSectionProps) => {
   return (
-    <div className="flex items-center justify-between">
+    <div className="flex items-center justify-between w-full">
       <div className="flex items-center gap-4 w-full justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">

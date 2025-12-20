@@ -87,7 +87,9 @@ const Permohonan = () => {
                 </span>
               ),
               action: () => {
-                navigate(`/operator/detail/${item.id}`);
+                navigate(`/operator/detail/${item.id}`, {
+                  state: { isAction: true, isFinal: true },
+                });
               },
             },
           ]}

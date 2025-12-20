@@ -48,9 +48,9 @@ const RegulasiPage = lazy(
 const ProsedurPage = lazy(
   () => import("./components/view/RegularUser/Prosedur")
 );
-const PengaduanPage = lazy(
-  () => import("./components/view/RegularUser/Pengaduan")
-);
+// const PengaduanPage = lazy(
+//   () => import("./components/view/RegularUser/Pengaduan")
+// );
 const LayananKrkPage = lazy(
   () => import("./components/view/RegularUser/LayananKrk")
 );
@@ -234,10 +234,10 @@ const router = createBrowserRouter([
     path: "/prosedur",
     element: <ProsedurPage />,
   },
-  {
-    path: "/pengaduan",
-    element: <PengaduanPage />,
-  },
+  // {
+  //   path: "/pengaduan",
+  //   element: <PengaduanPage />,
+  // },
   {
     path: "/admin",
     children: [
