@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import MenuItem from "@/components/commons/MenuItem";
 import MainLayout from "@/components/layouts/MainLayout/MainLayout";
 import type { Swiper as SwiperType } from "swiper";
@@ -12,56 +12,235 @@ import "swiper/css";
 import "swiper/css/pagination";
 // @ts-ignore
 import "swiper/css/navigation";
-import { menuItems } from "./Home.constant";
-
-const heroSlides = [
-  {
-    id: 1,
-    title: "KRK Online",
-    subtitle: "Kota Bengkulu",
-    description:
-      "Layanan digital terpadu untuk pengurusan Keterangan Rencana Kota dengan proses cepat, transparan, dan akuntabel",
-    // Gambar: Blueprint/Peta Rencana Kota di atas meja kerja (Relevan dengan KRK/Tata Ruang)
-    image:
-      "https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=800&q=80",
-  },
-  {
-    id: 2,
-    title: "Pelayanan Digital",
-    subtitle: "Terintegrasi",
-    description:
-      "Akses layanan KRK kapan saja dan di mana saja melalui sistem online yang terintegrasi",
-    // Gambar: Tangan mengetik di Laptop dengan grafik data (Nuansa Digital & Sistem)
-    image:
-      "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80",
-  },
-  {
-    id: 3,
-    title: "Proses Cepat",
-    subtitle: "dan Akuntabel",
-    description:
-      "Monitoring realtime status pengajuan Anda dengan sistem yang transparan",
-    // Gambar: Dokumen tertata dengan kacamata/pena (Nuansa Verifikasi & Akuntabilitas)
-    image:
-      "https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&w=800&q=80",
-  },
-  {
-    id: 4,
-    title: "Layanan Online",
-    subtitle: "24 Jam",
-    description:
-      "Ajukan permohonan KRK secara online tanpa batas waktu dan lokasi",
-    // Gambar: Setup meja kerja modern/clean (Nuansa aksesibilitas & layanan publik modern)
-    image:
-      "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?auto=format&fit=crop&w=800&q=80",
-  },
-];
+import { heroSlides, menuItems } from "./Home.constant";
+import useHomepage from "./useHomepage";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import {
+  AlertTriangle,
+  ArrowRight,
+  CheckCircle2,
+  FileText,
+  X,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 export default function Homepage() {
   const swiperRef = useRef<SwiperType | null>(null);
+  const [showWarningModal, setShowWarningModal] = useState(false);
+  const navigate = useNavigate();
+
+  const {
+    isEligible,
+    isLoadingMaster,
+    isLoadingUser,
+    percentage,
+    totalRequired,
+  } = useHomepage();
+
+  useEffect(() => {
+    // Jika data sudah selesai loading DAN user belum eligible
+    if (
+      !isLoadingMaster &&
+      !isLoadingUser &&
+      !isEligible &&
+      totalRequired > 0
+    ) {
+      // Kasih delay dikit biar ga kaget pas baru load page
+      const timer = setTimeout(() => {
+        setShowWarningModal(true);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [isLoadingMaster, isLoadingUser, isEligible, totalRequired]);
 
   return (
     <MainLayout title="Home | KRK Bengkulu" isBgGray={false} isPaddingY={false}>
+      <Dialog open={showWarningModal} onOpenChange={setShowWarningModal}>
+        <DialogContent
+          className="
+      fixed top-8 left-[50%] -translate-x-[50%] translate-y-0 
+      w-[90vw] max-w-2xl p-0 
+      bg-white
+      shadow-xl border border-gray-200
+      rounded-xl overflow-hidden
+      data-[state=open]:slide-in-from-top-10
+      data-[state=open]:fade-in-0
+    "
+        >
+          {/* Header dengan warna resmi pemerintah */}
+          <div className="relative bg-gradient-to-r from-blue-700 via-blue-600 to-blue-700 px-6 py-6 overflow-hidden">
+            {/* Pattern garis tipis untuk identitas pemerintah */}
+            <div className="absolute inset-0 opacity-10">
+              <div
+                className="absolute inset-0"
+                style={{
+                  backgroundImage: `repeating-linear-gradient(
+              45deg,
+              transparent,
+              transparent 10px,
+              white 10px,
+              white 20px
+            )`,
+                }}
+              />
+            </div>
+
+            <div className="relative flex items-start gap-4">
+              {/* Badge Peringatan */}
+              <div className="flex-shrink-0">
+                <div className="relative">
+                  <div className="absolute inset-0 bg-white/20 rounded-full blur-sm" />
+                  <div className="relative p-3 bg-white/90 backdrop-blur-sm rounded-full shadow-lg">
+                    <AlertTriangle
+                      className="w-6 h-6 text-red-600"
+                      strokeWidth={2}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Title Section */}
+              <div className="flex-1">
+                <div className="inline-block px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full mb-2">
+                  <span className="text-xs font-bold text-white tracking-wide">
+                    PERHATIAN
+                  </span>
+                </div>
+                <h3 className="font-bold text-white text-xl leading-tight mb-2">
+                  Dokumen Persyaratan Belum Lengkap
+                </h3>
+                <p className="text-blue-100 text-sm leading-relaxed">
+                  Silakan lengkapi dokumen persyaratan untuk dapat mengajukan
+                  permohonan baru
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Content Section */}
+          <div className="relative px-6 py-6 space-y-6">
+            {/* Progress Card */}
+            <div className="bg-gray-50 rounded-lg p-5 border border-gray-200">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-blue-600 rounded-lg">
+                    <FileText className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-gray-900">
+                      Status Kelengkapan Berkas
+                    </h4>
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      {percentage}% dokumen telah lengkap
+                    </p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="text-2xl font-bold text-blue-700 leading-none">
+                    {percentage}%
+                  </div>
+                </div>
+              </div>
+
+              {/* Progress Bar */}
+              <div className="relative">
+                <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-gradient-to-r from-blue-600 to-blue-700 rounded-full transition-all duration-500"
+                    style={{ width: `${percentage}%` }}
+                  />
+                </div>
+                <div className="flex justify-between text-xs text-gray-500 mt-2">
+                  <span>0%</span>
+                  <span>50%</span>
+                  <span>100%</span>
+                </div>
+              </div>
+
+              {/* Status Info */}
+              <div className="mt-4 p-3 bg-white rounded-lg border border-gray-100">
+                <div className="flex items-start gap-2">
+                  {percentage === 100 ? (
+                    <CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                  ) : (
+                    <AlertTriangle className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
+                  )}
+                  <p className="text-sm text-gray-700">
+                    {percentage === 100
+                      ? "Semua dokumen persyaratan telah lengkap. Anda dapat melanjutkan pengajuan permohonan."
+                      : `Anda perlu melengkapi ${totalRequired} dokumen persyaratan untuk dapat mengajukan permohonan baru.`}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Informasi Tambahan */}
+            <div className="bg-blue-50 rounded-lg p-4 border border-blue-100">
+              <div className="flex gap-3">
+                <div className="flex-shrink-0">
+                  <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+                    <span className="text-blue-700 text-sm font-bold">i</span>
+                  </div>
+                </div>
+                <div>
+                  <h5 className="font-semibold text-blue-800 text-sm mb-1">
+                    Informasi Penting
+                  </h5>
+                  <ul className="text-xs text-blue-700 space-y-1">
+                    <li className="flex items-start gap-1">
+                      <span className="mt-0.5">•</span>
+                      <span>
+                        Pastikan dokumen dalam format PDF atau JPG dengan
+                        resolusi yang jelas
+                      </span>
+                    </li>
+                    <li className="flex items-start gap-1">
+                      <span className="mt-0.5">•</span>
+                      <span>Dokumen harus berukuran maksimal 2MB per file</span>
+                    </li>
+                    <li className="flex items-start gap-1">
+                      <span className="mt-0.5">•</span>
+                      <span>
+                        Proses verifikasi membutuhkan waktu 3-5 hari kerja
+                      </span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex flex-col sm:flex-row gap-3 pt-2">
+              <Button
+                variant="outline"
+                onClick={() => setShowWarningModal(false)}
+                className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-50 font-medium"
+              >
+                Tutup
+              </Button>
+              <Button
+                onClick={() => navigate("/berkas")}
+                className="flex-1 bg-gradient-to-r from-blue-700 to-blue-600 hover:from-blue-800 hover:to-blue-700 text-white shadow-sm font-medium"
+              >
+                <span>Ke Halaman Berkas</span>
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            </div>
+
+            {/* Footer Note */}
+            <div className="pt-4 border-t border-gray-100">
+              <p className="text-xs text-gray-500 text-center">
+                Untuk bantuan lebih lanjut, hubungi layanan pelanggan di{" "}
+                <a href="tel:+62" className="text-blue-600 hover:underline">
+                  (0736) 123456
+                </a>
+              </p>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* Hero Section - Full Width dengan Swiper Carousel */}
       <div className="relative h-[90vh] min-h-[700px] max-h-[900px] overflow-hidden">
         <Swiper
