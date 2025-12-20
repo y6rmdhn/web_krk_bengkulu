@@ -68,7 +68,11 @@ const DetailPermohonan = () => {
         {/* MAIN CONTENT GRID */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">
-            <LocationMap latitude={latitude} longitude={longitude} />
+            <LocationMap
+              latitude={latitude}
+              longitude={longitude}
+              userRole="operator"
+            />
 
             <DataPemohonCard data={data} formatAlamat={formatAlamat} />
             <DataPemilikCard data={data} formatAlamat={formatAlamat} />

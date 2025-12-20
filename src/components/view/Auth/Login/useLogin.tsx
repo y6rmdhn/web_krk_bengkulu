@@ -2,7 +2,6 @@ import authServices from "@/services/api/auth.services";
 import type { ILogin } from "@/types/auth";
 import session from "@/utils/session";
 import { zodResolver } from "@hookform/resolvers/zod";
-// 1. Tambahkan import useQueryClient
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { useState } from "react";
@@ -20,7 +19,6 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 
 const useLogin = () => {
   const navigate = useNavigate();
-  // 2. Inisialisasi queryClient
   const queryClient = useQueryClient();
   const [captchaValue, setCaptchaValue] = useState<string | null>(null);
 
@@ -53,9 +51,6 @@ const useLogin = () => {
       const token = data?.data?.data?.accessToken;
       session.setSession(token);
 
-      // 3. TAMBAHKAN BARIS INI: Hapus semua cache query lama
-      // Ini memaksa semua useQuery di halaman tujuan untuk fetch ulang (refetch)
-      // karena cache dianggap kosong/invalid.
       queryClient.removeQueries();
 
       toast.success("Login Success", {

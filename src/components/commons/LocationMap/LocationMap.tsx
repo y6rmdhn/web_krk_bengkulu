@@ -9,7 +9,7 @@ import { getZoneColor } from "../SearchableMap/SearchableMap";
 interface LokasiBangunanCardProps {
   latitude?: string | number | null;
   longitude?: string | number | null;
-  userRole?: "pemohon" | "operator" | "surveyor";
+  userRole?: "pemohon" | "operator" | "surveyor" | "kadis";
 }
 
 const isPointInPolygon = (point: number[], vs: number[][]) => {

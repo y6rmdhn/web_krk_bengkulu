@@ -40,7 +40,6 @@ const REJECT_TEMPLATES = [
 
 const NEXT_ACTION_OPTIONS = [
   { label: "Lanjut ke Surveyor (Default)", value: "DEFAULT" },
-  { label: "Lanjut ke Kepala Dinas", value: "TO_KADIS" },
 ];
 
 const ActionButtons = ({
@@ -108,6 +107,7 @@ const ActionButtons = ({
                         <FormItem>
                           <FormLabel>Tindak Lanjut Ke</FormLabel>
                           <Select
+                            disabled={true}
                             onValueChange={field.onChange}
                             defaultValue={field.value}
                           >

@@ -5,11 +5,11 @@ export const menuItems = [
     icon: "/img/monitoring.png",
     href: "/monitoring-berkas",
   },
-  { title: "Peta", icon: "/img/peta.png", href: "#" },
+  // { title: "Peta", icon: "/img/peta.png", href: "#" },
   { title: "FAQ", icon: "/img/faq.png", href: "/faq" },
   { title: "Regulasi", icon: "/img/regulasi.png", href: "/regulasi" },
   { title: "Persyaratan", icon: "/img/persyaratan.png", href: "/prosedur" },
-  { title: "Pengaduan", icon: "/img/pengaduan.png", href: "/pengaduan" },
+  // { title: "Pengaduan", icon: "/img/pengaduan.png", href: "/pengaduan" },
   { title: "Website Portal", icon: "/img/website-portal.png", href: "#" },
 ];
 

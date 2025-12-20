@@ -12,21 +12,7 @@ import "swiper/css";
 import "swiper/css/pagination";
 // @ts-ignore
 import "swiper/css/navigation";
-
-const menuItems = [
-  { title: "Layanan", icon: "/img/layanan.png", href: "/layanan" },
-  {
-    title: "Monitoring",
-    icon: "/img/monitoring.png",
-    href: "/monitoring-berkas",
-  },
-  { title: "Peta", icon: "/img/peta.png", href: "#" },
-  { title: "FAQ", icon: "/img/faq.png", href: "/faq" },
-  { title: "Regulasi", icon: "/img/regulasi.png", href: "/regulasi" },
-  { title: "Persyaratan", icon: "/img/persyaratan.png", href: "/prosedur" },
-  { title: "Pengaduan", icon: "/img/pengaduan.png", href: "/pengaduan" },
-  { title: "Website Portal", icon: "/img/website-portal.png", href: "#" },
-];
+import { menuItems } from "./Home.constant";
 
 const heroSlides = [
   {
@@ -184,7 +170,7 @@ export default function Homepage() {
                               d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                             />
                           </svg>
-                          Pelajari Lebih Lanjut
+                          Pelajari Tutorial
                         </a>
                       </div>
                     </div>
@@ -250,7 +236,7 @@ export default function Homepage() {
           </div>
 
           {/* Menu Grid with Enhanced Design */}
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 lg:gap-8">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6 lg:gap-8">
             {menuItems.map((item, index) => (
               <div
                 key={item.title}

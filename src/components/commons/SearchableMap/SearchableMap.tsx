@@ -13,6 +13,17 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import dataPolaRuang from "./pola_ruang.json";
 
+const redIcon = new L.Icon({
+  iconUrl:
+    "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png",
+  shadowUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
+  iconSize: [25, 41], // Ukuran icon
+  iconAnchor: [12, 41], // Titik penunjuk (ujung bawah pin)
+  popupAnchor: [1, -34], // Titik munculnya popup
+  shadowSize: [41, 41], // Ukuran bayangan
+});
+
 // --- FIX ICON LEAFLET ---
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -571,7 +582,7 @@ interface SearchableMapProps {
   initialSearchQuery?: string;
   readonly?: boolean;
   zoneName?: string;
-  role?: "pemohon" | "operator" | "surveyor";
+  role?: "pemohon" | "operator" | "surveyor" | "kadis";
 }
 
 // --- SUB-COMPONENTS ---
@@ -612,7 +623,7 @@ const SearchableMap: React.FC<SearchableMapProps> = ({
   role = "pemohon",
 }) => {
   const [position, setPosition] = useState<[number, number]>(initialPosition);
-  const isInternal = role === "operator" || role === "surveyor";
+  const isInternal = ["operator", "surveyor", "kadis"].includes(role || "");
 
   useEffect(() => {
     setPosition(initialPosition);
@@ -832,45 +843,53 @@ const SearchableMap: React.FC<SearchableMapProps> = ({
               />
             </LayersControl.BaseLayer>
 
-            <LayersControl.BaseLayer
-              checked={isInternal}
-              name="Google Streets (Bersih)"
-            >
-              <TileLayer
-                attribution="&copy; Google Maps"
-                url="http://mt0.google.com/vt/lyrs=m&x={x}&y={y}&z={z}"
-              />
-            </LayersControl.BaseLayer>
+            {isInternal && (
+              <>
+                {/* BASELAYER 2: Google Streets */}
+                <LayersControl.BaseLayer
+                  checked={true}
+                  name="Google Streets (Bersih)"
+                >
+                  <TileLayer
+                    attribution="&copy; Google Maps"
+                    url="http://mt0.google.com/vt/lyrs=m&x={x}&y={y}&z={z}"
+                  />
+                </LayersControl.BaseLayer>
 
-            <LayersControl.BaseLayer name="OpenStreetMap">
-              <TileLayer
-                attribution="&copy; OpenStreetMap"
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              />
-            </LayersControl.BaseLayer>
+                {/* BASELAYER 3: OSM */}
+                <LayersControl.BaseLayer name="OpenStreetMap">
+                  <TileLayer
+                    attribution="&copy; OpenStreetMap"
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  />
+                </LayersControl.BaseLayer>
 
-            <LayersControl.Overlay
-              checked={isInternal}
-              name="Peta Pola Ruang (RTRW)"
-            >
-              <GeoJSON
-                key="pola-ruang-layer"
-                data={dataPolaRuang as any}
-                style={geoJsonStyle}
-                onEachFeature={onEachFeature}
-              />
-            </LayersControl.Overlay>
+                {/* OVERLAY: RTRW (Pola Ruang) */}
+                {/* Internal bisa melihat dan on/off layer ini */}
+                <LayersControl.Overlay
+                  checked={true} // Default nyala buat internal
+                  name="Peta Pola Ruang (RTRW)"
+                >
+                  <GeoJSON
+                    key="pola-ruang-layer"
+                    data={dataPolaRuang as any}
+                    style={geoJsonStyle}
+                    onEachFeature={onEachFeature}
+                  />
+                </LayersControl.Overlay>
+              </>
+            )}
           </LayersControl>
 
-          <Marker position={position}>
+          <Marker position={position} icon={redIcon}>
             <Popup>
               <div className="text-center">
                 <strong className="block mb-1 text-gray-800">
                   Lokasi Terpilih
                 </strong>
-                {zoneName && (
+                {(isInternal || zoneName) && (
                   <p className="text-sm font-bold text-blue-600 mb-1">
-                    {zoneName}
+                    {zoneName || "Zona Belum Dicek"}
                   </p>
                 )}
                 <span className="text-xs text-gray-500 font-mono bg-gray-100 px-1 rounded">
