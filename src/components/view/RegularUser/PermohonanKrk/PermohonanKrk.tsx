@@ -104,7 +104,11 @@ export default function PermohonanKrk() {
                   </span>
                 </div>
 
-                <Progress value={percentage} className="h-3" />
+                <Progress
+                  value={percentage}
+                  className="h-3"
+                  indicatorClassName="bg-blue-600"
+                />
 
                 <p className="text-xs text-gray-400 text-right">
                   {percentage}% Lengkap
