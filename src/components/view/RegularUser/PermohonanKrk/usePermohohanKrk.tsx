@@ -1,6 +1,7 @@
+import berkasServices from "@/services/api/berkas.services";
 import permohonanKrkServices from "@/services/api/permohonanKrk";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
@@ -126,6 +127,29 @@ const usePermohohanKrk = () => {
 
   const navigate = useNavigate();
 
+  const { data: masterBerkas, isLoading: isLoadingMaster } = useQuery({
+    queryKey: ["master-berkas"],
+    queryFn: berkasServices.getMasterData,
+  });
+
+  const { data: userBerkas, isLoading: isLoadingUser } = useQuery({
+    queryKey: ["user-berkas"],
+    queryFn: berkasServices.getListBerkas,
+  });
+
+  const requiredList = masterBerkas?.data.data || [];
+  const uploadedList = userBerkas?.data.data || [];
+
+  const totalRequired = requiredList.length;
+
+  const totalUploaded = requiredList.filter((reqItem: any) =>
+    uploadedList.some((upItem: any) => upItem.master_berkas_id === reqItem.id)
+  ).length;
+
+  const isEligible = totalRequired > 0 && totalUploaded === totalRequired;
+  const progressString = `${totalUploaded}/${totalRequired}`;
+  const isLoadingCheck = isLoadingMaster || isLoadingUser;
+
   const permohonan = async (payload: FormData) => {
     const result = await permohonanKrkServices.permohonan(payload);
     return result;
@@ -146,8 +170,6 @@ const usePermohohanKrk = () => {
       navigate("/riwayat-permohonan");
     },
   });
-
-  console.log("Zod Errors:", form.formState.errors);
 
   const handleCreatePermohonan = (values: PermohonanFormValues) => {
     const formData = new FormData();
@@ -222,13 +244,15 @@ const usePermohohanKrk = () => {
     mutate(formData);
   };
 
-  const handleRefreshCaptcha = () => {};
-
   return {
     form,
     onSubmit: handleCreatePermohonan,
-    handleRefreshCaptcha,
     isPending,
+    isEligible,
+    progressString,
+    isLoadingCheck,
+    totalRequired,
+    totalUploaded,
   };
 };
 
