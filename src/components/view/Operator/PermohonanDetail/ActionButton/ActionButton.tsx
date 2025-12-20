@@ -45,9 +45,11 @@ const NEXT_ACTION_OPTIONS = [
 const ActionButtons = ({
   id,
   isFinal = true,
+  isVerificationComplete = false,
 }: {
   id: string;
   isFinal?: boolean;
+  isVerificationComplete?: boolean;
 }) => {
   const { formAccept, formRevisiReject, actions, state } = useActionButton(id);
 
@@ -77,9 +79,18 @@ const ActionButtons = ({
             onOpenChange={(open) => setOpenDialog(open ? "accept" : null)}
           >
             <DialogTrigger asChild>
-              <Button className="w-full bg-green-600 hover:bg-green-700">
+              <Button
+                disabled={!isVerificationComplete}
+                className="w-full bg-green-600 hover:bg-green-700"
+                title={
+                  !isVerificationComplete
+                    ? "Harap selesaikan checklist verifikasi dokumen terlebih dahulu"
+                    : ""
+                }
+              >
                 <CheckCircle className="h-4 w-4 mr-2" />
                 Setujui Permohonan
+                {!isVerificationComplete && " (Terkunci)"}
               </Button>
             </DialogTrigger>
             <DialogContent>

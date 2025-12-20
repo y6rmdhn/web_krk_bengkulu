@@ -1,6 +1,6 @@
 import OperatorLayout from "@/components/layouts/OperatorLayout";
 import { Button } from "@/components/ui/button";
-import { useNavigate, useParams, useLocation } from "react-router-dom"; // UPDATE: Import useLocation
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import useDetailPermohonan from "./usePermohonanDetail";
 import HeaderSection from "./HeaderSection";
 import DataPemohonCard from "./DataPemohonCard";
@@ -13,12 +13,15 @@ import { getStatusColor, getStatusText } from "@/utils/statusUtils";
 import { formatAlamat } from "@/utils/formatUtils";
 import { Loader2 } from "lucide-react";
 import LocationMap from "@/components/commons/LocationMap";
+import { useState } from "react";
+import VerifikasiChecklist from "./VerifikasiChecklist";
 
 const DetailPermohonan = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { id } = useParams();
   const { data, isLoading, dataDetailHistory } = useDetailPermohonan(id!);
+  const [isVerified, setIsVerified] = useState(false);
 
   const isFinal = location.state?.isFinal;
 
@@ -86,7 +89,17 @@ const DetailPermohonan = () => {
           <div className="lg:col-span-1 space-y-6">
             <AlurPermohonanCard data={dataDetailHistory} />
 
-            <ActionButtons id={`${id}`} isFinal={isFinal} />
+            <VerifikasiChecklist
+              onVerificationChange={(isValid) => setIsVerified(isValid)}
+            />
+
+            <div className="mt-6">
+              <ActionButtons
+                id={id || ""}
+                isFinal={isFinal}
+                isVerificationComplete={isVerified}
+              />
+            </div>
           </div>
         </div>
       </div>
