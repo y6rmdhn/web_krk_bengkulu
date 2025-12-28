@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import {
   Dialog,
   DialogContent,
@@ -33,7 +34,7 @@ const ActionButtons = ({ id }: { id: string }) => {
     <Card>
       <CardContent className="p-6">
         <div className="flex flex-col gap-3">
-          {/* --- BUTTON & DIALOG SETUJUI --- */}
+          {/* --- DIALOG SETUJUI (APPROVE) --- */}
           <Dialog
             open={openDialog === "accept"}
             onOpenChange={(open) => setOpenDialog(open ? "accept" : null)}
@@ -41,17 +42,18 @@ const ActionButtons = ({ id }: { id: string }) => {
             <DialogTrigger asChild>
               <Button className="w-full bg-green-600 hover:bg-green-700">
                 <CheckCircle className="h-4 w-4 mr-2" />
-                Setujui Permohonan
+                Setujui & Terbitkan SK
               </Button>
             </DialogTrigger>
-            <DialogContent>
+
+            <DialogContent className="max-w-lg">
               <DialogHeader>
                 <DialogTitle>Setujui Permohonan</DialogTitle>
                 <DialogDescription>
-                  Apakah Anda yakin ingin menyetujui permohonan ini? Tambahkan
-                  catatan jika perlu.
+                  Masukkan parameter teknis untuk SK KRK sesuai hasil kajian.
                 </DialogDescription>
               </DialogHeader>
+
               <Form {...formAccept}>
                 <form
                   onSubmit={(e) => {
@@ -60,15 +62,124 @@ const ActionButtons = ({ id }: { id: string }) => {
                   }}
                   className="space-y-4"
                 >
+                  {/* Grid Layout untuk Input Teknis */}
+                  <div className="grid grid-cols-2 gap-4">
+                    {/* --- INPUT GSP BARU --- */}
+                    <FormField
+                      control={formAccept.control}
+                      name="gsp"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>GSP (m)</FormLabel>
+                          <FormControl>
+                            <Input placeholder="3" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* GSB */}
+                    <FormField
+                      control={formAccept.control}
+                      name="gsb"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>GSB (m)</FormLabel>
+                          <FormControl>
+                            <Input placeholder="5" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* KDB */}
+                    <FormField
+                      control={formAccept.control}
+                      name="kdb"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>KDB (%)</FormLabel>
+                          <FormControl>
+                            <Input placeholder="60" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* KLB */}
+                    <FormField
+                      control={formAccept.control}
+                      name="klb"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>KLB</FormLabel>
+                          <FormControl>
+                            <Input placeholder="1.5" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* KDH */}
+                    <FormField
+                      control={formAccept.control}
+                      name="kdh"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>KDH (%)</FormLabel>
+                          <FormControl>
+                            <Input placeholder="20" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* TB Max */}
+                    <FormField
+                      control={formAccept.control}
+                      name="tb_max"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>TB Max (Lantai)</FormLabel>
+                          <FormControl>
+                            <Input placeholder="3" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* TB Min */}
+                    <FormField
+                      control={formAccept.control}
+                      name="tb_min"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>TB Min (Lantai)</FormLabel>
+                          <FormControl>
+                            <Input placeholder="1" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  {/* Catatan (Full Width) */}
                   <FormField
                     control={formAccept.control}
                     name="catatan"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Catatan (Opsional)</FormLabel>
+                        <FormLabel>Catatan SK (Opsional)</FormLabel>
                         <FormControl>
                           <Textarea
-                            placeholder="Masukkan catatan persetujuan..."
+                            placeholder="Disetujui secara teknis. Dokumen telah ditandatangani..."
                             {...field}
                           />
                         </FormControl>
@@ -76,6 +187,7 @@ const ActionButtons = ({ id }: { id: string }) => {
                       </FormItem>
                     )}
                   />
+
                   <DialogFooter>
                     <Button
                       type="button"
@@ -100,7 +212,7 @@ const ActionButtons = ({ id }: { id: string }) => {
             </DialogContent>
           </Dialog>
 
-          {/* --- BUTTON & DIALOG TOLAK --- */}
+          {/* --- DIALOG TOLAK (REJECT) - Tidak ada perubahan --- */}
           <Dialog
             open={openDialog === "reject"}
             onOpenChange={(open) => setOpenDialog(open ? "reject" : null)}

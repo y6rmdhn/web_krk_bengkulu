@@ -4,8 +4,16 @@ import { AxiosError } from "axios";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
+// UPDATE: Menambahkan gsp
 export interface AcceptPayload {
   catatan: string;
+  gsp: string; // <--- BARU
+  gsb: string;
+  kdb: string;
+  klb: string;
+  kdh: string;
+  tb_max: string;
+  tb_min: string;
 }
 
 export interface RevisiAndRejectPayload {
@@ -21,7 +29,16 @@ const useActionButton = (id: string) => {
   };
 
   const formAccept = useForm<AcceptPayload>({
-    defaultValues: { catatan: "" },
+    defaultValues: {
+      catatan: "",
+      gsp: "", // <--- BARU: Harus ada default value
+      gsb: "",
+      kdb: "",
+      klb: "",
+      kdh: "",
+      tb_max: "",
+      tb_min: "",
+    },
   });
 
   const formRevisiReject = useForm<RevisiAndRejectPayload>({
@@ -30,6 +47,7 @@ const useActionButton = (id: string) => {
 
   const { mutate: acceptAction, isPending: isPendingAccept } = useMutation({
     mutationFn: async (payload: AcceptPayload) => {
+      // console.log("Payload dikirim:", payload); // Uncomment untuk debug
       return await disposisiServices.approve(id, payload);
     },
     onError: (error) => {

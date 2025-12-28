@@ -2,7 +2,7 @@ import axiosInstance from "@/lib/axiosInstance";
 import endpoint from "./endpoint";
 
 const disposisiServices = {
-  approve: (id: string, payload: { catatan: string }) =>
+  approve: (id: string, payload: any) =>
     axiosInstance.put(
       `${endpoint.STAF}/${endpoint.DISPOSISI}/${id}/approve`,
       payload
