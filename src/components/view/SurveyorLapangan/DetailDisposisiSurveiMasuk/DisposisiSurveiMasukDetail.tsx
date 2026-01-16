@@ -1,17 +1,3 @@
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { toast } from "sonner"; // Pastikan sudah install sonner
-
 import { useNavigate, useParams } from "react-router-dom";
 import useDisposisiSurveiMasukDetail from "./useDisposisiSurveiMasukDetail";
 import HeaderSection from "./HeaderSection";
@@ -24,8 +10,10 @@ import ActionButtons from "./ActionButton";
 import { getStatusColor, getStatusText } from "@/utils/statusUtils";
 import { formatAlamat } from "@/utils/formatUtils";
 import SurveyorLayout from "@/components/layouts/SurveyorLayout";
-import { Loader2, MapPin, CheckCircle } from "lucide-react";
+import { Loader2, Info } from "lucide-react";
 import LocationMap from "@/components/commons/LocationMap";
+import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 const DisposisiSurveiMasukDetail = () => {
   const navigate = useNavigate();
@@ -33,29 +21,6 @@ const DisposisiSurveiMasukDetail = () => {
   const { data, isLoading, dataDetailHistory } = useDisposisiSurveiMasukDetail(
     id!
   );
-
-  // State untuk Modal Survei (Hanya ini yang tersisa di sini)
-  const [openSurveiModal, setOpenSurveiModal] = useState(false);
-  const [catatan, setCatatan] = useState("");
-
-  // Handler Submit Survei (Simulasi / Manual Process)
-  const handleSubmitSurvei = () => {
-    // KARENA TIDAK ADA ENDPOINT BE:
-    // Kita anggap ini proses manual. Tombol ini hanya UX untuk "mengingatkan"
-    // user bahwa dia memutuskan untuk survei fisik.
-
-    // 1. Tutup Modal
-    setOpenSurveiModal(false);
-
-    // 2. Reset Catatan
-    setCatatan("");
-
-    // 3. Tampilkan Notifikasi Sukses
-    toast.success("Jadwal Survei Dicatat", {
-      description:
-        "Instruksi telah dicatat. Silakan lakukan survei lapangan sebelum menyetujui permohonan.",
-    });
-  };
 
   if (isLoading) {
     return (
@@ -104,7 +69,7 @@ const DisposisiSurveiMasukDetail = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* --- KOLOM KIRI (Data & Peta) --- */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Peta dengan Layer RTRW Aktif */}
+            {/* Peta dengan Layer RTRW Aktif untuk Surveyor */}
             <LocationMap
               latitude={latitude}
               longitude={longitude}
@@ -122,32 +87,21 @@ const DisposisiSurveiMasukDetail = () => {
 
           {/* --- KOLOM KANAN (Aksi & History) --- */}
           <div className="lg:col-span-1 space-y-6">
-            {/* 1. Panel Opsi Survei (Jika ragu dan butuh cek lapangan) */}
-            <div className="bg-blue-50/50 border border-blue-100 p-5 rounded-lg space-y-4">
-              <div className="flex items-center gap-2 border-b border-blue-200 pb-2">
-                <CheckCircle className="h-5 w-5 text-blue-600" />
-                <h3 className="font-semibold text-blue-900">
-                  Tindak Lanjut Lapangan
-                </h3>
-              </div>
-
-              <div className="space-y-3">
-                <p className="text-xs text-blue-700">
-                  Jika lokasi sulit diidentifikasi via peta atau data meragukan:
-                </p>
-                <Button
-                  variant="outline"
-                  className="w-full justify-start gap-2 bg-white hover:bg-blue-50 border-blue-200 text-blue-700"
-                  onClick={() => setOpenSurveiModal(true)}
-                >
-                  <MapPin className="h-4 w-4" />
-                  Jadwalkan Survei Lapangan
-                </Button>
-              </div>
-            </div>
+            {/* 1. Informasi Tindak Lanjut Lapangan (Peringatan Statis) */}
+            <Alert className="bg-blue-50 border-blue-200 text-blue-900 shadow-sm">
+              <Info className="h-4 w-4 text-blue-600" />
+              <AlertTitle className="font-bold text-sm">
+                Peringatan Survei
+              </AlertTitle>
+              <AlertDescription className="text-xs leading-relaxed mt-1">
+                Jika lokasi sulit diidentifikasi melalui peta digital atau data
+                berkas meragukan, harap lakukan{" "}
+                <strong>Pengecekan Fisik/Survei Lapangan</strong> sebelum
+                memberikan persetujuan teknis.
+              </AlertDescription>
+            </Alert>
 
             {/* 2. ActionButtons (Setujui/Tolak/Revisi) */}
-            {/* Input GSB/KDB ada di dalam popup tombol 'Setujui' component ini */}
             <ActionButtons id={`${id}`} />
 
             {/* 3. History Alur */}
@@ -155,34 +109,6 @@ const DisposisiSurveiMasukDetail = () => {
           </div>
         </div>
       </div>
-
-      {/* --- MODAL DIALOG SURVEI --- */}
-      <Dialog open={openSurveiModal} onOpenChange={setOpenSurveiModal}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Tindak Lanjut: Survei Lapangan</DialogTitle>
-            <DialogDescription>
-              Instruksikan tim teknis untuk melakukan pengecekan fisik di
-              lokasi.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="py-4 space-y-2">
-            <Label>Catatan untuk Tim Lapangan</Label>
-            <Textarea
-              placeholder="Contoh: Pastikan batas patok tanah bagian belakang..."
-              value={catatan}
-              onChange={(e) => setCatatan(e.target.value)}
-            />
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setOpenSurveiModal(false)}>
-              Batal
-            </Button>
-            {/* Tombol ini hanya trigger toast simulasi */}
-            <Button onClick={handleSubmitSurvei}>Kirim Disposisi Survei</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </SurveyorLayout>
   );
 };

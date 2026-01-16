@@ -71,7 +71,9 @@ const SurveyorLayoutSidebar = (props: PropsType) => {
                 onClose();
               }}
             />
-            <p className="text-lg font-bold text-gray-800">Surveyor</p>
+            <p className="text-lg font-bold text-gray-800">
+              Jabatan Fungsional
+            </p>
           </div>
 
           {/* Menu List */}
