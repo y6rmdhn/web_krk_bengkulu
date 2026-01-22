@@ -90,6 +90,7 @@ const JenisFungsiBangunan = lazy(
   () => import("./components/view/Admin/JenisFungsiBangunan"),
 );
 const Roles = lazy(() => import("./components/view/Admin/Role"));
+const UserRoles = lazy(() => import("./components/view/Admin/UserRole"));
 
 // operator
 const PermohonanAdminPage = lazy(
@@ -272,6 +273,11 @@ const router = createBrowserRouter([
         path: "roles",
         loader: adminLoader,
         element: <Roles />,
+      },
+      {
+        path: "user-roles",
+        loader: adminLoader,
+        element: <UserRoles />,
       },
     ],
   },

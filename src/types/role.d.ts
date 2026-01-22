@@ -4,4 +4,10 @@ interface IRole {
   is_active: boolean;
 }
 
-export { IRole };
+interface IUserRoles {
+  id?: string;
+  userId: string;
+  roleId: string;
+}
+
+export { IRole, IUserRoles };

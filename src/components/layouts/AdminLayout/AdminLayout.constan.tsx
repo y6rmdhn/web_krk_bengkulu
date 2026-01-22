@@ -37,6 +37,12 @@ const SIDEBAR_ADMIN = [
     href: "/admin/roles",
     icon: <FaFileSignature />,
   },
+  {
+    key: "userroles",
+    label: "User Roles",
+    href: "/admin/user-roles",
+    icon: <FaFileSignature />,
+  },
 ];
 
 export { SIDEBAR_ADMIN };
