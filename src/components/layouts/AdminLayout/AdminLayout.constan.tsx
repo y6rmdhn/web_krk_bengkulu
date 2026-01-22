@@ -31,6 +31,12 @@ const SIDEBAR_ADMIN = [
     href: "/admin/jenis-permohonan",
     icon: <FaFileSignature />,
   },
+  {
+    key: "roles",
+    label: "Roles",
+    href: "/admin/roles",
+    icon: <FaFileSignature />,
+  },
 ];
 
 export { SIDEBAR_ADMIN };

@@ -11,131 +11,132 @@ import mainLoader from "./components/layouts/MainLayout/MainLayout.loader";
 const Homepage = lazy(() => import("./components/view/RegularUser/Homepage"));
 const LoginPage = lazy(() => import("./components/view/Auth/Login/Login"));
 const ForgotPasswordPage = lazy(
-  () => import("./components/view/Auth/ForgotPassword")
+  () => import("./components/view/Auth/ForgotPassword"),
 );
 const RegisterPage = lazy(
-  () => import("./components/view/Auth/Register/Register")
+  () => import("./components/view/Auth/Register/Register"),
 );
 const KelengkapanBerkas = lazy(
-  () => import("./components/view/RegularUser/Berkas")
+  () => import("./components/view/RegularUser/Berkas"),
 );
 const LayananPage = lazy(
-  () => import("./components/view/RegularUser/Layanan/Layanan")
+  () => import("./components/view/RegularUser/Layanan/Layanan"),
 );
 const PanduanPengajuan = lazy(
-  () => import("./components/view/RegularUser/PanduanPengajuan")
+  () => import("./components/view/RegularUser/PanduanPengajuan"),
 );
 const PermohonanKrk = lazy(
-  () => import("./components/view/RegularUser/PermohonanKrk")
+  () => import("./components/view/RegularUser/PermohonanKrk"),
 );
 const PermohonanKrkEdit = lazy(
-  () => import("./components/view/RegularUser/PermohonanKrkEdit")
+  () => import("./components/view/RegularUser/PermohonanKrkEdit"),
 );
 const BerhasilBuatBaruPage = lazy(
-  () => import("./components/view/RegularUser/SuccessPage")
+  () => import("./components/view/RegularUser/SuccessPage"),
 );
 const MonitoringBerkasPage = lazy(
-  () => import("./components/view/RegularUser/MonitoringBerkas")
+  () => import("./components/view/RegularUser/MonitoringBerkas"),
 );
 const DetailMonitoringBerkasPage = lazy(
   () =>
-    import("./components/view/RegularUser/MonitoringBerkas/PermohonanDetail")
+    import("./components/view/RegularUser/MonitoringBerkas/PermohonanDetail"),
 );
 const FAQPage = lazy(() => import("./components/view/RegularUser/Faq"));
 const RegulasiPage = lazy(
-  () => import("./components/view/RegularUser/Regulasi")
+  () => import("./components/view/RegularUser/Regulasi"),
 );
 const ProsedurPage = lazy(
-  () => import("./components/view/RegularUser/Prosedur")
+  () => import("./components/view/RegularUser/Prosedur"),
 );
 // const PengaduanPage = lazy(
 //   () => import("./components/view/RegularUser/Pengaduan")
 // );
 const LayananKrkPage = lazy(
-  () => import("./components/view/RegularUser/LayananKrk")
+  () => import("./components/view/RegularUser/LayananKrk"),
 );
 const RiwayatPermohonanPage = lazy(
-  () => import("./components/view/RegularUser/RiwayatPermohonan")
+  () => import("./components/view/RegularUser/RiwayatPermohonan"),
 );
 const RiwayatPermohonanDetailPage = lazy(
   () =>
-    import("./components/view/RegularUser/RiwayatPermohonan/PermohonanDetail")
+    import("./components/view/RegularUser/RiwayatPermohonan/PermohonanDetail"),
 );
 const SuccessRegisterPage = lazy(
-  () => import("./components/view/SuccessRegister")
+  () => import("./components/view/SuccessRegister"),
 );
 const SuccessVerificationEmailPage = lazy(
-  () => import("./components/view/VerificationEmailSuccess")
+  () => import("./components/view/VerificationEmailSuccess"),
 );
 const PreviewSkPage = lazy(
-  () => import("./components/view/RegularUser/PreviewSk")
+  () => import("./components/view/RegularUser/PreviewSk"),
 );
 const TrackingPage = lazy(
-  () => import("./components/view/RegularUser/Tracking")
+  () => import("./components/view/RegularUser/Tracking"),
 );
 const DetailTrackingPage = lazy(
-  () => import("./components/view/RegularUser/Tracking/PermohonanDetail")
+  () => import("./components/view/RegularUser/Tracking/PermohonanDetail"),
 );
 
 // admin
 const JenisLayanan = lazy(() => import("./components/view/Admin/JenisLayanan"));
 const AdminBerkas = lazy(() => import("./components/view/Admin/Berkas"));
 const JenisPermohonanAdmin = lazy(
-  () => import("./components/view/Admin/JenisPermohonan")
+  () => import("./components/view/Admin/JenisPermohonan"),
 );
 const JenisKategoriFungsiBangunan = lazy(
-  () => import("./components/view/Admin/KategoriFungsiBangunan")
+  () => import("./components/view/Admin/KategoriFungsiBangunan"),
 );
 const JenisFungsiBangunan = lazy(
-  () => import("./components/view/Admin/JenisFungsiBangunan")
+  () => import("./components/view/Admin/JenisFungsiBangunan"),
 );
+const Roles = lazy(() => import("./components/view/Admin/Role"));
 
 // operator
 const PermohonanAdminPage = lazy(
-  () => import("./components/view/Operator/Permohonan")
+  () => import("./components/view/Operator/Permohonan"),
 );
 const PermohonanSelesai = lazy(
-  () => import("./components/view/Operator/PermohonanSelesai")
+  () => import("./components/view/Operator/PermohonanSelesai"),
 );
 const PermohonanDitolak = lazy(
-  () => import("./components/view/Operator/PermohonanDitolak")
+  () => import("./components/view/Operator/PermohonanDitolak"),
 );
 const PermohonanDikembalikan = lazy(
-  () => import("./components/view/Operator/PermohonanDikembalikan")
+  () => import("./components/view/Operator/PermohonanDikembalikan"),
 );
 const PermohonanDiProses = lazy(
-  () => import("./components/view/Operator/PermohonanFinal")
+  () => import("./components/view/Operator/PermohonanFinal"),
 );
 const DetailPermohonanAdminPage = lazy(
-  () => import("./components/view/Operator/PermohonanDetail")
+  () => import("./components/view/Operator/PermohonanDetail"),
 );
 
 // Surveyor Lapangan
 const DisposisiSurveiMasuk = lazy(
-  () => import("./components/view/SurveyorLapangan/DisposisiSurveiMasuk")
+  () => import("./components/view/SurveyorLapangan/DisposisiSurveiMasuk"),
 );
 const DisposisiSurveiDiproses = lazy(
-  () => import("./components/view/SurveyorLapangan/DisposisiSurveiDitolak")
+  () => import("./components/view/SurveyorLapangan/DisposisiSurveiDitolak"),
 );
 const DisposisiSurveiSelesai = lazy(
-  () => import("./components/view/SurveyorLapangan/DisposisiSurveiSelesai")
+  () => import("./components/view/SurveyorLapangan/DisposisiSurveiSelesai"),
 );
 const DisposisiSurveiMasukDetail = lazy(
-  () => import("./components/view/SurveyorLapangan/DetailDisposisiSurveiMasuk")
+  () => import("./components/view/SurveyorLapangan/DetailDisposisiSurveiMasuk"),
 );
 
 // Kepala Dinas
 const PermohonanSkTTE = lazy(
-  () => import("./components/view/KepalaDinas/PermohonanSKTTE")
+  () => import("./components/view/KepalaDinas/PermohonanSKTTE"),
 );
 const SkTTEDiproses = lazy(
-  () => import("./components/view/KepalaDinas/SKTTEDitolak")
+  () => import("./components/view/KepalaDinas/SKTTEDitolak"),
 );
 const SkTTESelesai = lazy(
-  () => import("./components/view/KepalaDinas/SKTTESelesai")
+  () => import("./components/view/KepalaDinas/SKTTESelesai"),
 );
 const PermohonanSkTTEDetail = lazy(
-  () => import("./components/view/KepalaDinas/DetailPermohonanSkTTE")
+  () => import("./components/view/KepalaDinas/DetailPermohonanSkTTE"),
 );
 const SkDetail = lazy(() => import("./components/view/KepalaDinas/PreviewSk"));
 
@@ -266,6 +267,11 @@ const router = createBrowserRouter([
         path: "fungsi-bangunan",
         loader: adminLoader,
         element: <JenisFungsiBangunan />,
+      },
+      {
+        path: "roles",
+        loader: adminLoader,
+        element: <Roles />,
       },
     ],
   },

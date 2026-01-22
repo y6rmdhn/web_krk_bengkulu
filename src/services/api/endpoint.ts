@@ -5,6 +5,7 @@ const endpoint = {
   STAF: "/staff",
   DISPOSISI: "/disposisi",
   TRACKING: "/tracking",
+  ADMIN: "/admin",
 };
 
 export default endpoint;
