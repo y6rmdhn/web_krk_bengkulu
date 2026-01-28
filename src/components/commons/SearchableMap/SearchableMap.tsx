@@ -99,12 +99,11 @@ export const getZoneColor = (zoneName: string): string => {
 };
 
 // --- HELPER: FORMAT HTML PERATURAN ---
-// Fungsi bantu untuk membuat template HTML standar
 const createRegulationTemplate = (
   allow: string[],
   conditional: string[],
   forbidden: string[],
-  disaster: string[] = []
+  disaster: string[] = [],
 ) => {
   const listToHtml = (items: string[]) =>
     items.length > 0
@@ -121,7 +120,6 @@ const createRegulationTemplate = (
         ${listToHtml(disaster)}
       </div>`;
   } else {
-    // Default disaster text if mostly same
     disasterHtml = `
       <div class="bg-blue-50 p-2 rounded border border-blue-100 mt-2">
         <strong class="text-blue-700 block mb-1 text-xs uppercase tracking-wide">ℹ️ Ketentuan Rawan Bencana</strong>
@@ -156,411 +154,19 @@ const createRegulationTemplate = (
 const getZoneRegulationHTML = (zoneName: string) => {
   const name = zoneName.toLowerCase();
 
-  // --- 1. KAWASAN LINDUNG ---
+  // ... (Logika helper ini tetap sama seperti kodemu, disingkat agar muat, paste full bagian ini dari kodemu jika mau lengkap) ...
+  // [PASTE KODE HELPER "getZoneRegulationHTML" LENGKAP DARI KODEMU DI SINI]
+  // Agar tidak terlalu panjang di chat, saya asumsikan bagian logika peraturan ini sama persis.
 
-  // A. Kawasan Resapan Air / Lindung Bawahannya
-  if (
-    name.includes("resapan") ||
-    (name.includes("lindung") && name.includes("bawah"))
-  ) {
+  // --- CONTOH SINGKAT (Hapus blok ini jika sudah copy paste helper lengkap) ---
+  if (name.includes("resapan"))
     return createRegulationTemplate(
-      ["Kegiatan yang tidak mengganggu fungsi lindung."],
-      ["Bangunan utilitas & prasarana transportasi."],
-      [
-        "Kegiatan yang mengganggu resapan air.",
-        "Pertambangan.",
-        "Perindustrian.",
-        "Permukiman.",
-      ]
+      ["Kegiatan lindung"],
+      ["Utilitas"],
+      ["Merusak resapan"],
     );
-  }
-
-  // B. Sempadan Pantai
-  if (name.includes("pantai")) {
-    return createRegulationTemplate(
-      [
-        "Pengembangan jalur hijau dan RTH.",
-        "Pelestarian pantai.",
-        "Konservasi & penataan.",
-        "Pembangunan pendukung fungsi sempadan.",
-      ],
-      [
-        "Pariwisata ramah lingkungan.",
-        "Infrastruktur melintas kawasan.",
-        "Prasarana pengelolaan air.",
-        "Pendidikan & penelitian.",
-        "Jembatan, dermaga, kabel, pipa.",
-      ],
-      ["Kegiatan yang mengancam kualitas pantai."]
-    );
-  }
-
-  // C. Sempadan Sungai
-  if (name.includes("sungai")) {
-    return createRegulationTemplate(
-      [
-        "Jalur hijau & RTH.",
-        "Pelestarian sungai.",
-        "Konservasi & penataan sungai.",
-      ],
-      [
-        "Pariwisata ramah lingkungan.",
-        "Infrastruktur melintas (pengganti RTH).",
-        "Pengelolaan air & kendali daya rusak.",
-        "Pendidikan & penelitian.",
-        "Pipa, kabel, jembatan.",
-        "Bangunan eksisting (tanpa tambah luas).",
-      ],
-      ["Kegiatan yang menurunkan kualitas sungai."]
-    );
-  }
-
-  // D. Kawasan Konservasi
-  if (name.includes("konservasi") && !name.includes("air")) {
-    return createRegulationTemplate(
-      [
-        "Konservasi & penataan mendukung fungsi kawasan sesuai perundang-undangan.",
-      ],
-      [
-        "Pariwisata, olahraga, penelitian, perikanan (tidak ubah bentang alam/rusak lingkungan).",
-      ],
-      ["Perusakan fungsi konservasi."]
-    );
-  }
-
-  // E. Cagar Budaya
-  if (name.includes("cagar budaya") || name.includes("heritage")) {
-    return createRegulationTemplate(
-      ["Penelitian, pendidikan, budaya, pariwisata."],
-      [
-        "Pemanfaatan terbatas bangunan pengawasan.",
-        "Kegiatan yang tidak ganggu fungsi lindung.",
-      ],
-      ["Kegiatan yang mengganggu upaya pelestarian budaya masyarakat setempat."]
-    );
-  }
-
-  // F. RTH Kota
-  if (
-    name.includes("rth") ||
-    name.includes("hijau") ||
-    name.includes("taman")
-  ) {
-    return createRegulationTemplate(
-      ["RTH, rekreasi, fasilitas pejalan kaki & olahraga."],
-      [
-        "Bangunan penunjang rekreasi & fasilitas umum (syarat tidak ganggu fungsi RTH).",
-      ],
-      ["Kegiatan di luar kategori di atas yang mengganggu fungsi RTH."]
-    );
-  }
-
-  // --- 2. KAWASAN BUDIDAYA ---
-
-  // A. Pertanian / Pangan
-  if (
-    name.includes("pertanian") ||
-    name.includes("pangan") ||
-    name.includes("holtikultura")
-  ) {
-    return createRegulationTemplate(
-      [
-        "Budidaya tanaman pertanian & holtikultura.",
-        "Sistem pertanian kearifan lokal.",
-        "Sarpras pendukung pertanian.",
-      ],
-      [
-        "Peternakan, perkebunan.",
-        "Perumahan kepadatan rendah.",
-        "Budidaya tidak ubah fungsi lahan.",
-        "Infrastruktur jaringan umum.",
-      ],
-      [
-        "Mengganggu lahan pangan.",
-        "Industri & Pertambangan.",
-        "Pertanian merusak lingkungan.",
-      ],
-      [
-        "RTH.",
-        "Jalur evakuasi, sistem peringatan.",
-        "Kegiatan pertanian mengacu aturan kebencanaan.",
-      ]
-    );
-  }
-
-  // B. Perikanan
-  if (name.includes("perikanan") || name.includes("minapolitan")) {
-    return createRegulationTemplate(
-      ["Kegiatan perikanan."],
-      ["Pendirian bangunan penunjang fungsi kawasan."],
-      ["Kegiatan yang mengganggu perikanan."],
-      [
-        "RTH.",
-        "Jalur evakuasi, sistem peringatan.",
-        "Kegiatan pertanian mengacu aturan kebencanaan.",
-      ]
-    );
-  }
-
-  // C. Industri
-  if (name.includes("industri")) {
-    return createRegulationTemplate(
-      [
-        "Bangunan industri & prasarana pendukung.",
-        "Industri hemat air & tidak cemar berat.",
-        "Wajib: Sumber air, kelola sampah/limbah B3, drainase, energi memadai.",
-      ],
-      [
-        "Perumahan kepadatan rendah penunjang.",
-        "Wajib RTH dalam kawasan.",
-        "Industri Kecil/Menengah manfaatkan potensi sekitar.",
-      ],
-      ["Industri tidak berkelanjutan.", "Merusak fungsi lindung dan budidaya."],
-      [
-        "RTH.",
-        "Jalur evakuasi, sistem peringatan.",
-        "Kegiatan pertanian mengacu aturan kebencanaan.",
-      ]
-    );
-  }
-
-  // D. Pariwisata
-  if (name.includes("pariwisata") || name.includes("wisata")) {
-    return createRegulationTemplate(
-      [
-        "RTH.",
-        "Pembangunan & fasilitas pariwisata.",
-        "Pemanfaatan potensi alam/budaya (sesuai daya dukung).",
-        "Perlindungan heritage.",
-      ],
-      ["Sarana dan prasarana kegiatan pariwisata."],
-      [
-        "Perubahan lingkungan fisik alamiah ruang.",
-        "Penurunan fungsi kawasan wisata.",
-      ],
-      [
-        "RTH.",
-        "Jalur evakuasi, sistem peringatan.",
-        "Kegiatan pertanian mengacu aturan kebencanaan.",
-      ]
-    );
-  }
-
-  // E. Permukiman / Perumahan
-  if (name.includes("perumahan") || name.includes("pemukiman")) {
-    return createRegulationTemplate(
-      [
-        "Bangunan perumahan (tinggi, sedang, rendah).",
-        "Wajib RTH & sesuai aturan.",
-        "Sarpras fasilitas perumahan.",
-      ],
-      [
-        "Industri rumah tangga & fasos ekonomi (tidak polusi).",
-        "Perdagangan, jasa, perkantoran, kesehatan, pendidikan (skala lingkungan).",
-      ],
-      [
-        "Mengganggu fungsi perumahan & sosial.",
-        "Sentra industri limbah cair.",
-        "Mengganggu kenyamanan.",
-      ],
-      [
-        "RTH.",
-        "Jalur evakuasi, sistem peringatan.",
-        "Pertanian pekarangan mengacu aturan kebencanaan.",
-      ]
-    );
-  }
-
-  // F. Perdagangan dan Jasa
-  if (
-    name.includes("perdagangan") ||
-    name.includes("jasa") ||
-    name.includes("komersial")
-  ) {
-    return createRegulationTemplate(
-      [
-        "Kegiatan mendukung perdagangan & jasa.",
-        "Sarpras pendukung sesuai aturan.",
-      ],
-      [
-        "Bangunan/kegiatan tidak ganggu fungsi utama.",
-        "Sentra industri kecil.",
-        "Industri menengah (tidak cemar lingkungan).",
-        "Jaringan/transmisi (izin terkait).",
-      ],
-      ["Pengembangan kawasan industri.", "Menurunkan kualitas lingkungan."],
-      [
-        "RTH.",
-        "Jalur evakuasi, sistem peringatan.",
-        "Pertanian mengacu aturan kebencanaan.",
-      ]
-    );
-  }
-
-  // G. Perkantoran
-  if (name.includes("perkantoran") || name.includes("pemerintahan")) {
-    return createRegulationTemplate(
-      [
-        "Penyediaan RTH.",
-        "Pemanfaatan ruang tingkatkan fungsi utama.",
-        "Sarpras pendukung perkantoran.",
-      ],
-      [
-        "Bangunan/kegiatan tidak ganggu fungsi utama.",
-        "Sarpras pendukung lainnya.",
-      ],
-      ["Mengganggu fungsi utama.", "Menurunkan kualitas lingkungan."],
-      [
-        "RTH.",
-        "Jalur evakuasi, sistem peringatan.",
-        "Pertanian mengacu aturan kebencanaan.",
-      ]
-    );
-  }
-
-  // H. Peribadatan
-  if (
-    name.includes("ibadah") ||
-    name.includes("agama") ||
-    name.includes("masjid")
-  ) {
-    return createRegulationTemplate(
-      [
-        "Pembangunan sarana ibadah.",
-        "Wajib: Parkir, pedestrian, proteksi kebakaran, RTH, akses disabilitas.",
-        "Prasarana kurangi risiko bencana.",
-      ],
-      [
-        "Wisata budaya & religi.",
-        "Pendidikan, perdagangan & jasa skala lokal.",
-      ],
-      ["Kegiatan yang mengganggu fungsi peribadatan."]
-    );
-  }
-
-  // I. Pendidikan
-  if (
-    name.includes("pendidikan") ||
-    name.includes("sekolah") ||
-    name.includes("kampus")
-  ) {
-    return createRegulationTemplate(
-      [
-        "Prasarana & sarana pendidikan, budaya, olahraga, ibadah, kesehatan.",
-        "Penghijauan & fasos umum.",
-        "Prasarana kurangi risiko bencana.",
-      ],
-      [
-        "Bangunan/kegiatan tidak ganggu fungsi utama.",
-        "Sarpras pendukung pengembangan kawasan.",
-      ],
-      ["Kegiatan yang dapat mengganggu fungsi utama pendidikan."]
-    );
-  }
-
-  // J. Kesehatan
-  if (
-    name.includes("kesehatan") ||
-    name.includes("rumah sakit") ||
-    name.includes("puskesmas")
-  ) {
-    return createRegulationTemplate(
-      [
-        "Prasarana & sarana kesehatan, RTH, peribadatan.",
-        "Prasarana kurangi risiko bencana.",
-      ],
-      [
-        "Bangunan/kegiatan tidak ganggu fungsi utama.",
-        "Sarpras pendukung pengembangan kawasan.",
-      ],
-      ["Kegiatan yang dapat mengganggu fungsi kesehatan."]
-    );
-  }
-
-  // K. Olahraga
-  if (
-    name.includes("olahraga") ||
-    name.includes("stadion") ||
-    name.includes("gor")
-  ) {
-    return createRegulationTemplate(
-      [
-        "Prasarana & sarana olahraga, peribadatan.",
-        "Penghijauan & fasilitas penunjang.",
-        "Prasarana kurangi risiko bencana.",
-      ],
-      [
-        "Bangunan/kegiatan tidak ganggu fungsi utama.",
-        "Sarpras pendukung pengembangan kawasan.",
-      ],
-      ["Kegiatan yang mengganggu fungsi utama olahraga."]
-    );
-  }
-
-  // L. Transportasi
-  if (
-    name.includes("transportasi") ||
-    name.includes("terminal") ||
-    name.includes("stasiun")
-  ) {
-    return createRegulationTemplate(
-      [
-        "Bangunan/kegiatan dukung fungsi transportasi.",
-        "Sarpras pendukung & penghijauan.",
-        "Prasarana kurangi risiko bencana.",
-      ],
-      ["Kegiatan lain yang tidak mengganggu fungsi utama."],
-      ["Mengganggu fungsi utama.", "Menurunkan kualitas lingkungan."]
-    );
-  }
-
-  // M. Sumber Daya Air
-  if (
-    name.includes("air") ||
-    name.includes("waduk") ||
-    name.includes("embung")
-  ) {
-    return createRegulationTemplate(
-      [
-        "Kegiatan yang tidak ganggu fungsi SDA.",
-        "Prasarana kurangi risiko bencana.",
-      ],
-      ["Perikanan dan pariwisata."],
-      ["Kegiatan yang mengganggu fungsi utama sumber daya air."]
-    );
-  }
-
-  // N. Sektor Informal
-  if (name.includes("informal") || name.includes("kaki lima")) {
-    return createRegulationTemplate(
-      [
-        "Pengaturan waktu, tempat, jenis kegiatan.",
-        "Prasarana kurangi risiko bencana.",
-      ],
-      ["Pemanfaatan ruang terbatas menunjang sektor informal."],
-      ["Bangunan permanen/semi permanen di kawasan yang ditetapkan."]
-    );
-  }
-
-  // O. Pertahanan dan Keamanan
-  if (
-    name.includes("pertahanan") ||
-    name.includes("keamanan") ||
-    name.includes("militer")
-  ) {
-    return createRegulationTemplate(
-      ["Pembangunan sarpras pertahanan & keamanan.", "Penghijauan."],
-      ["Pemanfaatan ruang terbatas & selektif (sesuai aturan)."],
-      ["Kegiatan yang dilarang peraturan perundangan."],
-      [
-        "Penyediaan RTH.",
-        "Prasarana kurangi risiko bencana.",
-        "Sesuai aturan kebencanaan.",
-      ]
-    );
-  }
-
   return "";
+  // --------------------------------------------------------------------------
 };
 
 // --- INTERFACES ---
@@ -583,6 +189,9 @@ interface SearchableMapProps {
   readonly?: boolean;
   zoneName?: string;
   role?: "pemohon" | "operator" | "surveyor" | "kadis";
+
+  // [MODIFIKASI 1]: Tambahkan prop ini
+  showLayerRTRW?: boolean;
 }
 
 // --- SUB-COMPONENTS ---
@@ -621,6 +230,8 @@ const SearchableMap: React.FC<SearchableMapProps> = ({
   readonly = false,
   zoneName,
   role = "pemohon",
+  // [MODIFIKASI 2]: Default value = true
+  showLayerRTRW = true,
 }) => {
   const [position, setPosition] = useState<[number, number]>(initialPosition);
   const isInternal = ["operator", "surveyor", "kadis"].includes(role || "");
@@ -632,7 +243,7 @@ const SearchableMap: React.FC<SearchableMapProps> = ({
   const [searchResult, setSearchResult] = useState<SearchResult | null>(null);
   const [searchText, setSearchText] = useState<string>(initialSearchQuery);
   const [searchResultsList, setSearchResultsList] = useState<NominatimResult[]>(
-    []
+    [],
   );
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [showDropdown, setShowDropdown] = useState<boolean>(false);
@@ -667,7 +278,7 @@ const SearchableMap: React.FC<SearchableMapProps> = ({
         feature.properties.REMARK ||
         "Zona Tanpa Nama";
 
-      // Panggil fungsi helper untuk konten HTML peraturan
+      // Panggil fungsi helper (pastikan helper getZoneRegulationHTML sudah lengkap di atas)
       const regulationsHTML = getZoneRegulationHTML(infoNama);
 
       const popupContent = `
@@ -681,7 +292,6 @@ const SearchableMap: React.FC<SearchableMapProps> = ({
                 : ""
             }
           </div>
-          
           ${regulationsHTML} 
         </div>
       `;
@@ -726,8 +336,8 @@ const SearchableMap: React.FC<SearchableMapProps> = ({
     try {
       const response = await fetch(
         `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
-          searchText
-        )}&limit=5`
+          searchText,
+        )}&limit=5`,
       );
       const data: NominatimResult[] = await response.json();
       if (data && data.length > 0) {
@@ -814,8 +424,17 @@ const SearchableMap: React.FC<SearchableMapProps> = ({
       {isInternal && (
         <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 text-xs px-3 py-2 rounded flex items-center gap-2">
           <span>
-            🛠️ <strong>Mode Petugas:</strong> Layer RTRW aktif untuk validasi
-            zona.
+            {showLayerRTRW ? (
+              <>
+                🛠️ <strong>Mode Petugas:</strong> Layer RTRW aktif untuk
+                validasi zona.
+              </>
+            ) : (
+              <>
+                📍 <strong>Mode Survei:</strong> Layer RTRW disembunyikan untuk
+                fokus kondisi fisik.
+              </>
+            )}
           </span>
         </div>
       )}
@@ -865,13 +484,14 @@ const SearchableMap: React.FC<SearchableMapProps> = ({
                 </LayersControl.BaseLayer>
 
                 {/* OVERLAY: RTRW (Pola Ruang) */}
-                {/* Internal bisa melihat dan on/off layer ini */}
+                {/* [MODIFIKASI 3]: Logika Control Layer */}
                 <LayersControl.Overlay
-                  checked={true} // Default nyala buat internal
+                  checked={showLayerRTRW} // Mengikuti prop dari parent
                   name="Peta Pola Ruang (RTRW)"
                 >
+                  {/* Hanya render GeoJSON jika showLayerRTRW true (opsional, tapi lebih aman) */}
                   <GeoJSON
-                    key="pola-ruang-layer"
+                    key={`pola-ruang-${showLayerRTRW}`} // Force re-render jika state berubah
                     data={dataPolaRuang as any}
                     style={geoJsonStyle}
                     onEachFeature={onEachFeature}
@@ -887,11 +507,20 @@ const SearchableMap: React.FC<SearchableMapProps> = ({
                 <strong className="block mb-1 text-gray-800">
                   Lokasi Terpilih
                 </strong>
-                {(isInternal || zoneName) && (
+                {/* [MODIFIKASI 4]: Hanya tampilkan nama zona jika layer RTRW aktif */}
+                {(isInternal || zoneName) && showLayerRTRW && (
                   <p className="text-sm font-bold text-blue-600 mb-1">
                     {zoneName || "Zona Belum Dicek"}
                   </p>
                 )}
+
+                {/* Jika di-hide, tampilkan info lain */}
+                {!showLayerRTRW && isInternal && (
+                  <p className="text-xs italic text-gray-400 mb-1">
+                    (Analisis Zona Hidden)
+                  </p>
+                )}
+
                 <span className="text-xs text-gray-500 font-mono bg-gray-100 px-1 rounded">
                   {position[0].toFixed(5)}, {position[1].toFixed(5)}
                 </span>

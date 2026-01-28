@@ -99,8 +99,16 @@ const DisposisiSurveiMasukDetail = () => {
               latitude={latitude}
               longitude={longitude}
               userRole="surveyor"
-              // Contoh: Aktifkan drag marker hanya saat mode survei
-              // isDraggable={workflowStep === 'surveying'}
+              // LOGIKA UTAMA DISINI:
+
+              // 1. Draggable (Bisa Geser): Hanya Aktif saat step 'surveying'
+              isDraggable={workflowStep === "surveying"}
+              // 2. Show Analysis (Lihat Warna Zona): HANYA Aktif saat step 'analysis'
+              //    (Saat 'selection' dan 'surveying', warna zona akan hidden/abu-abu)
+              showAnalysisLayer={workflowStep === "analysis"}
+
+              // Opsional: Handle simpan koordinat baru
+              // onLocationChange={(newLat, newLng) => { ...update state koordinat... }}
             />
 
             {/* Tampilkan Alert khusus jika sedang mode survei */}
