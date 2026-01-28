@@ -1,7 +1,7 @@
 import OperatorLayout from "@/components/layouts/OperatorLayout";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Eye, Search } from "lucide-react";
+import { Eye, FileCheck, Search } from "lucide-react";
 import useDataTable from "@/hooks/useDataTable";
 import { useMemo, useState } from "react";
 import usePermohonan from "./usePermohonanSelesai";
@@ -89,6 +89,14 @@ const PermohonanSelesai = () => {
               action: () => {
                 navigate(`/operator/detail/${item.id}`);
               },
+            },
+            {
+              label: (
+                <span className="flex items-center gap-2 text-blue-600 font-medium">
+                  <FileCheck size={16} /> Lihat SK
+                </span>
+              ),
+              action: () => navigate(`/operator/sk-detail/${item.id}`),
             },
           ]}
         />,

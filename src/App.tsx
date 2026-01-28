@@ -111,6 +111,9 @@ const PermohonanDiProses = lazy(
 const DetailPermohonanAdminPage = lazy(
   () => import("./components/view/Operator/PermohonanDetail"),
 );
+const PrevSkOperator = lazy(
+  () => import("./components/view/Operator/PreviewSk"),
+);
 
 // Surveyor Lapangan
 const DisposisiSurveiMasuk = lazy(
@@ -124,6 +127,9 @@ const DisposisiSurveiSelesai = lazy(
 );
 const DisposisiSurveiMasukDetail = lazy(
   () => import("./components/view/SurveyorLapangan/DetailDisposisiSurveiMasuk"),
+);
+const PrevSKSurveyor = lazy(
+  () => import("./components/view/SurveyorLapangan/PreviewSk"),
 );
 
 // Kepala Dinas
@@ -324,6 +330,11 @@ const router = createBrowserRouter([
         loader: operatorLoader,
         element: <DetailTrackingPage />,
       },
+      {
+        path: "sk-detail/:id",
+        loader: operatorLoader,
+        element: <PrevSkOperator />,
+      },
     ],
   },
   {
@@ -348,6 +359,11 @@ const router = createBrowserRouter([
         path: "detail/:id",
         loader: surveyorLoader,
         element: <DisposisiSurveiMasukDetail />,
+      },
+      {
+        path: "sk-detail/:id",
+        loader: surveyorLoader,
+        element: <PrevSKSurveyor />,
       },
     ],
   },

@@ -39,7 +39,7 @@ export default function LoginPage() {
               <Branding />
 
               {/* Right Side - Login Form */}
-              <div className="flex justify-center lg:justify-end">
+              <div className="flex flex-col justify-center items-center gap-3 lg:justify-end">
                 <Card className="w-full max-w-md border-0 shadow-2xl bg-white/90 backdrop-blur-sm rounded-3xl">
                   <CardHeader className="space-y-6 pb-8">
                     <div className="flex items-center justify-between">
@@ -126,6 +126,9 @@ export default function LoginPage() {
                     </p>
                   </CardFooter>
                 </Card>
+                <Link to="/" className="text-blue-500">
+                  back to homepage
+                </Link>
               </div>
             </div>
           </div>
