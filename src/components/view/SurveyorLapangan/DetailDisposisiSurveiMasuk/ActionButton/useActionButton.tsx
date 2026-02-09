@@ -4,10 +4,11 @@ import { AxiosError } from "axios";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-// UPDATE: Menambahkan gsp
+// UPDATE: Tambahkan geom ke payload
 export interface AcceptPayload {
   catatan: string;
-  gsp: string; // <--- BARU
+  geom: string[]; // <--- WAJIB: Tambahkan ini agar geom terdaftar
+  gsp: string;
   gsb: string;
   kdb: string;
   klb: string;
@@ -31,7 +32,8 @@ const useActionButton = (id: string) => {
   const formAccept = useForm<AcceptPayload>({
     defaultValues: {
       catatan: "",
-      gsp: "", // <--- BARU: Harus ada default value
+      geom: ["", ""], // <--- WAJIB: Default value array kosong untuk koordinat
+      gsp: "",
       gsb: "",
       kdb: "",
       klb: "",
@@ -47,7 +49,7 @@ const useActionButton = (id: string) => {
 
   const { mutate: acceptAction, isPending: isPendingAccept } = useMutation({
     mutationFn: async (payload: AcceptPayload) => {
-      // console.log("Payload dikirim:", payload); // Uncomment untuk debug
+      // console.log("Payload dikirim:", payload); // Cek di console browser
       return await disposisiServices.approve(id, payload);
     },
     onError: (error) => {

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react"; // <--- Jangan lupa import useEffect
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -23,12 +23,29 @@ import { Textarea } from "@/components/ui/textarea";
 import { CheckCircle, XCircle, Loader2 } from "lucide-react";
 import useActionButton from "./useActionButton";
 
-const ActionButtons = ({ id }: { id: string }) => {
+// Tambahkan props surveyLocation agar bisa menerima data dari induk
+interface ActionButtonsProps {
+  id: string;
+  surveyLocation: { lat: number; lng: number } | null;
+}
+
+const ActionButtons = ({ id, surveyLocation }: ActionButtonsProps) => {
   const { formAccept, formRevisiReject, actions, state } = useActionButton(id);
 
   const [openDialog, setOpenDialog] = useState<
     "accept" | "revisi" | "reject" | null
   >(null);
+
+  // WAJIB: Efek ini akan memasukkan koordinat peta ke dalam form secara otomatis
+  useEffect(() => {
+    if (surveyLocation) {
+      // Pastikan format array string ["lat", "long"]
+      formAccept.setValue("geom", [
+        String(surveyLocation.lat),
+        String(surveyLocation.lng),
+      ]);
+    }
+  }, [surveyLocation, formAccept, openDialog]);
 
   return (
     <Card>
@@ -50,7 +67,8 @@ const ActionButtons = ({ id }: { id: string }) => {
               <DialogHeader>
                 <DialogTitle>Setujui Permohonan</DialogTitle>
                 <DialogDescription>
-                  Masukkan parameter teknis untuk SK KRK sesuai hasil kajian.
+                  Masukkan parameter teknis. Koordinat survei akan otomatis
+                  tersimpan.
                 </DialogDescription>
               </DialogHeader>
 
@@ -62,9 +80,8 @@ const ActionButtons = ({ id }: { id: string }) => {
                   }}
                   className="space-y-4"
                 >
-                  {/* Grid Layout untuk Input Teknis */}
                   <div className="grid grid-cols-2 gap-4">
-                    {/* --- INPUT GSP BARU --- */}
+                    {/* GSP */}
                     <FormField
                       control={formAccept.control}
                       name="gsp"
@@ -78,7 +95,6 @@ const ActionButtons = ({ id }: { id: string }) => {
                         </FormItem>
                       )}
                     />
-
                     {/* GSB */}
                     <FormField
                       control={formAccept.control}
@@ -93,7 +109,6 @@ const ActionButtons = ({ id }: { id: string }) => {
                         </FormItem>
                       )}
                     />
-
                     {/* KDB */}
                     <FormField
                       control={formAccept.control}
@@ -108,7 +123,6 @@ const ActionButtons = ({ id }: { id: string }) => {
                         </FormItem>
                       )}
                     />
-
                     {/* KLB */}
                     <FormField
                       control={formAccept.control}
@@ -123,7 +137,6 @@ const ActionButtons = ({ id }: { id: string }) => {
                         </FormItem>
                       )}
                     />
-
                     {/* KDH */}
                     <FormField
                       control={formAccept.control}
@@ -138,7 +151,6 @@ const ActionButtons = ({ id }: { id: string }) => {
                         </FormItem>
                       )}
                     />
-
                     {/* TB Max */}
                     <FormField
                       control={formAccept.control}
@@ -153,7 +165,6 @@ const ActionButtons = ({ id }: { id: string }) => {
                         </FormItem>
                       )}
                     />
-
                     {/* TB Min */}
                     <FormField
                       control={formAccept.control}
@@ -170,7 +181,7 @@ const ActionButtons = ({ id }: { id: string }) => {
                     />
                   </div>
 
-                  {/* Catatan (Full Width) */}
+                  {/* Catatan (Tetap Ada) */}
                   <FormField
                     control={formAccept.control}
                     name="catatan"
@@ -179,7 +190,7 @@ const ActionButtons = ({ id }: { id: string }) => {
                         <FormLabel>Catatan SK (Opsional)</FormLabel>
                         <FormControl>
                           <Textarea
-                            placeholder="Disetujui secara teknis. Dokumen telah ditandatangani..."
+                            placeholder="Disetujui secara teknis..."
                             {...field}
                           />
                         </FormControl>
@@ -212,7 +223,7 @@ const ActionButtons = ({ id }: { id: string }) => {
             </DialogContent>
           </Dialog>
 
-          {/* --- DIALOG TOLAK (REJECT) - Tidak ada perubahan --- */}
+          {/* --- DIALOG TOLAK (REJECT) --- */}
           <Dialog
             open={openDialog === "reject"}
             onOpenChange={(open) => setOpenDialog(open ? "reject" : null)}

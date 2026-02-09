@@ -86,6 +86,7 @@ export default function RiwayatPermohonan() {
 
     return paginatedData.map((item: any, index: number) => {
       let menuActions = [];
+      console.log(item.status);
 
       if (item.status === "APPROVED") {
         menuActions = [
@@ -148,7 +149,7 @@ export default function RiwayatPermohonan() {
           variant="outline"
           className={`whitespace-nowrap ${getBadgeColor(item.status)}`}
         >
-          {item.current_step_name || item.status}
+          {item.status}
         </Badge>,
         <DropdownActions key={`action-${item.id}`} menu={menuActions} />,
       ];

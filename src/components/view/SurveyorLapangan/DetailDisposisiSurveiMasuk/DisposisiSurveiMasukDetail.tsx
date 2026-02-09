@@ -1,4 +1,4 @@
-import { useState } from "react"; // Tambahkan useState
+import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import useDisposisiSurveiMasukDetail from "./useDisposisiSurveiMasukDetail";
 import HeaderSection from "./HeaderSection";
@@ -11,12 +11,11 @@ import ActionButtons from "./ActionButton";
 import { getStatusColor, getStatusText } from "@/utils/statusUtils";
 import { formatAlamat } from "@/utils/formatUtils";
 import SurveyorLayout from "@/components/layouts/SurveyorLayout";
-import { Loader2, Info, MapPin, FileText, CheckCircle2 } from "lucide-react"; // Tambah Icon
+import { Loader2, Info, MapPin, FileText, CheckCircle2 } from "lucide-react";
 import LocationMap from "@/components/commons/LocationMap";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Textarea } from "@/components/ui/textarea"; // Asumsi ada komponen Textarea
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"; // Tambahkan Card untuk UI Flow
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const DisposisiSurveiMasukDetail = () => {
   const navigate = useNavigate();
@@ -25,16 +24,27 @@ const DisposisiSurveiMasukDetail = () => {
     id!,
   );
 
-  // --- STATE UNTUK MENGATUR FLOW ---
-  // 'selection': User memilih mau Survei atau langsung Kajian
-  // 'surveying': User sedang input catatan survei & edit lokasi
-  // 'analysis': User melihat hasil peta & tombol final (Setujui/Tolak)
+  // Workflow state
   const [workflowStep, setWorkflowStep] = useState<
     "selection" | "surveying" | "analysis"
   >("selection");
 
-  // State untuk menyimpan catatan survei sementara
-  const [surveyNote, setSurveyNote] = useState("");
+  // State untuk menyimpan koordinat hasil survei
+  // Inisialisasi awal null, nanti diisi useEffect saat data fetch selesai
+  const [surveyLocation, setSurveyLocation] = useState<{
+    lat: number;
+    lng: number;
+  } | null>(null);
+
+  // Inisialisasi koordinat saat data berhasil diload
+  useEffect(() => {
+    if (data?.geom?.coordinates) {
+      setSurveyLocation({
+        lng: data.geom.coordinates[0],
+        lat: data.geom.coordinates[1],
+      });
+    }
+  }, [data]);
 
   if (isLoading) {
     return (
@@ -61,14 +71,10 @@ const DisposisiSurveiMasukDetail = () => {
     );
   }
 
-  const longitude = data.geom?.coordinates?.[0];
-  const latitude = data.geom?.coordinates?.[1];
-
   // Handler saat tombol "Simpan Hasil Survei" diklik
   const handleSaveSurvey = () => {
-    // Di sini nanti bisa tambahkan logika API call untuk simpan note/koordinat baru
-    console.log("Menyimpan catatan survei:", surveyNote);
-    // Setelah simpan, lanjut ke tahap analisis
+    // Koordinat sudah tersimpan di state `surveyLocation` dari map
+    // Lanjut ke tahap analisis
     setWorkflowStep("analysis");
   };
 
@@ -91,34 +97,36 @@ const DisposisiSurveiMasukDetail = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* --- KOLOM KIRI (Data & Peta) --- */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Peta dengan Logika Interaktif:
-               Jika sedang tahap 'surveying', userRole mungkin perlu diubah agar marker bisa digeser (draggable).
-               Kita asumsikan LocationMap menerima prop 'isDraggable' atau sejenisnya.
-            */}
+            {/* PETA */}
             <LocationMap
-              latitude={latitude}
-              longitude={longitude}
+              // Gunakan koordinat dari state jika ada (untuk real-time update saat drag),
+              // fallback ke data dari DB
+              latitude={
+                surveyLocation
+                  ? surveyLocation.lat
+                  : data.geom?.coordinates?.[1]
+              }
+              longitude={
+                surveyLocation
+                  ? surveyLocation.lng
+                  : data.geom?.coordinates?.[0]
+              }
               userRole="surveyor"
-              // LOGIKA UTAMA DISINI:
-
-              // 1. Draggable (Bisa Geser): Hanya Aktif saat step 'surveying'
+              // Peta hanya bisa digeser saat mode 'surveying'
               isDraggable={workflowStep === "surveying"}
-              // 2. Show Analysis (Lihat Warna Zona): HANYA Aktif saat step 'analysis'
-              //    (Saat 'selection' dan 'surveying', warna zona akan hidden/abu-abu)
               showAnalysisLayer={workflowStep === "analysis"}
-
-              // Opsional: Handle simpan koordinat baru
-              // onLocationChange={(newLat, newLng) => { ...update state koordinat... }}
+              // Callback untuk menangkap perubahan posisi marker
+              onLocationChange={(lat, lng) => setSurveyLocation({ lat, lng })}
             />
 
-            {/* Tampilkan Alert khusus jika sedang mode survei */}
+            {/* Alert Mode Survei */}
             {workflowStep === "surveying" && (
               <Alert className="bg-orange-50 border-orange-200 text-orange-900">
                 <MapPin className="h-4 w-4 text-orange-600" />
                 <AlertTitle className="font-bold">Mode Edit Lokasi</AlertTitle>
                 <AlertDescription>
-                  Silakan geser penanda (marker) di peta jika titik lokasi
-                  pemohon kurang akurat.
+                  Silakan geser penanda (marker) di peta untuk memperbarui
+                  koordinat lokasi yang akurat.
                 </AlertDescription>
               </Alert>
             )}
@@ -148,8 +156,8 @@ const DisposisiSurveiMasukDetail = () => {
                     <Alert className="bg-blue-50 border-none mb-2">
                       <Info className="h-4 w-4 text-blue-600" />
                       <AlertDescription className="text-xs text-blue-800">
-                        Pilih tindakan lanjut untuk permohonan ini. Apakah perlu
-                        tinjauan lapangan?
+                        Pilih tindakan lanjut. Lakukan validasi lokasi jika
+                        diperlukan.
                       </AlertDescription>
                     </Alert>
 
@@ -161,10 +169,10 @@ const DisposisiSurveiMasukDetail = () => {
                       <MapPin className="mr-2 h-4 w-4" />
                       <div className="flex flex-col items-start text-left">
                         <span className="font-semibold text-sm">
-                          Survei Lapangan
+                          Validasi Lokasi (Survei)
                         </span>
                         <span className="text-[10px] text-gray-500 font-normal">
-                          Input catatan & koreksi koordinat
+                          Perbarui koordinat via peta
                         </span>
                       </div>
                     </Button>
@@ -179,26 +187,26 @@ const DisposisiSurveiMasukDetail = () => {
                           Lanjut Kajian Teknis
                         </span>
                         <span className="text-[10px] text-blue-100 font-normal">
-                          Langsung ke analisis peta pola ruang
+                          Analisis peta & keputusan akhir
                         </span>
                       </div>
                     </Button>
                   </div>
                 )}
 
-                {/* STEP 2: FORM SURVEI (Surveying) */}
+                {/* STEP 2: MODE SURVEI (Surveying) - Input Catatan DIHAPUS */}
                 {workflowStep === "surveying" && (
                   <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2">
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-gray-700">
-                        Catatan Temuan Lapangan
-                      </label>
-                      <Textarea
-                        placeholder="Tuliskan kondisi fisik lapangan (misal: ada sungai, bangunan eksisting, dll)..."
-                        className="min-h-[120px]"
-                        value={surveyNote}
-                        onChange={(e) => setSurveyNote(e.target.value)}
-                      />
+                    <div className="text-sm text-gray-700 bg-gray-50 p-3 rounded border">
+                      <p className="font-medium mb-1">Instruksi:</p>
+                      <ul className="list-disc ml-4 space-y-1">
+                        <li>Geser Pin merah pada peta di sebelah kiri.</li>
+                        <li>Pastikan titik koordinat sudah akurat.</li>
+                        <li>
+                          Tekan <b>Simpan & Lanjut</b> untuk menggunakan
+                          koordinat tersebut.
+                        </li>
+                      </ul>
                     </div>
 
                     <div className="flex gap-2 pt-2">
@@ -222,23 +230,17 @@ const DisposisiSurveiMasukDetail = () => {
                 {/* STEP 3: ANALISIS FINAL (Analysis) */}
                 {workflowStep === "analysis" && (
                   <div className="space-y-4 animate-in fade-in zoom-in-95">
-                    {/* Tampilkan ringkasan jika ada catatan survei */}
-                    {surveyNote && (
-                      <div className="bg-yellow-50 p-3 rounded-md border border-yellow-200 text-sm">
-                        <span className="font-semibold text-yellow-800 block mb-1">
-                          Catatan Survei:
-                        </span>
-                        <p className="text-gray-700 italic">"{surveyNote}"</p>
-                      </div>
-                    )}
-
                     <div className="text-sm text-gray-600 mb-2">
                       Silakan lakukan analisis spasial pada peta, lalu tentukan
-                      keputusan akhir:
+                      keputusan akhir (Koordinat survei akan otomatis
+                      tersimpan).
                     </div>
 
-                    {/* ActionButtons asli dipanggil di sini */}
-                    <ActionButtons id={`${id}`} />
+                    {/* ActionButtons menerima surveyLocation */}
+                    <ActionButtons
+                      id={`${id}`}
+                      surveyLocation={surveyLocation}
+                    />
 
                     <Button
                       variant="link"
@@ -252,7 +254,6 @@ const DisposisiSurveiMasukDetail = () => {
               </CardContent>
             </Card>
 
-            {/* 3. History Alur (Tetap Ada) */}
             <AlurPermohonanCard data={dataDetailHistory} />
           </div>
         </div>

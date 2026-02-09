@@ -5,17 +5,17 @@ const disposisiServices = {
   approve: (id: string, payload: any) =>
     axiosInstance.put(
       `${endpoint.STAF}/${endpoint.DISPOSISI}/${id}/approve`,
-      payload
+      payload,
     ),
   reject: (id: string, payload: { alasan_penolakan: string }) =>
     axiosInstance.put(
       `${endpoint.STAF}/${endpoint.DISPOSISI}/${id}/reject`,
-      payload
+      payload,
     ),
-  revisi: (id: string, payload: { catatan: string }) =>
+  revisi: (id: string, payload: any) =>
     axiosInstance.put(
       `${endpoint.STAF}/${endpoint.DISPOSISI}/${id}/revisi`,
-      payload
+      payload,
     ),
 };
 
