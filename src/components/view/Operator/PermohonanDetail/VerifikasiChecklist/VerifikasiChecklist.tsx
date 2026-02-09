@@ -11,7 +11,8 @@ interface VerifikasiChecklistProps {
 const REQUIRED_DOCUMENTS = [
   { id: "ktp", label: "KTP Pemohon (Valid & Terbaca)" },
   { id: "sertifikat", label: "Sertifikat Tanah / Bukti Kepemilikan" },
-  { id: "pbb", label: "Bukti Lunas PBB Tahun Terakhir" },
+  { id: "pbb", label: "Pajak Bangunan Berdiri" },
+  { id: "rencana_tapak", label: "Rencana Tapak" },
 ];
 
 const VerifikasiChecklist = ({

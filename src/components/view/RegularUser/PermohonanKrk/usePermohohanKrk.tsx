@@ -1,3 +1,5 @@
+// Lokasi: src/components/view/RegularUser/PermohonanKrk/usePermohohanKrk.tsx
+
 import berkasServices from "@/services/api/berkas.services";
 import permohonanKrkServices from "@/services/api/permohonanKrk";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -8,7 +10,6 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import z from "zod";
 
-// --- HELPER: Title Case (Huruf depan besar) ---
 const toTitleCase = (str: string) => {
   if (!str) return "";
   return str.toLowerCase().replace(/(?:^|\s)\w/g, function (a) {
@@ -22,7 +23,7 @@ export const fileSchema = z
   .refine(
     (file) =>
       ["application/pdf", "image/jpeg", "image/png"].includes(file.type),
-    "Format file harus PDF, JPG, atau PNG"
+    "Format file harus PDF, JPG, atau PNG",
   );
 
 const permohonanSchema = z.object({
@@ -40,13 +41,13 @@ const permohonanSchema = z.object({
   rt_lokasi_pemohon: z.string(),
   rw_lokasi_pemohon: z.string(),
 
-  // Field ID (Untuk Logic Cascading)
+  // Field ID
   provinsi_pemohon: z.string().min(1),
   kota_pemohon: z.string().min(1),
   kecamatan_pemohon: z.string().min(1),
   kelurahan_pemohon: z.string().min(1),
 
-  // Field Nama (Untuk Dikirim ke API) - Hidden Fields
+  // Field Nama
   provinsi_pemohon_name: z.string().optional(),
   kota_pemohon_name: z.string().optional(),
   kecamatan_pemohon_name: z.string().optional(),
@@ -64,13 +65,13 @@ const permohonanSchema = z.object({
   rt_lokasi_pemilik: z.string(),
   rw_lokasi_pemilik: z.string(),
 
-  // Field ID (Untuk Logic Cascading)
+  // Field ID
   provinsi_pemilik: z.string().min(1),
   kota_pemilik: z.string().min(1),
   kecamatan_pemilik: z.string().min(1),
   kelurahan_pemilik: z.string().min(1),
 
-  // Field Nama (Untuk Dikirim ke API)
+  // Field Nama
   provinsi_pemilik_name: z.string().optional(),
   kota_pemilik_name: z.string().optional(),
   kecamatan_pemilik_name: z.string().optional(),
@@ -91,12 +92,13 @@ const permohonanSchema = z.object({
   hasil_ukur: z.string().min(1),
   no_pbb: z.string().min(1),
 
-  // Lokasi Bangunan (Biasanya ini juga perlu nama/ID, sesuaikan jika perlu)
   kecamatan_lokasi: z.string().min(1),
   kelurahan_lokasi: z.string().min(1),
 
   file_sertifikat_tanah: fileSchema,
   PBB: fileSchema,
+  // 1. Tambahkan ke Schema Validation
+  RENCANA_TAPAK: fileSchema,
 });
 
 export type PermohonanFormValues = z.infer<typeof permohonanSchema>;
@@ -109,7 +111,7 @@ const usePermohohanKrk = () => {
       kota_pemohon: "",
       kecamatan_pemohon: "",
       kelurahan_pemohon: "",
-      provinsi_pemohon_name: "", // Init empty
+      provinsi_pemohon_name: "",
       kota_pemohon_name: "",
       kecamatan_pemohon_name: "",
       kelurahan_pemohon_name: "",
@@ -118,7 +120,7 @@ const usePermohohanKrk = () => {
       kota_pemilik: "",
       kecamatan_pemilik: "",
       kelurahan_pemilik: "",
-      provinsi_pemilik_name: "", // Init empty
+      provinsi_pemilik_name: "",
       kota_pemilik_name: "",
       kecamatan_pemilik_name: "",
       kelurahan_pemilik_name: "",
@@ -143,7 +145,7 @@ const usePermohohanKrk = () => {
   const totalRequired = requiredList.length;
 
   const totalUploaded = requiredList.filter((reqItem: any) =>
-    uploadedList.some((upItem: any) => upItem.master_berkas_id === reqItem.id)
+    uploadedList.some((upItem: any) => upItem.master_berkas_id === reqItem.id),
   ).length;
 
   const isEligible = totalRequired > 0 && totalUploaded === totalRequired;
@@ -184,7 +186,6 @@ const usePermohohanKrk = () => {
 
     formData.append("lokasi", JSON.stringify(geoJsonData));
 
-    // List field wilayah yang perlu diganti ID-nya menjadi NAMA saat dikirim
     const regionFields = [
       "provinsi_pemohon",
       "kota_pemohon",
@@ -197,32 +198,26 @@ const usePermohohanKrk = () => {
     ];
 
     Object.entries(values).forEach(([key, value]) => {
-      // Skip file dan field khusus
+      // 2. Tambahkan pengecualian RENCANA_TAPAK agar tidak masuk sebagai string biasa
       if (
         key !== "file_ktp_pemohon" &&
         key !== "jenis_layanan_id" &&
         key !== "PBB" &&
         key !== "file_sertifikat_tanah" &&
+        key !== "RENCANA_TAPAK" && // Exclude here
         key !== "latitude" &&
         key !== "longitude" &&
-        !key.includes("_name") && // Jangan kirim field _name mentah-mentah
+        !key.includes("_name") &&
         value !== undefined &&
         value !== null
       ) {
-        // LOGIKA UTAMA: Jika key adalah wilayah, ambil value dari field _name DAN FORMAT KE TITLE CASE
         if (regionFields.includes(key)) {
           const nameKey = `${key}_name` as keyof PermohonanFormValues;
           const rawName = (values[nameKey] as string) || (value as string);
-
-          // FORMAT DI SINI
           formData.append(key, toTitleCase(rawName));
-        }
-        // TAMBAHAN: FORMAT JUGA WILAYAH LOKASI
-        else if (key === "kecamatan_lokasi" || key === "kelurahan_lokasi") {
+        } else if (key === "kecamatan_lokasi" || key === "kelurahan_lokasi") {
           formData.append(key, toTitleCase(value as string));
-        }
-        // TAMBAHAN OPSIONAL: FORMAT ALAMAT DAN NAMA ORANG JUGA
-        else if (key.includes("nama") || key.includes("alamat")) {
+        } else if (key.includes("nama") || key.includes("alamat")) {
           formData.append(key, toTitleCase(value as string));
         } else {
           formData.append(key, value as string);
@@ -239,6 +234,10 @@ const usePermohohanKrk = () => {
     }
     if (values.file_sertifikat_tanah instanceof File) {
       formData.append("Sertifikat-Tanah", values.file_sertifikat_tanah);
+    }
+    // 3. Append File Rencana Tapak
+    if (values.RENCANA_TAPAK instanceof File) {
+      formData.append("RENCANA_TAPAK", values.RENCANA_TAPAK);
     }
 
     mutate(formData);

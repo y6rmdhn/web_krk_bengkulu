@@ -1,3 +1,5 @@
+// Lokasi: src/components/view/RegularUser/PermohonanKrkEdit/usePermohohanKrkEdit.tsx
+
 import permohonanKrkServices from "@/services/api/permohonanKrk";
 import { wilayahServices } from "@/services/api/region.services";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -98,6 +100,8 @@ const permohonanSchema = z.object({
   file_ktp_pemohon: fileSchemaEdit,
   file_sertifikat_tanah: fileSchemaEdit,
   PBB: fileSchemaEdit,
+  // 1. Tambahkan RENCANA_TAPAK ke schema
+  RENCANA_TAPAK: fileSchemaEdit,
 });
 
 export type PermohonanEditFormValues = z.infer<typeof permohonanSchema>;
@@ -141,7 +145,7 @@ const usePermohonanKrkEdit = (id: string) => {
 
     // 2. Kalau gak ketemu ID, cari yang NAMANYA mirip (Case Insensitive)
     const matchByName = list.find(
-      (item) => item.name.toLowerCase() === valString
+      (item) => item.name.toLowerCase() === valString,
     );
     return matchByName ? matchByName.id : "";
   };
@@ -215,7 +219,7 @@ const usePermohonanKrkEdit = (id: string) => {
                     const resKel = await wilayahServices.getVillages(kecId);
                     const kelId = findRegionId(
                       resKel.data,
-                      data.kelurahan_pemohon
+                      data.kelurahan_pemohon,
                     );
 
                     if (kelId) {
@@ -257,7 +261,7 @@ const usePermohonanKrkEdit = (id: string) => {
                     const resKel = await wilayahServices.getVillages(kecId);
                     const kelId = findRegionId(
                       resKel.data,
-                      data.kelurahan_pemilik
+                      data.kelurahan_pemilik,
                     );
 
                     if (kelId) {
@@ -286,7 +290,7 @@ const usePermohonanKrkEdit = (id: string) => {
           const resKec = await wilayahServices.getDistricts(BENGKULU_CITY_ID);
           const kecamatanLokasi = resKec.data.find(
             (kec: any) =>
-              kec.name.toLowerCase() === kecamatanLokasiNama.toLowerCase()
+              kec.name.toLowerCase() === kecamatanLokasiNama.toLowerCase(),
           );
 
           if (kecamatanLokasi) {
@@ -300,7 +304,7 @@ const usePermohonanKrkEdit = (id: string) => {
                     const kelurahanLokasi = resKel.data.find(
                       (kel: any) =>
                         kel.name.toLowerCase() ===
-                        kelurahanLokasiNama.toLowerCase()
+                        kelurahanLokasiNama.toLowerCase(),
                     );
 
                     if (kelurahanLokasi) {
@@ -346,7 +350,7 @@ const usePermohonanKrkEdit = (id: string) => {
       const getFilePath = (kode: string) => {
         if (!data.attachments || !Array.isArray(data.attachments)) return "";
         const file = data.attachments.find(
-          (item: any) => item.masterBerkas?.kode === kode
+          (item: any) => item.masterBerkas?.kode === kode,
         );
         return file?.file_path || "";
       };
@@ -354,12 +358,16 @@ const usePermohonanKrkEdit = (id: string) => {
       const ktpPath = getFilePath("KTP-Pemohon");
       const pbbPath = getFilePath("PBB");
       const sertifikatPath = getFilePath("Sertifikat-Tanah");
+      // 2. Ambil path RENCANA_TAPAK
+      const rencanaTapakPath = getFilePath("RENCANA_TAPAK");
 
       setTimeout(() => {
         if (ktpPath) form.setValue("file_ktp_pemohon", ktpPath);
         if (pbbPath) form.setValue("PBB", pbbPath);
         if (sertifikatPath)
           form.setValue("file_sertifikat_tanah", sertifikatPath);
+        // 3. Set value RENCANA_TAPAK (jika ada)
+        if (rencanaTapakPath) form.setValue("RENCANA_TAPAK", rencanaTapakPath);
       }, 800);
     }
   }, [data, form]);
@@ -393,73 +401,71 @@ const usePermohonanKrkEdit = (id: string) => {
       fieldKey: string,
       idValue: string,
       serviceFn: any,
-      parentId?: string
+      parentId?: string,
     ) => {
       if (!idValue) return;
       try {
         const res = parentId ? await serviceFn(parentId) : await serviceFn();
         const item = res.data.find((d: any) => d.id === idValue);
 
-        // JIKA KETEMU, KIRIM NAMA (DIFORMAT TITLE CASE)
         if (item) formData.append(fieldKey, toTitleCase(item.name));
-        // JIKA TIDAK KETEMU, KIRIM VALUE ASLI (DIFORMAT TITLE CASE)
         else formData.append(fieldKey, toTitleCase(idValue));
       } catch (e) {
         formData.append(fieldKey, toTitleCase(idValue));
       }
     };
 
-    // 1. Wilayah Pemohon (Fetch ulang nama berdasarkan ID)
+    // 1. Wilayah Pemohon
     await appendWilayahByName(
       "provinsi_pemohon",
       values.provinsi_pemohon,
-      wilayahServices.getProvinces
+      wilayahServices.getProvinces,
     );
     await appendWilayahByName(
       "kota_pemohon",
       values.kota_pemohon,
       wilayahServices.getRegencies,
-      values.provinsi_pemohon
+      values.provinsi_pemohon,
     );
     await appendWilayahByName(
       "kecamatan_pemohon",
       values.kecamatan_pemohon,
       wilayahServices.getDistricts,
-      values.kota_pemohon
+      values.kota_pemohon,
     );
     await appendWilayahByName(
       "kelurahan_pemohon",
       values.kelurahan_pemohon,
       wilayahServices.getVillages,
-      values.kecamatan_pemohon
+      values.kecamatan_pemohon,
     );
 
-    // 2. Wilayah Pemilik (Fetch ulang nama berdasarkan ID - INI PENTING KARENA FORM NYIMPEN ID)
+    // 2. Wilayah Pemilik
     await appendWilayahByName(
       "provinsi_pemilik",
       values.provinsi_pemilik,
-      wilayahServices.getProvinces
+      wilayahServices.getProvinces,
     );
     await appendWilayahByName(
       "kota_pemilik",
       values.kota_pemilik,
       wilayahServices.getRegencies,
-      values.provinsi_pemilik
+      values.provinsi_pemilik,
     );
     await appendWilayahByName(
       "kecamatan_pemilik",
       values.kecamatan_pemilik,
       wilayahServices.getDistricts,
-      values.kota_pemilik
+      values.kota_pemilik,
     );
     await appendWilayahByName(
       "kelurahan_pemilik",
       values.kelurahan_pemilik,
       wilayahServices.getVillages,
-      values.kecamatan_pemilik
+      values.kecamatan_pemilik,
     );
 
-    // 3. Wilayah Lokasi (Value form sudah Nama, tinggal format Title Case)
+    // 3. Wilayah Lokasi
     if (values.kecamatan_lokasi) {
       formData.append("kecamatan_lokasi", toTitleCase(values.kecamatan_lokasi));
     }
@@ -467,34 +473,32 @@ const usePermohonanKrkEdit = (id: string) => {
       formData.append("kelurahan_lokasi", toTitleCase(values.kelurahan_lokasi));
     }
 
-    // 4. Exclude Keys yang sudah di-handle manual di atas
+    // 4. Exclude Keys
     const excludeSubmitKeys = [
       "file_ktp_pemohon",
       "PBB",
       "file_sertifikat_tanah",
+      // 4. Exclude RENCANA_TAPAK agar tidak terkirim sebagai string path
+      "RENCANA_TAPAK",
       "latitude",
       "longitude",
       "jenis_layanan_id",
-      // Exclude Pemohon
       "provinsi_pemohon",
       "kota_pemohon",
       "kecamatan_pemohon",
       "kelurahan_pemohon",
-      // Exclude Pemilik (TAMBAHAN PENTING)
       "provinsi_pemilik",
       "kota_pemilik",
       "kecamatan_pemilik",
       "kelurahan_pemilik",
-      // Exclude Lokasi
       "kecamatan_lokasi",
       "kelurahan_lokasi",
     ];
 
-    // 5. Append Sisa Field (dan format Title Case jika string)
+    // 5. Append Sisa Field
     Object.entries(values).forEach(([key, value]) => {
       if (excludeSubmitKeys.includes(key) || key.includes("_name")) return;
       if (value !== undefined && value !== null) {
-        // Opsional: Format nama orang dan alamat jadi Title Case juga
         if (key.includes("nama") || key.includes("alamat")) {
           formData.append(key, toTitleCase(value as string));
         } else {
@@ -508,6 +512,10 @@ const usePermohonanKrkEdit = (id: string) => {
     if (values.PBB instanceof File) formData.append("PBB", values.PBB);
     if (values.file_sertifikat_tanah instanceof File)
       formData.append("Sertifikat-Tanah", values.file_sertifikat_tanah);
+    // 5. Append File RENCANA_TAPAK jika ada perubahan
+    if (values.RENCANA_TAPAK instanceof File) {
+      formData.append("RENCANA_TAPAK", values.RENCANA_TAPAK);
+    }
 
     mutate(formData);
   };

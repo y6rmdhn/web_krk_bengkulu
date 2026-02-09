@@ -1,6 +1,7 @@
+// Lokasi: src/components/view/RegularUser/PermohonanKrk/DataLokasiForm/DataLokasi.tsx
+
 import SectionTitle from "../SectionTitle";
 import type { UseFormReturn } from "react-hook-form";
-// Tambahkan useWatch dan useEffect
 import { useWatch } from "react-hook-form";
 import { useState, useEffect } from "react";
 import type { PermohonanFormValues } from "../usePermohohanKrk";
@@ -19,6 +20,8 @@ const DataLokasi = (props: PropTypes) => {
 
   const [sertifikatFile, setSertifikatFile] = useState<File | null>(null);
   const [PpbFile, setPpbFile] = useState<File | null>(null);
+  // 1. Tambahkan State untuk Rencana Tapak
+  const [rencanaTapakFile, setRencanaTapakFile] = useState<File | null>(null);
 
   const {
     dataJenisBangunan,
@@ -34,7 +37,7 @@ const DataLokasi = (props: PropTypes) => {
 
   const filteredFungsiBangunan =
     dataJenisBangunan?.filter(
-      (item: any) => item.kategori_id === selectedKategoriId
+      (item: any) => item.kategori_id === selectedKategoriId,
     ) || [];
 
   useEffect(() => {
@@ -54,7 +57,6 @@ const DataLokasi = (props: PropTypes) => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-12 gap-y-6">
         {/* KOLOM KIRI */}
-
         <div className="space-y-6">
           <FormInput
             form={form}
@@ -122,12 +124,12 @@ const DataLokasi = (props: PropTypes) => {
                 (item: { nama: string; id: string }) => ({
                   label: item.nama,
                   value: item.id,
-                })
+                }),
               ) || []
             }
           />
 
-          {/* INPUT FUNGSI (CHILD) - Sudah di filter & Disabled logic */}
+          {/* INPUT FUNGSI (CHILD) */}
           <FormFieldSelect
             form={form}
             name="fungsi_bangunan_id"
@@ -145,7 +147,7 @@ const DataLokasi = (props: PropTypes) => {
                 (item: { nama: string; id: string }) => ({
                   label: item.nama,
                   value: item.id,
-                })
+                }),
               ) || []
             }
           />
@@ -194,6 +196,16 @@ const DataLokasi = (props: PropTypes) => {
             accept=".pdf"
             selectedFile={PpbFile}
             setSelectedFile={setPpbFile}
+          />
+
+          {/* 2. Tambahkan Input File Rencana Tapak */}
+          <InputFile
+            form={form}
+            label="Rencana Tapak"
+            name="RENCANA_TAPAK"
+            accept=".pdf"
+            selectedFile={rencanaTapakFile}
+            setSelectedFile={setRencanaTapakFile}
           />
 
           <FormInput

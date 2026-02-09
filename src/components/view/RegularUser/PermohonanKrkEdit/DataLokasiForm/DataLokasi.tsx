@@ -1,3 +1,5 @@
+// Lokasi: src/components/view/RegularUser/PermohonanKrkEdit/DataLokasiForm/DataLokasi.tsx
+
 import SectionTitle from "../SectionTitle";
 import type { UseFormReturn } from "react-hook-form";
 import { useWatch } from "react-hook-form";
@@ -10,13 +12,15 @@ import WilayahForm from "../WilayahForm/WilayahForm";
 import type { PermohonanEditFormValues } from "../usePermohohanKrkEdit";
 
 type PropTypes = {
-  form: UseFormReturn<PermohonanEditFormValues>; // Gunakan Type Edit
+  form: UseFormReturn<PermohonanEditFormValues>;
 };
 
 const DataLokasi = (props: PropTypes) => {
   const { form } = props;
   const [sertifikatFile, setSertifikatFile] = useState<File | null>(null);
   const [PpbFile, setPpbFile] = useState<File | null>(null);
+  // 1. Tambahkan state untuk Rencana Tapak
+  const [rencanaTapakFile, setRencanaTapakFile] = useState<File | null>(null);
 
   const {
     dataJenisBangunan,
@@ -32,12 +36,10 @@ const DataLokasi = (props: PropTypes) => {
 
   const filteredFungsiBangunan =
     dataJenisBangunan?.filter(
-      (item: any) => item.kategori_id === selectedKategoriId
+      (item: any) => item.kategori_id === selectedKategoriId,
     ) || [];
 
   useEffect(() => {
-    // Reset fungsi jika kategori berubah (kecuali saat initial load dimana data sudah terisi)
-    // Kita cek form state isDirty untuk tau ini user input atau load data
     if (form.getFieldState("kategori_bangunan_id").isDirty) {
       form.setValue("fungsi_bangunan_id", "");
     }
@@ -174,6 +176,17 @@ const DataLokasi = (props: PropTypes) => {
             selectedFile={PpbFile}
             setSelectedFile={setPpbFile}
           />
+
+          {/* 2. Tambahkan Input File Rencana Tapak */}
+          <InputFile
+            form={form}
+            label="Rencana Tapak"
+            name="RENCANA_TAPAK"
+            accept=".pdf"
+            selectedFile={rencanaTapakFile}
+            setSelectedFile={setRencanaTapakFile}
+          />
+
           <FormInput
             form={form}
             label="Hasil Ukur"
