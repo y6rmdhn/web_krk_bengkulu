@@ -19,6 +19,12 @@ const SIDEBAR_ADMIN = [
     href: "/kepala-dinas/sk-tte-selesai",
     icon: <FaFileSignature />,
   },
+  {
+    key: "SKTTELainnya",
+    label: "Permohonan Sk Lainnya",
+    href: "/kepala-dinas/permohonan-sk-lainnya",
+    icon: <FaFileSignature />,
+  },
 ];
 
 export { SIDEBAR_ADMIN };

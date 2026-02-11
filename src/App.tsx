@@ -145,6 +145,9 @@ const SkTTESelesai = lazy(
 const PermohonanSkTTEDetail = lazy(
   () => import("./components/view/KepalaDinas/DetailPermohonanSkTTE"),
 );
+const PermohonanSkTTELainnya = lazy(
+  () => import("./components/view/KepalaDinas/SKTTELainnya"),
+);
 const SkDetail = lazy(() => import("./components/view/KepalaDinas/PreviewSk"));
 
 const router = createBrowserRouter([
@@ -384,6 +387,11 @@ const router = createBrowserRouter([
         path: "sk-tte-selesai",
         loader: kepalaDinasLoader,
         element: <SkTTESelesai />,
+      },
+      {
+        path: "permohonan-sk-lainnya",
+        loader: kepalaDinasLoader,
+        element: <PermohonanSkTTELainnya />,
       },
       {
         path: "sk-detail/:id",
