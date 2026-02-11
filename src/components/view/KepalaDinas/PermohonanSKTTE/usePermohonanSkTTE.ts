@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 
 const usePermohonanSkTTE = () => {
   const getListPermohonan = async () => {
-    const status = "";
+    const status = "PENDING_KADIS";
 
     const result = await permohonanKrkServices.getPermohonanKrk(status);
 
