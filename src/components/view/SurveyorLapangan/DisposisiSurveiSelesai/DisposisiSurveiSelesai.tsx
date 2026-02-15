@@ -70,15 +70,15 @@ const DisposisiSurveiSelesai = () => {
 
         // BARU: Kolom Tanggal Selesai
         // Ganti item.updated_at dengan field yang sesuai dari backend jika berbeda
-        item.updated_at
-          ? new Date(item.updated_at).toLocaleDateString("id-ID", {
-              day: "2-digit",
-              month: "short",
-              year: "numeric",
-              hour: "2-digit",
-              minute: "2-digit",
-            })
-          : "-",
+        // item.updated_at
+        //   ? new Date(item.updated_at).toLocaleDateString("id-ID", {
+        //       day: "2-digit",
+        //       month: "short",
+        //       year: "numeric",
+        //       hour: "2-digit",
+        //       minute: "2-digit",
+        //     })
+        //   : "-",
 
         item.nama_pemilik || item.user?.name || "-",
 
@@ -155,7 +155,7 @@ const DisposisiSurveiSelesai = () => {
                 "No",
                 "No. Pengajuan",
                 "Tanggal Masuk",
-                "Tanggal Selesai", // Header Baru Ditambahkan
+                // "Tanggal Selesai",
                 "Nama Pemohon",
                 "Status",
                 "Aksi",

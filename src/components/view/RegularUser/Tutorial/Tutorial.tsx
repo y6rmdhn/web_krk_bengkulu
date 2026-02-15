@@ -1,30 +1,39 @@
 import MainLayout from "@/components/layouts/MainLayout/MainLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {
-  FileText,
-  PlayCircle,
-  Download,
-  ExternalLink,
-  ArrowRight,
-} from "lucide-react";
+import { FileText, PlayCircle, Download, ArrowRight, X } from "lucide-react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+// HAPUS IMPORT INI (Ini sumber masalahnya)
+// import pdfFile from "@/assets/files/panduan-aplikasi.pdf";
+// import videoFile from "@/assets/videos/tutorial-sistem.mp4";
 
 export default function Tutorial() {
-  // Fungsi dummy untuk handle klik
-  const handleOpenPdf = () => {
-    // Ganti dengan URL PDF asli Anda
-    window.open("/files/panduan-krk.pdf", "_blank");
-  };
+  const navigate = useNavigate();
+  const [isVideoOpen, setIsVideoOpen] = useState(false);
 
-  const handleOpenVideo = () => {
-    // Ganti dengan Link Youtube / Video asli Anda
-    window.open("https://youtube.com", "_blank");
+  // --- GUNAKAN PATH STRING BIASA ---
+  // Tanda "/" di awal artinya folder "public"
+  const PDF_PATH = "/assets/files/panduan-aplikasi.pdf";
+  const VIDEO_PATH = "/assets/videos/tutorial-sistem.mp4";
+
+  const handleDownloadPdf = () => {
+    const link = document.createElement("a");
+    link.href = PDF_PATH;
+    link.download = "Panduan_Penggunaan_KRK.pdf";
+    link.target = "_blank";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   return (
     <MainLayout title="Tutorial | KRK Bengkulu">
       <div className="min-h-[81vh] bg-gradient-to-br from-green-50 via-blue-50 to-emerald-50 py-8 relative overflow-hidden">
-        {/* Background Elements (Sama dengan Layanan agar konsisten) */}
+        {/* ... (Kode Sisa kebawah SAMA PERSIS, tidak ada yang perlu diubah) ... */}
+
+        {/* Background Elements */}
         <div className="absolute inset-0 z-0">
           <div className="absolute top-0 left-0 w-72 h-72 bg-green-200/20 rounded-full mix-blend-multiply filter blur-3xl animate-blob"></div>
           <div className="absolute top-0 right-0 w-72 h-72 bg-blue-200/20 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-2000"></div>
@@ -70,11 +79,11 @@ export default function Tutorial() {
 
                 <p className="text-gray-600 mb-8 flex-grow">
                   Dokumen lengkap berisi tata cara pendaftaran, persyaratan
-                  berkas, hingga alur penerbitan KRK secara tertulis.
+                  berkas, hingga alur penerbitan KRK.
                 </p>
 
                 <Button
-                  onClick={handleOpenPdf}
+                  onClick={handleDownloadPdf}
                   className="w-full bg-orange-600 hover:bg-orange-700 text-white rounded-xl py-6 text-lg shadow-lg shadow-orange-200"
                 >
                   <Download className="mr-2 h-5 w-5" />
@@ -96,16 +105,16 @@ export default function Tutorial() {
                 </h3>
 
                 <p className="text-gray-600 mb-8 flex-grow">
-                  Tonton video langkah demi langkah visualisasi penggunaan
-                  aplikasi mulai dari registrasi akun hingga selesai.
+                  Tonton video visualisasi penggunaan aplikasi mulai dari
+                  registrasi akun hingga selesai.
                 </p>
 
                 <Button
-                  onClick={handleOpenVideo}
+                  onClick={() => setIsVideoOpen(true)}
                   className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-xl py-6 text-lg shadow-lg shadow-blue-200"
                 >
-                  <ExternalLink className="mr-2 h-5 w-5" />
-                  Tonton Video
+                  <PlayCircle className="mr-2 h-5 w-5" />
+                  Putar Video
                 </Button>
               </CardContent>
             </Card>
@@ -114,6 +123,7 @@ export default function Tutorial() {
           {/* Footer Note */}
           <div className="mt-12 text-center">
             <Button
+              onClick={() => navigate("/")}
               variant="ghost"
               className="text-gray-500 hover:text-gray-700 gap-2"
             >
@@ -121,6 +131,32 @@ export default function Tutorial() {
             </Button>
           </div>
         </main>
+
+        {/* --- VIDEO MODAL OVERLAY --- */}
+        {isVideoOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+            {/* Close Button */}
+            <button
+              onClick={() => setIsVideoOpen(false)}
+              className="absolute top-4 right-4 text-white hover:text-gray-300 transition-colors bg-white/10 p-2 rounded-full backdrop-blur-md"
+            >
+              <X size={32} />
+            </button>
+
+            {/* Video Container */}
+            <div className="relative w-full max-w-5xl bg-black rounded-2xl overflow-hidden shadow-2xl ring-1 ring-white/10">
+              <video
+                controls
+                autoPlay
+                className="w-full h-auto max-h-[80vh] object-contain"
+              >
+                {/* Pastikan path ini sesuai dengan file di public */}
+                <source src={VIDEO_PATH} type="video/mp4" />
+                Browser Anda tidak mendukung tag video.
+              </video>
+            </div>
+          </div>
+        )}
       </div>
     </MainLayout>
   );
