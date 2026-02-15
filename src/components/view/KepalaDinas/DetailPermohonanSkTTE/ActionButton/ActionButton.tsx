@@ -19,11 +19,11 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
-import { CheckCircle, XCircle, Loader2 } from "lucide-react";
+import { CheckCircle, Loader2 } from "lucide-react";
 import useActionButton from "./useActionButton";
 
 const ActionButtons = ({ id }: { id: string }) => {
-  const { formAccept, formRevisiReject, actions, state } = useActionButton(id);
+  const { formAccept, actions, state } = useActionButton(id);
 
   const [openDialog, setOpenDialog] = useState<
     "accept" | "revisi" | "reject" | null
@@ -101,7 +101,7 @@ const ActionButtons = ({ id }: { id: string }) => {
           </Dialog>
 
           {/* --- BUTTON & DIALOG TOLAK --- */}
-          <Dialog
+          {/* <Dialog
             open={openDialog === "reject"}
             onOpenChange={(open) => setOpenDialog(open ? "reject" : null)}
           >
@@ -170,7 +170,7 @@ const ActionButtons = ({ id }: { id: string }) => {
                 </form>
               </Form>
             </DialogContent>
-          </Dialog>
+          </Dialog> */}
         </div>
       </CardContent>
     </Card>

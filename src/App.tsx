@@ -22,14 +22,14 @@ const KelengkapanBerkas = lazy(
 const LayananPage = lazy(
   () => import("./components/view/RegularUser/Layanan/Layanan"),
 );
+const TutorialPage = lazy(
+  () => import("./components/view/RegularUser/Tutorial"),
+);
 const PanduanPengajuan = lazy(
   () => import("./components/view/RegularUser/PanduanPengajuan"),
 );
 const PermohonanKrk = lazy(
   () => import("./components/view/RegularUser/PermohonanKrk"),
-);
-const PermohonanKrkEdit = lazy(
-  () => import("./components/view/RegularUser/PermohonanKrkEdit"),
 );
 const BerhasilBuatBaruPage = lazy(
   () => import("./components/view/RegularUser/SuccessPage"),
@@ -104,9 +104,6 @@ const PermohonanDitolak = lazy(
 );
 const PermohonanDikembalikan = lazy(
   () => import("./components/view/Operator/PermohonanDikembalikan"),
-);
-const PermohonanDiProses = lazy(
-  () => import("./components/view/Operator/PermohonanFinal"),
 );
 const DetailPermohonanAdminPage = lazy(
   () => import("./components/view/Operator/PermohonanDetail"),
@@ -203,11 +200,6 @@ const router = createBrowserRouter([
     element: <PermohonanKrk />,
   },
   {
-    path: "/permohonan-krk/edit/:id",
-    loader: mainLoader,
-    element: <PermohonanKrkEdit />,
-  },
-  {
     path: "/riwayat-permohonan",
     loader: mainLoader,
     element: <RiwayatPermohonanPage />,
@@ -245,6 +237,10 @@ const router = createBrowserRouter([
   {
     path: "/prosedur",
     element: <ProsedurPage />,
+  },
+  {
+    path: "/tutorial",
+    element: <TutorialPage />,
   },
   // {
   //   path: "/pengaduan",
@@ -312,11 +308,6 @@ const router = createBrowserRouter([
         path: "permohonan-dikembalikan",
         loader: operatorLoader,
         element: <PermohonanDikembalikan />,
-      },
-      {
-        path: "draft-final",
-        loader: operatorLoader,
-        element: <PermohonanDiProses />,
       },
       {
         path: "detail/:id",

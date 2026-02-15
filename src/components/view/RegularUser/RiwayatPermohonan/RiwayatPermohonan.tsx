@@ -14,7 +14,6 @@ import {
   Filter,
   Eye,
   FileText,
-  Pencil,
   FileCheck,
   Bell,
   X, // Tambahkan import icon X
@@ -108,14 +107,6 @@ export default function RiwayatPermohonan() {
               </span>
             ),
             action: () => navigate(`/riwayat-permohonan/detail/${item.id}`),
-          },
-          {
-            label: (
-              <span className="flex items-center gap-2">
-                <Pencil size={16} /> Edit
-              </span>
-            ),
-            action: () => navigate(`/permohonan-krk/edit/${item.id}`),
           },
         ];
       }

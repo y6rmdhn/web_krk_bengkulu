@@ -20,12 +20,6 @@ const SIDEBAR_ADMIN = [
     icon: <FaInbox />,
   },
   {
-    key: "permohonan diproses",
-    label: "Final Operator",
-    href: "/operator/draft-final",
-    icon: <FaInbox />,
-  },
-  {
     key: "permohonan selesai",
     label: "Permohonan Selesai",
     href: "/operator/permohonan-selesai",

@@ -8,8 +8,8 @@ const SIDEBAR_ADMIN = [
     icon: <FaFileSignature />,
   },
   {
-    key: "SKTTEDitolak",
-    label: "SK TTE Ditolak",
+    key: "PengajuanKRKDitolak",
+    label: "Pengajuan KRK Ditolak",
     href: "/kepala-dinas/sk-tte-ditolak",
     icon: <FaFileSignature />,
   },
@@ -20,8 +20,8 @@ const SIDEBAR_ADMIN = [
     icon: <FaFileSignature />,
   },
   {
-    key: "SKTTELainnya",
-    label: "Permohonan Sk Lainnya",
+    key: "ListSKKRK",
+    label: "List SK KRK",
     href: "/kepala-dinas/permohonan-sk-lainnya",
     icon: <FaFileSignature />,
   },

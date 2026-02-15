@@ -10,7 +10,7 @@ export const menuItems = [
   { title: "Regulasi", icon: "/img/regulasi.png", href: "/regulasi" },
   { title: "Persyaratan", icon: "/img/persyaratan.png", href: "/prosedur" },
   // { title: "Pengaduan", icon: "/img/pengaduan.png", href: "/pengaduan" },
-  { title: "Website Portal", icon: "/img/website-portal.png", href: "#" },
+  { title: "Portal Terkait", icon: "/img/website-portal.png", href: "#" },
 ];
 
 export const SLIDES = [

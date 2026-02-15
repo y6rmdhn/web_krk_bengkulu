@@ -10,7 +10,7 @@ const MENU_ITEMS = [
   {
     title: "Tutorial",
     icon: "/img/faq.png",
-    href: "#",
+    href: "/tutorial",
     description: "Panduan penggunaan sistem",
     gradient: "from-green-500/10 to-emerald-500/10",
     color: "text-green-600",
