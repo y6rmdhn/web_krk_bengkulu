@@ -66,6 +66,16 @@ const PermohonanDikembalikan = () => {
           minute: "2-digit",
         }),
 
+        item.tanggal_verifikasi_operator
+          ? new Date(item.tanggal_verifikasi_operator).toLocaleDateString("id-ID", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+          })
+          : "-",
+
         item.nama_pemilik || item.user?.name || "-",
 
         <Badge
@@ -133,6 +143,7 @@ const PermohonanDikembalikan = () => {
                 "No",
                 "No. Pengajuan",
                 "Tanggal Masuk",
+                "Tanggal Dikembalikan",
                 "Nama Pemohon",
                 "Status",
                 "Aksi",

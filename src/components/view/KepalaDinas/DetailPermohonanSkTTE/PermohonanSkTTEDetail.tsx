@@ -58,6 +58,7 @@ const PermohonanSkTTEDetail = () => {
           <HeaderSection
             data={data}
             onBack={() => navigate(-1)}
+            onViewSk={() => navigate(`/kepala-dinas/sk-detail/${id}`)}
             getStatusColor={getStatusColor}
             getStatusText={getStatusText}
           />

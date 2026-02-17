@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,15 +18,26 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import KepalaDinasLayout from "@/components/layouts/KepalaDinas";
+import OperatorLayout from "@/components/layouts/OperatorLayout";
+import SurveyorLayout from "@/components/layouts/SurveyorLayout";
+import useGetProfile from "@/hooks/useGetProfile";
 
 const PreviewSk = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { dataProfile } = useGetProfile();
 
-  const { dataSk, isLoadingSk, isError } = usePreviewSk(`${id}`);
+  const { dataSk, dataDetail, isLoadingSk, isError } = usePreviewSk(`${id}`);
 
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [blobUrl, setBlobUrl] = useState<string | null>(null);
+
+  const Layout = useMemo(() => {
+    const roles = dataProfile?.roles?.map((r: any) => r.name) || [];
+    if (roles.includes("Operator")) return OperatorLayout;
+    if (roles.includes("Surveyor Lapangan")) return SurveyorLayout;
+    return KepalaDinasLayout;
+  }, [dataProfile]);
 
   useEffect(() => {
     if (dataSk && dataSk instanceof Blob) {
@@ -51,12 +62,9 @@ const PreviewSk = () => {
     }
   };
 
-  const handleOpenNewTab = () => {
-    if (blobUrl) window.open(blobUrl, "_blank");
-  };
 
   return (
-    <KepalaDinasLayout title="Preview SK | KRK Bengkulu">
+    <Layout title="Preview SK | KRK Bengkulu">
       <div className="flex flex-col h-[calc(100vh-64px)] bg-zinc-100">
         <div className="bg-white border-b border-gray-200 px-6 py-3 flex justify-between items-center shadow-sm z-20 sticky top-0">
           <div className="flex items-center gap-4">
@@ -75,14 +83,29 @@ const PreviewSk = () => {
               <div className="p-2 bg-blue-50 text-blue-600 rounded-lg">
                 <FileText size={20} />
               </div>
-              <div className="hidden sm:block">
-                <h1 className="text-sm font-bold text-gray-800 leading-tight">
-                  Preview Dokumen SK
-                </h1>
-                <p className="text-xs text-gray-500">
-                  ID:{" "}
-                  <span className="font-mono">{id?.substring(0, 8)}...</span>
-                </p>
+              <div className="hidden sm:flex items-center gap-6">
+                <div>
+                  <p className="text-[10px] uppercase tracking-wider text-gray-400 font-medium">No. Permohonan</p>
+                  <p className="text-sm font-bold text-gray-800">{dataDetail?.nomor_permohonan || "-"}</p>
+                </div>
+                <Separator orientation="vertical" className="h-8" />
+                <div>
+                  <p className="text-[10px] uppercase tracking-wider text-gray-400 font-medium">Nama Pemilik</p>
+                  <p className="text-sm font-semibold text-gray-700">{dataDetail?.nama_pemilik || "-"}</p>
+                </div>
+                <Separator orientation="vertical" className="h-8" />
+                <div>
+                  <p className="text-[10px] uppercase tracking-wider text-gray-400 font-medium">Tanggal Permohonan</p>
+                  <p className="text-sm font-semibold text-gray-700">
+                    {dataDetail?.submitted_at
+                      ? new Date(dataDetail.submitted_at).toLocaleDateString("id-ID", {
+                        day: "2-digit",
+                        month: "long",
+                        year: "numeric",
+                      })
+                      : "-"}
+                  </p>
+                </div>
               </div>
             </div>
           </div>
@@ -90,20 +113,24 @@ const PreviewSk = () => {
           <div className="flex items-center gap-2">
             {!isLoadingSk && !isError && blobUrl && (
               <>
-                <TooltipProvider delayDuration={100}>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={handleOpenNewTab}
-                      >
-                        <ExternalLink size={18} className="text-gray-600" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>Buka di Tab Baru</TooltipContent>
-                  </Tooltip>
+                <Button
+                  variant="outline"
+                  className="gap-2"
+                  onClick={() => {
+                    const roles = dataProfile?.roles?.map((r: any) => r.name) || [];
+                    let prefix = "/kepala-dinas";
+                    if (roles.includes("Operator")) prefix = "/operator";
+                    else if (roles.includes("Surveyor Lapangan")) prefix = "/jf";
+                    navigate(`${prefix}/detail/${id}`);
+                  }}
+                >
+                  <ExternalLink size={18} className="text-blue-600" />
+                  <span className="hidden sm:inline font-medium">Lihat Detail</span>
+                </Button>
 
+                <Separator orientation="vertical" className="h-6 mx-1" />
+
+                <TooltipProvider delayDuration={100}>
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Button
@@ -185,7 +212,7 @@ const PreviewSk = () => {
           )}
         </div>
       </div>
-    </KepalaDinasLayout>
+    </Layout>
   );
 };
 

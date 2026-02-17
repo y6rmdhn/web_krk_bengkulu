@@ -67,6 +67,22 @@ const DisposisiSurveiDiproses = () => {
           minute: "2-digit",
         }),
 
+        (() => {
+          const tanggalDitolak =
+            item.tanggal_persetujuan_kadis ||
+            item.tanggal_survey_lapangan ||
+            item.tanggal_verifikasi_operator;
+          return tanggalDitolak
+            ? new Date(tanggalDitolak).toLocaleDateString("id-ID", {
+              day: "2-digit",
+              month: "short",
+              year: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            })
+            : "-";
+        })(),
+
         item.nama_pemilik || item.user?.name || "-",
 
         <Badge
@@ -134,6 +150,7 @@ const DisposisiSurveiDiproses = () => {
                 "No",
                 "No. Pengajuan",
                 "Tanggal Masuk",
+                "Tanggal Ditolak",
                 "Nama Pemohon",
                 "Status",
                 "Aksi",

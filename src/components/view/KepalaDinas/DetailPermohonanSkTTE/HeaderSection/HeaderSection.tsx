@@ -1,10 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, FileText } from "lucide-react";
 
 interface HeaderSectionProps {
   data: any;
   onBack: () => void;
+  onViewSk?: () => void;
   getStatusColor: (status: string) => string;
   getStatusText: (status: string) => string;
 }
@@ -12,6 +13,7 @@ interface HeaderSectionProps {
 const HeaderSection = ({
   data,
   onBack,
+  onViewSk,
   getStatusColor,
   getStatusText,
 }: HeaderSectionProps) => {
@@ -42,15 +44,27 @@ const HeaderSection = ({
           </p>
         </div>
 
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={onBack}
-          className="flex items-center gap-2 p-4"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Kembali
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onBack}
+            className="flex items-center gap-2 p-4"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Kembali
+          </Button>
+          {onViewSk && (
+            <Button
+              size="sm"
+              onClick={onViewSk}
+              className="flex items-center gap-2 p-4 bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              <FileText className="h-4 w-4" />
+              Lihat SK
+            </Button>
+          )}
+        </div>
       </div>
     </div>
   );

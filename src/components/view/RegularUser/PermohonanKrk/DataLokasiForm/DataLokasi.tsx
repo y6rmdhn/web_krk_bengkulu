@@ -184,9 +184,9 @@ const DataLokasi = (props: PropTypes) => {
 
           <FormInput
             form={form}
-            label="No Pbb"
+            label="No PBB"
             name="no_pbb"
-            placeholder="Masukan No Pbb"
+            placeholder="Masukan No PBB"
           />
 
           <InputFile

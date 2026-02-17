@@ -68,6 +68,13 @@ const DisposisiSurveiSelesai = () => {
           minute: "2-digit",
         }),
 
+        new Date(item.tanggal_survey_lapangan).toLocaleDateString("id-ID", {
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
         // BARU: Kolom Tanggal Selesai
         // Ganti item.updated_at dengan field yang sesuai dari backend jika berbeda
         // item.updated_at
@@ -155,7 +162,7 @@ const DisposisiSurveiSelesai = () => {
                 "No",
                 "No. Pengajuan",
                 "Tanggal Masuk",
-                // "Tanggal Selesai",
+                "Tanggal Selesai",
                 "Nama Pemohon",
                 "Status",
                 "Aksi",

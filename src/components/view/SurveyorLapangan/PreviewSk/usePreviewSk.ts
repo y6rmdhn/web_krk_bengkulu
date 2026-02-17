@@ -7,6 +7,11 @@ export const usePreviewSk = (id: string) => {
     return result.data;
   };
 
+  const getDetail = async () => {
+    const result = await permohonanKrkServices.getDetailPermohonanKrk(id);
+    return result.data.data;
+  };
+
   const {
     data: dataSk,
     isLoading: isLoadingSk,
@@ -18,8 +23,15 @@ export const usePreviewSk = (id: string) => {
     retry: 1,
   });
 
+  const { data: dataDetail } = useQuery({
+    queryKey: ["preview-sk-detail", id],
+    queryFn: getDetail,
+    enabled: !!id,
+  });
+
   return {
     dataSk,
+    dataDetail,
     isLoadingSk,
     isError,
   };

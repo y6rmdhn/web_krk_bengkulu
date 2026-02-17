@@ -89,6 +89,7 @@ const DisposisiSurveiMasukDetail = () => {
           <HeaderSection
             data={data}
             onBack={() => navigate(-1)}
+            onViewSk={() => navigate(`/jf/sk-detail/${id}`)}
             getStatusColor={getStatusColor}
             getStatusText={getStatusText}
           />

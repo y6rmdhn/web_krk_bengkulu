@@ -66,6 +66,13 @@ const SKTTESelesai = () => {
           hour: "2-digit",
           minute: "2-digit",
         }),
+        new Date(item.tanggal_persetujuan_kadis).toLocaleDateString("id-ID", {
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
 
         item.nama_pemilik || item.user?.name || "-",
 
@@ -142,6 +149,7 @@ const SKTTESelesai = () => {
                 "No",
                 "No. Pengajuan",
                 "Tanggal Masuk",
+                "Tanggal Selesai",
                 "Nama Pemohon",
                 "Status",
                 "Aksi",
