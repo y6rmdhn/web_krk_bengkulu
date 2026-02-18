@@ -27,6 +27,7 @@ export default function PermohonanKrk() {
     progressString,
     totalRequired,
     totalUploaded,
+    uploadedList,
   } = usePermohohanKrk();
   const navigate = useNavigate();
 
@@ -166,7 +167,7 @@ export default function PermohonanKrk() {
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-12">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-12 gap-y-8">
-                <DataPemohonForm form={form} />
+                <DataPemohonForm form={form} profileBerkas={uploadedList} />
 
                 <div className="space-y-6">
                   <div className="flex items-center space-x-2 bg-gray-50 p-4 rounded-md border border-gray-200">
@@ -188,7 +189,7 @@ export default function PermohonanKrk() {
                 </div>
               </div>
 
-              <DataLokasi form={form} />
+              <DataLokasi form={form} profileBerkas={uploadedList} />
 
               <div className="flex justify-end items-center gap-4 pt-4">
                 <Button

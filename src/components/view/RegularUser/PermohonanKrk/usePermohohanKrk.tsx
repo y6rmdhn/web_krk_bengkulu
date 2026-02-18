@@ -252,6 +252,7 @@ const usePermohohanKrk = () => {
     isLoadingCheck,
     totalRequired,
     totalUploaded,
+    uploadedList,
   };
 };
 

@@ -13,10 +13,15 @@ import WilayahForm from "../WilayahForm/WilayahForm";
 
 type PropTypes = {
   form: UseFormReturn<PermohonanFormValues>;
+  profileBerkas?: any[];
 };
 
 const DataLokasi = (props: PropTypes) => {
-  const { form } = props;
+  const { form, profileBerkas } = props;
+
+  // Helper: cari berkas profil berdasarkan nama master berkas
+  const findBerkasByNama = (nama: string) =>
+    profileBerkas?.find((b: any) => b.masterBerkas?.nama === nama) || null;
 
   const [sertifikatFile, setSertifikatFile] = useState<File | null>(null);
   const [PpbFile, setPpbFile] = useState<File | null>(null);
@@ -180,6 +185,7 @@ const DataLokasi = (props: PropTypes) => {
             accept=".pdf"
             selectedFile={sertifikatFile}
             setSelectedFile={setSertifikatFile}
+            existingBerkas={findBerkasByNama("Sertifikat Tanah")}
           />
 
           <FormInput
@@ -196,6 +202,7 @@ const DataLokasi = (props: PropTypes) => {
             accept=".pdf"
             selectedFile={PpbFile}
             setSelectedFile={setPpbFile}
+            existingBerkas={findBerkasByNama("Bukti Pembayaran PBB Tahun Berjalan")}
           />
 
           {/* 2. Tambahkan Input File Rencana Tapak */}
@@ -206,6 +213,7 @@ const DataLokasi = (props: PropTypes) => {
             accept=".pdf"
             selectedFile={rencanaTapakFile}
             setSelectedFile={setRencanaTapakFile}
+            existingBerkas={findBerkasByNama("Rencana Tapak")}
           />
 
           <FormInput

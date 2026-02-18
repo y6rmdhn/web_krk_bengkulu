@@ -22,11 +22,16 @@ import {
 
 type PropTypes = {
   form: UseFormReturn<PermohonanFormValues>;
+  profileBerkas?: any[];
 };
 
 const DataPemohonForm = (props: PropTypes) => {
-  const { form } = props;
+  const { form, profileBerkas } = props;
   const [fileDoc, setFileDoc] = useState<File | null>(null);
+
+  // Helper: cari berkas profil berdasarkan nama master berkas
+  const findBerkasByNama = (nama: string) =>
+    profileBerkas?.find((b: any) => b.masterBerkas?.nama === nama) || null;
 
   const selectedProvinsi = form.watch("provinsi_pemohon");
   const selectedKota = form.watch("kota_pemohon");
@@ -322,6 +327,7 @@ const DataPemohonForm = (props: PropTypes) => {
         accept=".pdf,.jpg,.jpeg,.png"
         selectedFile={fileDoc}
         setSelectedFile={setFileDoc}
+        existingBerkas={findBerkasByNama("Berkas KTP Pemohon")}
       />
     </div>
   );
