@@ -64,10 +64,13 @@ const RegulasiList = (props: PropTypes) => {
               >
                 <Info className="h-4 w-4" />
               </Button>
-              <Button className="bg-green-600 hover:bg-green-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105">
-                <Download className="mr-2 h-4 w-4" />
-                Download
-              </Button>
+              {/* Ini bagian yang diubah agar bisa download file */}
+              <a href={item.fileUrl} download target="_blank" rel="noreferrer">
+                <Button className="bg-green-600 hover:bg-green-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105">
+                  <Download className="mr-2 h-4 w-4" />
+                  Download
+                </Button>
+              </a>
             </div>
           </div>
         ))

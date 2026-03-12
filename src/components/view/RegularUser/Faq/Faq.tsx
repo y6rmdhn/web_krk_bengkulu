@@ -1,68 +1,114 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
 import MainLayout from "@/components/layouts/MainLayout/MainLayout";
-import { Search, FileText, Clock, User, Building, MapPin } from "lucide-react";
+import { Search, FileText, Building, MapPin } from "lucide-react";
 import { useState } from "react";
 import FaqAccordion from "./FaqAccordion/FaqAccordion";
 
 const faqData = [
   {
     id: "item-1",
-    question: "Apa yang dimaksud dengan KRK?",
+    question: "Apa yang dimaksud dengan Keterangan Rencana Kota (KRK)?",
     answer:
-      "KRK atau Keterangan Rencana Kota adalah informasi tentang peruntukan lahan dan peraturan zonasi yang berlaku pada suatu lokasi. Dokumen ini memberikan gambaran mengenai rencana tata ruang dan peruntukan lahan di wilayah Kota Bengkulu.",
+      "Keterangan Rencana Kota (KRK) adalah Informasi tentang ketentuan tata bangunan dan lingkungan yang diberlakukan oleh pemerintah daerah kabupaten/kota pada lokasi tertentu",
     category: "umum",
     icon: FileText,
   },
   {
     id: "item-2",
-    question: "Apa yang dimaksud dengan RDB?",
+    question: "Apa yang dimaksud dengan Persetujuan Bangunan Gedung (PBG)?",
     answer:
-      "RDB (Rencana Detail Bangunan) adalah dokumen teknis yang berisi ketentuan-ketentuan detail tentang bangunan yang akan didirikan pada suatu lokasi, termasuk persyaratan teknis, ketinggian, dan tata letak bangunan.",
+      "Persetujuan Bangunan Gedung (PBG) adalah perizinan yang diberikan kepada pemilik Bangunan Gedung untuk membangun baru, mengubah, memperluas, mengurangi, dan/atau merawat Bangunan Gedung sesuai dengan standar teknis Bangunan Gedung.",
+    category: "umum",
+    icon: FileText,
+  },
+  {
+    id: "item-3",
+    question: "Apa hubungan antara KRK dan PBG?",
+    answer:
+      "KRK merupakan salah satu syarat pengajuan PBG, sebagai dasar penilaian kesesuaian pengajuan PBG terhadap ketentuan peruntukan dan intensitas Bangunan Gedung",
+    category: "syarat",
+    icon: FileText,
+  },
+  {
+    id: "item-4",
+    question: "KRK didasarkan pada apa?",
+    answer: "KRK pada RDTR dan/atau RTBL",
+    category: "teknis",
+    icon: FileText,
+  },
+  {
+    id: "item-5",
+    question: "Apa saja muatan dari KRK?",
+    answer:
+      "Muatan dari KRK adalah:\n1. fungsi Bangunan Gedung yang dapat dibangun pada lokasi bersangkutan;\n2. ketinggian maksimum Bangunan Gedung yang diizinkan;\n3. jumlah lantai/lapis Bangunan Gedung di bawah permukaan tanah dan KTB yang diizinkan;\n4. garis sempadan dan jarak bebas minimum Bangunan Gedung yang diizinkan;\n5. KDB maksimum yang diizinkan;\n6. KLB maksimum yang diizinkan;\n7. KDH minimum yang diwajibkan;\n8. KTB maksimum yang diizinkan; dan\n9. jaringan utilitas kota",
+    category: "teknis",
+    icon: FileText,
+  },
+  {
+    id: "item-6",
+    question: "Apa yang dimaksud dengan fungsi Bangunan Gedung?",
+    answer:
+      "Fungsi Bangunan Gedung merupakan ketetapan pemenuhan Standar Teknis, yang ditinjau dari segi tata bangunan dan lingkungannya maupun keandalan Bangunan Gedung, meliputi:\n1. fungsi hunian;\n2. fungsi keagamaan;\n3. fungsi usaha;\n4. fungsi sosial dan budaya; dan\n5. fungsi khusus",
     category: "teknis",
     icon: Building,
   },
   {
-    id: "item-3",
-    question: "Berapa lama proses pengajuan KRK?",
+    id: "item-7",
+    question: "Apa yang dimaksud dengan Ketinggian Bangunan Gedung (KBG)?",
     answer:
-      "Proses pengajuan KRK membutuhkan waktu sekitar 5-7 hari kerja setelah semua dokumen lengkap dan memenuhi persyaratan. Anda dapat memantau perkembangan melalui fitur monitoring berkas.",
-    category: "proses",
-    icon: Clock,
+      "Ketinggian Bangunan Gedung (KBG) adalah angka maksimal jumlah lantai Bangunan Gedung yang diperkenankan.",
+    category: "teknis",
+    icon: Building,
   },
   {
-    id: "item-4",
-    question: "Siapa yang dapat mengajukan KRK?",
+    id: "item-8",
+    question: "Apa yang dimaksud dengan Garis Sempadan Bangunan (GSB)?",
     answer:
-      "Pengajuan KRK dapat dilakukan oleh pemilik tanah, ahli waris, atau pihak yang memiliki kuasa dari pemilik tanah dengan melampirkan dokumen-dokumen yang diperlukan.",
-    category: "syarat",
-    icon: User,
-  },
-  {
-    id: "item-5",
-    question: "Bagaimana cara mengetahui zonasi lahan?",
-    answer:
-      "Anda dapat mengetahui informasi zonasi lahan melalui peta digital yang tersedia di sistem KRK Online atau dengan mengajukan permohonan KRK untuk mendapatkan informasi detail tentang peruntukan lahan.",
+      "Garis Sempadan Bangunan (GSB) adalah garis yang mengatur Batasan lahan yang tidak boleh dilewati dengan bangunan yang membatasi fisik bangunan ke arah depan, belakang, maupun samping.",
     category: "teknis",
     icon: MapPin,
   },
   {
-    id: "item-6",
-    question: "Apa saja dokumen yang diperlukan?",
+    id: "item-9",
+    question: "Apa yang dimaksud dengan Koefisien Dasar Bangunan (KDB)?",
     answer:
-      "Dokumen yang diperlukan meliputi: Fotokopi KTP, Sertifikat tanah, Surat kuasa (jika dikuasakan), dan dokumen pendukung lainnya sesuai dengan jenis permohonan.",
-    category: "syarat",
-    icon: FileText,
+      "Koefisien Dasar Bangunan (KDB) adalah angka persentase berdasarkan perbandingan antara luas seluruh lantai dasar Bangunan Gedung terhadap luas lahan perpetakan atau daerah perencanaan sesuai KRK",
+    category: "teknis",
+    icon: Building,
+  },
+  {
+    id: "item-10",
+    question: "Apa yang dimaksud dengan Koefisien Lantai Bangunan (KLB)?",
+    answer:
+      "Koefisien Lantai Bangunan (KLB) adalah angka persentase perbandingan antara luas seluruh lantai Bangunan Gedung terhadap luas lahan perpetakan atau daerah perencanaan sesuai KRK.",
+    category: "teknis",
+    icon: Building,
+  },
+  {
+    id: "item-11",
+    question: "Apa yang dimaksud dengan Koefisien Daerah Hijau (KDH)?",
+    answer:
+      "Koefisien Daerah Hijau (KDH) adalah angka persentase perbandingan antara luas seluruh ruang terbuka di luar Bangunan Gedung yang diperuntukkan bagi pertamanan/penghijauan terhadap luas lahan perpetakan atau daerah perencanaan sesuai KRK",
+    category: "teknis",
+    icon: MapPin,
+  },
+  {
+    id: "item-12",
+    question: "Apa yang dimaksud dengan Koefisien Tapak Basemen (KTB)?",
+    answer:
+      "Koefisien Tapak Basemen (KTB) adalah angka persentase berdasarkan perbandingan antara luas tapak basemen terhadap luas lahan perpetakan atau daerah perencanaan sesuai KRK.",
+    category: "teknis",
+    icon: Building,
+  },
+  {
+    id: "item-13",
+    question: "Apa yang dimaksud jarak bebas minimum Bangunan Gedung?",
+    answer:
+      "Jarak bebas minimum Bangunan Gedung meliputi:\n1. jarak Bangunan Gedung dengan batas persil, yaitu garis yang membatasi jarak bebas minimum dari bidang terluar suatu massa Bangunan Gedung dengan batas persil\n2. jarak antar-Bangunan Gedung, yaitu garis yang membatasi jarak bebas minimum dari bidang terluar suatu massa Bangunan Gedung dengan bidang terluar massa Bangunan Gedung lain dalam satu persil",
+    category: "teknis",
+    icon: MapPin,
   },
 ];
 
@@ -155,43 +201,6 @@ export default function Faq() {
 
                   {/* FAQ Accordion */}
                   <FaqAccordion filteredFaqData={filteredFaqData} />
-
-                  {/* Pagination */}
-                  {filteredFaqData.length > 0 && (
-                    <Pagination className="flex items-center justify-center mt-8">
-                      <PaginationContent className="flex gap-2">
-                        <PaginationItem>
-                          <PaginationPrevious
-                            href="#"
-                            className="rounded-lg border-gray-300"
-                          />
-                        </PaginationItem>
-                        <PaginationItem>
-                          <PaginationLink
-                            href="#"
-                            isActive
-                            className="rounded-lg"
-                          >
-                            1
-                          </PaginationLink>
-                        </PaginationItem>
-                        <PaginationItem>
-                          <PaginationLink href="#" className="rounded-lg">
-                            2
-                          </PaginationLink>
-                        </PaginationItem>
-                        <PaginationItem>
-                          <PaginationEllipsis />
-                        </PaginationItem>
-                        <PaginationItem>
-                          <PaginationNext
-                            href="#"
-                            className="rounded-lg border-gray-300"
-                          />
-                        </PaginationItem>
-                      </PaginationContent>
-                    </Pagination>
-                  )}
 
                   {/* Help Section */}
                   <div className="mt-8 p-6 bg-gradient-to-r from-green-50 to-blue-50 rounded-2xl border border-green-200 text-center">

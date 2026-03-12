@@ -1,13 +1,4 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
 import MainLayout from "@/components/layouts/MainLayout/MainLayout";
 import RegulasiList from "./RegulasiList/RegulasiList";
 
@@ -15,62 +6,34 @@ const regulasiData = [
   {
     id: 1,
     title:
-      "Undang - Undang Republik Indonesia Nomor 14 Tahun 2008 Tentang Keterbukaan Informasi Publik",
-    fileUrl: "/path/to/your/file1.pdf",
-    type: "uu",
-    year: 2008,
-    category: "informasi",
-    size: "2.4 MB",
+      "Peraturan Pemerintah Republik Indonesia Nomor 16 Tahun 2021 Tentang Peraturan Pelaksanaan Undang-Undang Nomor 28 Tahun 2002 Tentang Bangunan Gedung",
+    fileUrl: "/regulasi/PP16_Tahun_2021_Penyelenggaraan BG.pdf",
+    type: "pp",
+    year: 2021,
+    category: "bangunan",
+    size: "PDF",
   },
   {
     id: 2,
     title:
-      "Undang - Undang Republik Indonesia Nomor 25 Tahun 2009 Tentang Pelayanan Publik",
-    fileUrl: "/path/to/your/file2.pdf",
-    type: "uu",
-    year: 2009,
-    category: "pelayanan",
-    size: "1.8 MB",
+      "Peraturan Pemerintah Republik Indonesia Nomor 21 Tahun 2021 Tentang Penyelenggaraan Penataan Ruang",
+    fileUrl:
+      "/regulasi/PP Nomor 21 Tahun 2021_Penyelenggaraan Penataan Ruang.pdf",
+    type: "pp",
+    year: 2021,
+    category: "tata-ruang",
+    size: "PDF",
   },
   {
     id: 3,
     title:
-      "Undang - Undang Republik Indonesia Nomor 28 Tahun 2002 Tentang Bangunan Gedung",
-    fileUrl: "/path/to/your/file3.pdf",
-    type: "uu",
-    year: 2002,
-    category: "bangunan",
-    size: "3.2 MB",
-  },
-  {
-    id: 4,
-    title:
-      "Peraturan Pemerintah Republik Indonesia Nomor 36 Tahun 2005 Tentang Peraturan Pelaksanaan Undang - Undang Nomor 28 Tahun 2002 Tentang Bangunan Gedung",
-    fileUrl: "/path/to/your/file4.pdf",
-    type: "pp",
-    year: 2005,
-    category: "bangunan",
-    size: "2.1 MB",
-  },
-  {
-    id: 5,
-    title:
-      "Peraturan Pemerintah Republik Indonesia Nomor 53 Tahun 2010 Tentang Disiplin Pegawai Negeri Sipil",
-    fileUrl: "/path/to/your/file5.pdf",
-    type: "pp",
-    year: 2010,
-    category: "kepegawaian",
-    size: "1.5 MB",
-  },
-  {
-    id: 6,
-    title:
-      "Peraturan Daerah Kota Bengkulu Nomor 4 Tahun 2018 Tentang Rencana Tata Ruang Wilayah",
-    fileUrl: "/path/to/your/file6.pdf",
+      "Peraturan Daerah Kota Bengkulu Nomor 4 Tahun 2021 Tentang Rencana Tata Ruang Wilayah Kota Bengkulu 2021 - 2041",
+    fileUrl:
+      "/regulasi/Perda No. 4 Tahun 2021 ttg RTRW Kota Bengkulu 2021 - 2041.pdf",
     type: "perda",
-    year: 2018,
+    year: 2021,
     category: "tata-ruang",
-    size: "4.2 MB",
+    size: "PDF",
   },
 ];
 
@@ -128,65 +91,6 @@ export default function Regulasi() {
                 <CardContent className="pb-8">
                   {/* Regulasi List */}
                   <RegulasiList regulasiData={regulasiData} />
-
-                  {/* Pagination */}
-                  {regulasiData.length > 0 && (
-                    <div className="mt-8 flex justify-center">
-                      <Pagination>
-                        <PaginationContent className="flex gap-1">
-                          <PaginationItem>
-                            <PaginationPrevious
-                              href="#"
-                              className="rounded-xl border-gray-300"
-                            />
-                          </PaginationItem>
-                          <PaginationItem>
-                            <PaginationLink href="#" className="rounded-xl">
-                              1
-                            </PaginationLink>
-                          </PaginationItem>
-                          <PaginationItem>
-                            <PaginationLink
-                              href="#"
-                              isActive
-                              className="rounded-xl bg-blue-600 text-white border-blue-600"
-                            >
-                              2
-                            </PaginationLink>
-                          </PaginationItem>
-                          <PaginationItem>
-                            <PaginationLink href="#" className="rounded-xl">
-                              3
-                            </PaginationLink>
-                          </PaginationItem>
-                          <PaginationItem>
-                            <PaginationLink href="#" className="rounded-xl">
-                              4
-                            </PaginationLink>
-                          </PaginationItem>
-                          <PaginationItem>
-                            <PaginationLink href="#" className="rounded-xl">
-                              5
-                            </PaginationLink>
-                          </PaginationItem>
-                          <PaginationItem>
-                            <PaginationEllipsis />
-                          </PaginationItem>
-                          <PaginationItem>
-                            <PaginationLink href="#" className="rounded-xl">
-                              11
-                            </PaginationLink>
-                          </PaginationItem>
-                          <PaginationItem>
-                            <PaginationNext
-                              href="#"
-                              className="rounded-xl border-gray-300"
-                            />
-                          </PaginationItem>
-                        </PaginationContent>
-                      </Pagination>
-                    </div>
-                  )}
                 </CardContent>
               </Card>
             </div>
