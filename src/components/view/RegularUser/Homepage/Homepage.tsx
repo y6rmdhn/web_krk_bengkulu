@@ -20,6 +20,7 @@ import {
   ArrowRight,
   CheckCircle2,
   FileText,
+  XCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -35,6 +36,7 @@ export default function Homepage() {
     isLoadingUser,
     percentage,
     totalRequired,
+    mandatoryDocsStatus, // Tangkap data status dokumen wajib dari hook
   } = useHomepage();
 
   useEffect(() => {
@@ -65,6 +67,7 @@ export default function Homepage() {
       rounded-xl overflow-hidden
       data-[state=open]:slide-in-from-top-10
       data-[state=open]:fade-in-0
+      max-h-[90vh] overflow-y-auto
     "
         >
           {/* Header dengan warna resmi pemerintah */}
@@ -110,8 +113,8 @@ export default function Homepage() {
                   Dokumen Persyaratan Belum Lengkap
                 </h3>
                 <p className="text-blue-100 text-sm leading-relaxed">
-                  Silakan lengkapi dokumen persyaratan untuk dapat mengajukan
-                  permohonan baru
+                  Silakan lengkapi dokumen persyaratan wajib untuk dapat
+                  mengajukan permohonan baru
                 </p>
               </div>
             </div>
@@ -157,8 +160,42 @@ export default function Homepage() {
                 </div>
               </div>
 
+              {/* Daftar Dokumen Wajib */}
+              <div className="mt-6">
+                <h5 className="text-sm font-semibold text-gray-800 mb-3 border-b border-gray-200 pb-2">
+                  Daftar Dokumen Wajib:
+                </h5>
+                <ul className="space-y-3">
+                  {mandatoryDocsStatus?.map((doc: any) => (
+                    <li key={doc.kode} className="flex items-start gap-3">
+                      {doc.isUploaded ? (
+                        <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0" />
+                      ) : (
+                        <XCircle className="w-5 h-5 text-red-400 flex-shrink-0" />
+                      )}
+                      <div>
+                        <span
+                          className={`text-sm ${
+                            doc.isUploaded
+                              ? "text-gray-400 line-through"
+                              : "text-gray-700 font-medium"
+                          }`}
+                        >
+                          {doc.nama}
+                        </span>
+                        {!doc.isUploaded && (
+                          <p className="text-xs text-red-500 mt-0.5">
+                            Belum diunggah
+                          </p>
+                        )}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
               {/* Status Info */}
-              <div className="mt-4 p-3 bg-white rounded-lg border border-gray-100">
+              <div className="mt-5 p-3 bg-white rounded-lg border border-gray-100">
                 <div className="flex items-start gap-2">
                   {percentage === 100 ? (
                     <CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
@@ -167,8 +204,8 @@ export default function Homepage() {
                   )}
                   <p className="text-sm text-gray-700">
                     {percentage === 100
-                      ? "Semua dokumen persyaratan telah lengkap. Anda dapat melanjutkan pengajuan permohonan."
-                      : `Anda perlu melengkapi ${totalRequired} dokumen persyaratan untuk dapat mengajukan permohonan baru.`}
+                      ? "Semua dokumen persyaratan wajib telah lengkap. Anda dapat melanjutkan pengajuan permohonan."
+                      : `Anda perlu melengkapi dokumen yang ditandai merah di atas.`}
                   </p>
                 </div>
               </div>

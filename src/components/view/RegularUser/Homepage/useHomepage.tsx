@@ -2,7 +2,6 @@ import berkasServices from "@/services/api/berkas.services";
 import { useQuery } from "@tanstack/react-query";
 
 const useHomepage = () => {
-  // --- 1. AMBIL DATA BERKAS ---
   const { data: masterBerkas, isLoading: isLoadingMaster } = useQuery({
     queryKey: ["master-berkas"],
     queryFn: berkasServices.getMasterData,
@@ -13,14 +12,27 @@ const useHomepage = () => {
     queryFn: berkasServices.getListBerkas,
   });
 
-  // --- 2. HITUNG LOGIC KELENGKAPAN ---
-  const requiredList = masterBerkas?.data.data || [];
+  const allMasterList = masterBerkas?.data.data || [];
   const uploadedList = userBerkas?.data.data || [];
-  const totalRequired = requiredList.length;
 
-  // Filter yang sudah kita perbaiki logic-nya
-  const totalUploaded = requiredList.filter((reqItem: any) =>
-    uploadedList.some((upItem: any) => upItem.master_berkas_id === reqItem.id)
+  const MANDATORY_KODES = ["KTP-Pemohon", "Npwp", "Nib", "Sertifikat-Tanah"];
+
+  const requiredList = allMasterList.filter((item: any) =>
+    MANDATORY_KODES.includes(item.kode),
+  );
+
+  const mandatoryDocsStatus = requiredList.map((reqItem: any) => ({
+    id: reqItem.id,
+    kode: reqItem.kode,
+    nama: reqItem.nama,
+    isUploaded: uploadedList.some(
+      (upItem: any) => upItem.master_berkas_id === reqItem.id,
+    ),
+  }));
+
+  const totalRequired = requiredList.length;
+  const totalUploaded = mandatoryDocsStatus.filter(
+    (doc: any) => doc.isUploaded,
   ).length;
 
   const isEligible = totalRequired > 0 && totalUploaded === totalRequired;
@@ -35,6 +47,7 @@ const useHomepage = () => {
     percentage,
     progressString,
     totalRequired,
+    mandatoryDocsStatus,
   };
 };
 
