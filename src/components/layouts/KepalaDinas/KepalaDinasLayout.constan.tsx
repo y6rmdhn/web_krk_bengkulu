@@ -1,4 +1,9 @@
-import { FaFileSignature } from "react-icons/fa";
+import {
+  FaFileSignature,
+  FaTimesCircle,
+  FaCheckCircle,
+  FaListAlt,
+} from "react-icons/fa";
 
 const SIDEBAR_ADMIN = [
   {
@@ -11,19 +16,19 @@ const SIDEBAR_ADMIN = [
     key: "PengajuanKRKDitolak",
     label: "Pengajuan KRK Ditolak",
     href: "/kepala-dinas/sk-tte-ditolak",
-    icon: <FaFileSignature />,
+    icon: <FaTimesCircle />,
   },
   {
     key: "SKTTESelesai",
     label: "SK TTE Selesai",
     href: "/kepala-dinas/sk-tte-selesai",
-    icon: <FaFileSignature />,
+    icon: <FaCheckCircle />,
   },
   {
     key: "ListSKKRK",
     label: "List SK KRK",
     href: "/kepala-dinas/permohonan-sk-lainnya",
-    icon: <FaFileSignature />,
+    icon: <FaListAlt />,
   },
 ];
 

@@ -369,7 +369,7 @@ export default function Homepage() {
                           Mulai Pengajuan
                         </a>
                         <a
-                          href="#layanan"
+                          href="/tutorial"
                           className="px-6 sm:px-8 py-3 sm:py-4 bg-transparent text-white font-bold text-base sm:text-lg rounded-xl border-2 border-gray-300 hover:bg-white/10 transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2"
                         >
                           <svg

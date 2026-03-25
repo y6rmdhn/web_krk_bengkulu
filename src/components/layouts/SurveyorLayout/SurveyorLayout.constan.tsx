@@ -1,23 +1,23 @@
-import { FaInbox } from "react-icons/fa";
+import { FaInbox, FaTimesCircle, FaCheckCircle } from "react-icons/fa";
 
 const SIDEBAR_ADMIN = [
   {
-    key: "disposisiSurveiMasuk",
-    label: "Disposisi Survei Masuk",
-    href: "/jf/disposisi-survei-masuk",
+    key: "disposisiMasuk",
+    label: "Disposisi Masuk",
+    href: "/jf/disposisi-masuk",
     icon: <FaInbox />,
   },
   {
-    key: "disposisiSurveiDitolak",
-    label: "Disposisi Survei Ditolak",
-    href: "/jf/disposisi-survei-ditolak",
-    icon: <FaInbox />,
+    key: "disposisiDitolak",
+    label: "Disposisi Ditolak",
+    href: "/jf/disposisi-ditolak",
+    icon: <FaTimesCircle />,
   },
   {
-    key: "disposisiSurveiSelesai",
-    label: "Disposisi Survei Selesai",
-    href: "/jf/disposisi-survei-selesai",
-    icon: <FaInbox />,
+    key: "disposisiSelesai",
+    label: "Disposisi Selesai",
+    href: "/jf/disposisi-selesai",
+    icon: <FaCheckCircle />,
   },
 ];
 

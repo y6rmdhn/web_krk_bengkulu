@@ -9,6 +9,7 @@ import DataTable from "@/components/commons/DataTable";
 import { useNavigate } from "react-router-dom";
 import useDisposisiSurveiMasuk from "./useDisposisiSurveiMasuk";
 import SurveyorLayout from "@/components/layouts/SurveyorLayout";
+import { getStatusConfig } from "@/constants/status.constant";
 
 const DisposisiSurveiMasuk = () => {
   const { currentPage, currentLimit, handleChangePage, handleLimitChange } =
@@ -43,16 +44,9 @@ const DisposisiSurveiMasuk = () => {
     const paginatedData = filteredResult.slice(startIndex, endIndex);
 
     return paginatedData.map((item: any, index: number) => {
-      let badgeColor = "bg-gray-100 text-gray-700";
-      if (item.status === "PENDING_OPERATOR") {
-        badgeColor =
-          "bg-yellow-100 text-yellow-700 border-yellow-200 hover:bg-yellow-200";
-      } else if (item.status === "APPROVED") {
-        badgeColor =
-          "bg-green-100 text-green-700 border-green-200 hover:bg-green-200";
-      } else if (item.status === "REJECTED") {
-        badgeColor = "bg-red-100 text-red-700 border-red-200 hover:bg-red-200";
-      }
+      const { color: badgeColor, label: statusLabel } = getStatusConfig(
+        item.status,
+      );
 
       return [
         startIndex + index + 1,
@@ -72,9 +66,9 @@ const DisposisiSurveiMasuk = () => {
         <Badge
           key={`badge-${item.id}`}
           variant="outline"
-          className={badgeColor}
+          className={`whitespace-nowrap ${badgeColor}`}
         >
-          {item.status}
+          {statusLabel}
         </Badge>,
 
         <DropdownActions
@@ -99,8 +93,8 @@ const DisposisiSurveiMasuk = () => {
 
   return (
     <SurveyorLayout
-      title="Disposisi Survey Masuk | KRK Kota Bengkulu"
-      desc="Disposisi Survey Masuk"
+      title="Disposisi Masuk | KRK Kota Bengkulu"
+      desc="Disposisi Masuk"
     >
       <div className="mt-10 flex flex-col gap-6">
         <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-start">
@@ -124,7 +118,7 @@ const DisposisiSurveiMasuk = () => {
           <CardHeader>
             <div className="flex justify-between items-center">
               <h1 className="text-lg font-semibold">
-                Daftar Disposisi Survey Masuk ({filteredResult.length})
+                Daftar Disposisi Masuk ({filteredResult.length})
               </h1>
             </div>
           </CardHeader>

@@ -3,8 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import MainLayout from "@/components/layouts/MainLayout/MainLayout";
-import { Search, FileText, AlertCircle, Eye } from "lucide-react";
-import { PENGUMUMAN_LIST } from "./MonitoringBerkas.constant";
+import { Search, FileText, Eye } from "lucide-react";
 import SidebarInfo from "./SidebarInfo/SidebarInfo";
 import useMonitoringBerkas from "./useMonitoringBerkas";
 
@@ -50,35 +49,6 @@ export default function MonitoringBerkasPage() {
             <div className="lg:col-span-2">
               <Card className="border-0 shadow-2xl bg-white/90 backdrop-blur-sm rounded-3xl overflow-hidden">
                 <CardContent className="p-8">
-                  {/* Pengumuman Section */}
-                  <div className="mb-8">
-                    <div className="bg-gradient-to-r from-blue-600 to-cyan-600 rounded-2xl p-6 text-white shadow-lg">
-                      <div className="flex items-center gap-3 mb-3">
-                        <AlertCircle size={24} className="text-yellow-300" />
-                        <h2 className="text-xl font-bold">
-                          PENGUMUMAN PENTING
-                        </h2>
-                      </div>
-                      <div className="space-y-3 text-blue-50">
-                        <p className="leading-relaxed">
-                          Sesuai dengan ketentuan PP Nomor 21 Tahun 2021 tentang
-                          Penyelenggaraan Penataan Ruang, berikut informasi
-                          penting terkait layanan KRK:
-                        </p>
-                        <ol className="list-decimal list-inside space-y-2 ml-4">
-                          {PENGUMUMAN_LIST.map((item) => (
-                            <li
-                              key={`list-${item.label}`}
-                              className="leading-relaxed"
-                            >
-                              {item.title}
-                            </li>
-                          ))}
-                        </ol>
-                      </div>
-                    </div>
-                  </div>
-
                   {/* Search Form - Menggunakan handler dari Hook */}
                   <form onSubmit={handleSearch} className="space-y-6">
                     <div className="text-center mb-8">

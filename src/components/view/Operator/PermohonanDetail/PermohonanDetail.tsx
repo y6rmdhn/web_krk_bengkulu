@@ -2,13 +2,6 @@ import OperatorLayout from "@/components/layouts/OperatorLayout";
 import { Button } from "@/components/ui/button";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import useDetailPermohonan from "./usePermohonanDetail";
-import HeaderSection from "./HeaderSection";
-import DataPemohonCard from "./DataPemohonCard";
-import DataPemilikCard from "./DataPemilikCard";
-import DataBangunanCard from "./DataBangunanCard";
-import BerkasLampiranCard from "./BerkasLampiranCard";
-import AlurPermohonanCard from "./AlurPermohonan";
-import ActionButtons from "./ActionButton";
 import { getStatusColor, getStatusText } from "@/utils/statusUtils";
 import { formatAlamat } from "@/utils/formatUtils";
 import { Loader2 } from "lucide-react";
@@ -16,6 +9,13 @@ import LocationMap from "@/components/commons/LocationMap";
 import { useState } from "react";
 import VerifikasiChecklist from "./VerifikasiChecklist";
 import { cn } from "@/lib/utils";
+import SharedActionButtons from "@/components/commons/SharedActionButtons";
+import AlurPermohonanCard from "@/components/commons/AlurPermohonanCard";
+import DataPemilikCard from "@/components/commons/DataPemilikCard";
+import DataBangunanCard from "@/components/commons/DataBangunanCard";
+import BerkasLampiranCard from "@/components/commons/BerkasLampiranCard";
+import DataPemohonCard from "@/components/commons/DataPemohonCard";
+import HeaderSection from "@/components/commons/HeaderSection";
 
 const DetailPermohonan = ({ isAction }: { isAction?: boolean }) => {
   const navigate = useNavigate();
@@ -101,8 +101,9 @@ const DetailPermohonan = ({ isAction }: { isAction?: boolean }) => {
 
               {shouldShowActionButtons && (
                 <div className="mt-6">
-                  <ActionButtons
+                  <SharedActionButtons
                     id={id || ""}
+                    role="OPERATOR"
                     isFinal={isFinal}
                     isVerificationComplete={isVerified}
                   />

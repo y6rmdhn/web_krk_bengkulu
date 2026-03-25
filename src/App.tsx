@@ -70,19 +70,13 @@ const SuccessVerificationEmailPage = lazy(
 const PreviewSkPage = lazy(
   () => import("./components/view/RegularUser/PreviewSk"),
 );
-const TrackingPage = lazy(
-  () => import("./components/view/RegularUser/Tracking"),
-);
-const DetailTrackingPage = lazy(
-  () => import("./components/view/RegularUser/Tracking/PermohonanDetail"),
-);
 
 // admin
-const JenisLayanan = lazy(() => import("./components/view/Admin/JenisLayanan"));
+// const JenisLayanan = lazy(() => import("./components/view/Admin/JenisLayanan"));
 const AdminBerkas = lazy(() => import("./components/view/Admin/Berkas"));
-const JenisPermohonanAdmin = lazy(
-  () => import("./components/view/Admin/JenisPermohonan"),
-);
+// const JenisPermohonanAdmin = lazy(
+//   () => import("./components/view/Admin/JenisPermohonan"),
+// );
 const JenisKategoriFungsiBangunan = lazy(
   () => import("./components/view/Admin/KategoriFungsiBangunan"),
 );
@@ -249,21 +243,21 @@ const router = createBrowserRouter([
   {
     path: "/admin",
     children: [
-      {
-        path: "jenis-layanan",
-        loader: adminLoader,
-        element: <JenisLayanan />,
-      },
+      // {
+      //   path: "jenis-layanan",
+      //   loader: adminLoader,
+      //   element: <JenisLayanan />,
+      // },
       {
         path: "berkas",
         loader: adminLoader,
         element: <AdminBerkas />,
       },
-      {
-        path: "jenis-permohonan",
-        loader: adminLoader,
-        element: <JenisPermohonanAdmin />,
-      },
+      // {
+      //   path: "jenis-permohonan",
+      //   loader: adminLoader,
+      //   element: <JenisPermohonanAdmin />,
+      // },
       {
         path: "jenis-kategori-fungsi-bangunan",
         loader: adminLoader,
@@ -315,16 +309,6 @@ const router = createBrowserRouter([
         element: <DetailPermohonanAdminPage />,
       },
       {
-        path: "tracking",
-        loader: operatorLoader,
-        element: <TrackingPage />,
-      },
-      {
-        path: "tracking/detail/:id",
-        loader: operatorLoader,
-        element: <DetailTrackingPage />,
-      },
-      {
         path: "sk-detail/:id",
         loader: operatorLoader,
         element: <PrevSkOperator />,
@@ -335,17 +319,17 @@ const router = createBrowserRouter([
     path: "/jf",
     children: [
       {
-        path: "disposisi-survei-masuk",
+        path: "disposisi-masuk",
         loader: surveyorLoader,
         element: <DisposisiSurveiMasuk />,
       },
       {
-        path: "disposisi-survei-ditolak",
+        path: "disposisi-ditolak",
         loader: surveyorLoader,
         element: <DisposisiSurveiDiproses />,
       },
       {
-        path: "disposisi-survei-selesai",
+        path: "disposisi-selesai",
         loader: surveyorLoader,
         element: <DisposisiSurveiSelesai />,
       },
@@ -390,7 +374,7 @@ const router = createBrowserRouter([
         element: <SkDetail />,
       },
       {
-        path: "permohonan-sk-tte/detail/:id",
+        path: "detail/:id",
         loader: kepalaDinasLoader,
         element: <PermohonanSkTTEDetail />,
       },

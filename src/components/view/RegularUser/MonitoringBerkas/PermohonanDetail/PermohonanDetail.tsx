@@ -2,9 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate, useParams } from "react-router-dom";
 import useDetailPermohonan from "./usePermohonanDetail";
-import HeaderSection from "./HeaderSection";
-import AlurPermohonanCard from "./AlurPermohonan";
-import { getStatusColor, getStatusText } from "@/utils/statusUtils";
+import { getStatusConfig } from "@/constants/status.constant";
 import {
   Loader2,
   ArrowLeft,
@@ -18,6 +16,8 @@ import {
 import { format } from "date-fns";
 import { id as idLocale } from "date-fns/locale";
 import { useState } from "react";
+import HeaderSection from "@/components/commons/HeaderSection";
+import AlurPermohonanPublicCard from "./AlurPermohonanPublicCard/AlurPermohonanPublicCard";
 
 const DetailPermohonan = () => {
   const navigate = useNavigate();
@@ -56,7 +56,6 @@ const DetailPermohonan = () => {
     );
   }
 
-  // Helper format tanggal sederhana
   const formatTgl = (date: string) => {
     try {
       return format(new Date(date), "dd MMMM yyyy, HH:mm 'WIB'", {
@@ -67,9 +66,12 @@ const DetailPermohonan = () => {
     }
   };
 
+  const statusConfig = data.info
+    ? getStatusConfig(data.info.status_terkini)
+    : null;
+
   return (
     <div className="p-4 sm:p-6 lg:p-8">
-      {/* Back Button for Mobile */}
       <div className="lg:hidden mb-4">
         <Button
           variant="ghost"
@@ -82,19 +84,21 @@ const DetailPermohonan = () => {
       </div>
 
       <div className="mt-4 lg:mt-10 flex flex-col gap-4 sm:gap-6">
-        {/* Header Section */}
-        <HeaderSection
-          data={data}
-          onBack={() => navigate(-1)}
-          getStatusColor={getStatusColor}
-          getStatusText={getStatusText}
-        />
+        {data.info && (
+          <HeaderSection
+            data={{
+              nomor_permohonan: data.info.nomor,
+              status: data.info.status_terkini,
+              submitted_at: data.info.tanggal_submit,
+            }}
+            onBack={() => navigate(-1)}
+            getStatusColor={(status) => getStatusConfig(status).color}
+            getStatusText={(status) => getStatusConfig(status).label}
+          />
+        )}
 
-        {/* Main Content Grid */}
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6">
-          {/* Left Column - Main Content */}
           <div className="xl:col-span-2 space-y-6">
-            {/* --- BAGIAN INFO (LANGSUNG DISINI) --- */}
             {data.info && (
               <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
                 <h3 className="text-lg font-semibold text-slate-800 mb-5 border-b pb-3">
@@ -102,7 +106,6 @@ const DetailPermohonan = () => {
                 </h3>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-8">
-                  {/* Nomor Registrasi */}
                   <div className="space-y-1">
                     <p className="text-sm font-medium text-slate-500 flex items-center gap-2">
                       <Hash className="w-4 h-4" /> Nomor Registrasi
@@ -124,20 +127,20 @@ const DetailPermohonan = () => {
                     </div>
                   </div>
 
-                  {/* Status */}
                   <div className="space-y-1">
                     <p className="text-sm font-medium text-slate-500 flex items-center gap-2">
                       Status Terkini
                     </p>
-                    <Badge
-                      variant="outline"
-                      className={`px-3 py-1 ${getStatusColor(data.info.status_terkini)} border-transparent`}
-                    >
-                      {data.info.status_terkini}
-                    </Badge>
+                    {statusConfig && (
+                      <Badge
+                        variant="outline"
+                        className={`px-3 py-1 ${statusConfig.color} border-transparent`}
+                      >
+                        {statusConfig.label}
+                      </Badge>
+                    )}
                   </div>
 
-                  {/* Pemilik */}
                   <div className="space-y-1">
                     <p className="text-sm font-medium text-slate-500 flex items-center gap-2">
                       <User className="w-4 h-4" /> Nama Pemilik
@@ -147,7 +150,6 @@ const DetailPermohonan = () => {
                     </p>
                   </div>
 
-                  {/* Tanggal */}
                   <div className="space-y-1">
                     <p className="text-sm font-medium text-slate-500 flex items-center gap-2">
                       <Calendar className="w-4 h-4" /> Tanggal Pengajuan
@@ -157,7 +159,6 @@ const DetailPermohonan = () => {
                     </p>
                   </div>
 
-                  {/* Posisi Dokumen (Full Width) */}
                   <div className="md:col-span-2 mt-2 pt-4 border-t border-dashed border-slate-200">
                     <div className="flex gap-3 items-start bg-slate-50 p-4 rounded-lg">
                       <MapPin className="w-5 h-5 text-indigo-500 mt-0.5" />
@@ -174,13 +175,11 @@ const DetailPermohonan = () => {
                 </div>
               </div>
             )}
-            {/* --- END BAGIAN INFO --- */}
           </div>
 
-          {/* Right Column - Sidebar */}
           <div className="xl:col-span-1">
             <div className="sticky top-4 space-y-4 sm:space-y-6">
-              <AlurPermohonanCard data={data.riwayat} />
+              <AlurPermohonanPublicCard data={data.riwayat} />
             </div>
           </div>
         </div>

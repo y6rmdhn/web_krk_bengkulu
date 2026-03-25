@@ -2,18 +2,18 @@ import { useNavigate, useParams } from "react-router-dom";
 import usePermohonanSkTTEDetail from "./usePermohonanSkTTEDetail";
 import { Button } from "@/components/ui/button";
 import KepalaDinasLayout from "@/components/layouts/KepalaDinas";
-import HeaderSection from "./HeaderSection";
-import DataPemohonCard from "./DataPemohonCard";
-import DataPemilikCard from "./DataPemilikCard";
-import DataBangunanCard from "./DataBangunanCard";
-import BerkasLampiranCard from "./BerkasLampiranCard";
-import AlurPermohonanCard from "./AlurPermohonan";
-import ActionButtons from "./ActionButton";
 import { getStatusColor, getStatusText } from "@/utils/statusUtils";
 import { formatAlamat } from "@/utils/formatUtils";
 
 import { Loader2 } from "lucide-react";
 import LocationMap from "@/components/commons/LocationMap";
+import AlurPermohonanCard from "@/components/commons/AlurPermohonanCard";
+import DataPemilikCard from "@/components/commons/DataPemilikCard";
+import DataBangunanCard from "@/components/commons/DataBangunanCard";
+import BerkasLampiranCard from "@/components/commons/BerkasLampiranCard";
+import DataPemohonCard from "@/components/commons/DataPemohonCard";
+import HeaderSection from "@/components/commons/HeaderSection";
+import SharedActionButtons from "@/components/commons/SharedActionButtons";
 
 const PermohonanSkTTEDetail = () => {
   const navigate = useNavigate();
@@ -48,6 +48,8 @@ const PermohonanSkTTEDetail = () => {
   const longitude = data.geom?.coordinates?.[0];
   const latitude = data.geom?.coordinates?.[1];
 
+  const shouldShowActionButtons = data.status === "PENDING_KADIS";
+
   return (
     <KepalaDinasLayout
       title={`Detail Permohonan KRK | ${data.nomor_permohonan}`}
@@ -58,7 +60,7 @@ const PermohonanSkTTEDetail = () => {
           <HeaderSection
             data={data}
             onBack={() => navigate(-1)}
-            onViewSk={() => navigate(`/kepala-dinas/sk-detail/${id}`)}
+            // onViewSk={() => navigate(`/kepala-dinas/sk-detail/${id}`)}
             getStatusColor={getStatusColor}
             getStatusText={getStatusText}
           />
@@ -83,7 +85,10 @@ const PermohonanSkTTEDetail = () => {
 
           <div className="lg:col-span-1 space-y-6">
             <AlurPermohonanCard data={dataDetailHistory} />
-            <ActionButtons id={`${id}`} />
+
+            {shouldShowActionButtons && (
+              <SharedActionButtons id={`${id}`} role="KADIS" />
+            )}
           </div>
         </div>
       </div>

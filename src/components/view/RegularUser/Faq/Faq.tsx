@@ -201,27 +201,6 @@ export default function Faq() {
 
                   {/* FAQ Accordion */}
                   <FaqAccordion filteredFaqData={filteredFaqData} />
-
-                  {/* Help Section */}
-                  <div className="mt-8 p-6 bg-gradient-to-r from-green-50 to-blue-50 rounded-2xl border border-green-200 text-center">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-2">
-                      Masih butuh bantuan?
-                    </h3>
-                    <p className="text-gray-600 mb-4">
-                      Tim support kami siap membantu menjawab pertanyaan Anda
-                    </p>
-                    <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                      <Button className="bg-green-600 hover:bg-green-700 text-white rounded-xl">
-                        Hubungi Support
-                      </Button>
-                      <Button
-                        variant="outline"
-                        className="rounded-xl border-gray-300"
-                      >
-                        Lihat Tutorial
-                      </Button>
-                    </div>
-                  </div>
                 </CardContent>
               </Card>
             </div>

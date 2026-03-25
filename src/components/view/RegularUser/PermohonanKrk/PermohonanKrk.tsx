@@ -1,10 +1,4 @@
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form } from "@/components/ui/form";
 import MainLayout from "@/components/layouts/MainLayout/MainLayout";
 import usePermohohanKrk from "./usePermohohanKrk";
@@ -12,30 +6,25 @@ import DataPemohonForm from "./DataPemohonForm/DataPemohonForm";
 import DataPemilik from "./DataPemilikForm/DataPemilik";
 import DataLokasi from "./DataLokasiForm/DataLokasi";
 import { Button } from "@/components/ui/button";
-import { AlertCircle, ArrowRight, FileText, FolderOpen } from "lucide-react";
+import {
+  AlertTriangle,
+  ArrowRight,
+  CheckCircle2,
+  FileText,
+  XCircle,
+} from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useNavigate } from "react-router-dom";
-import { Progress } from "@/components/ui/progress";
 
 export default function PermohonanKrk() {
-  const {
-    form,
-    onSubmit,
-    isPending,
-    isEligible,
-    isLoadingCheck,
-    progressString,
-    totalRequired,
-    totalUploaded,
-    uploadedList,
-  } = usePermohohanKrk();
+  const { form, onSubmit, isPending, isLoadingCheck, uploadedList } =
+    usePermohohanKrk();
+
   const navigate = useNavigate();
 
   const handleCopyData = (isChecked: boolean) => {
     if (isChecked) {
       const values = form.getValues();
-
-      // Salin data teks biasa
       form.setValue("nama_pemilik", values.nama_pemohon);
       form.setValue("no_ktp_pemilik", values.no_ktp_pemohon);
       form.setValue("email_pemilik", values.email_pemohon);
@@ -44,17 +33,41 @@ export default function PermohonanKrk() {
       form.setValue("no_lokasi_pemilik", values.no_lokasi_pemohon);
       form.setValue("rt_lokasi_pemilik", values.rt_lokasi_pemohon);
       form.setValue("rw_lokasi_pemilik", values.rw_lokasi_pemohon);
-
-      // Salin NAMA wilayah
-      // Ini akan men-trigger useEffect di DataPemilik.tsx
-      // yang akan otomatis mencari ID dan mengisi dropdown anak.
       form.setValue("provinsi_pemilik", values.provinsi_pemohon);
       form.setValue("kota_pemilik", values.kota_pemohon);
       form.setValue("kecamatan_pemilik", values.kecamatan_pemohon);
       form.setValue("kelurahan_pemilik", values.kelurahan_pemohon);
     }
-    // Jika uncheck, opsi untuk mengosongkan kembali bisa ditambahkan jika perlu
   };
+
+  // Helper untuk mengecek status 4 dokumen wajib
+  const checkIsUploaded = (keyword: string) => {
+    if (!uploadedList) return false;
+    return uploadedList.some((doc: any) =>
+      JSON.stringify(doc).toLowerCase().includes(keyword.toLowerCase()),
+    );
+  };
+
+  // Daftar spesifik 4 dokumen wajib
+  const mandatoryDocsStatus = [
+    { kode: "ktp", nama: "KTP", isUploaded: checkIsUploaded("ktp") },
+    { kode: "npwp", nama: "NPWP", isUploaded: checkIsUploaded("npwp") },
+    { kode: "nib", nama: "NIB", isUploaded: checkIsUploaded("nib") },
+    {
+      kode: "sertifikat",
+      nama: "Sertifikat Tanah",
+      isUploaded: checkIsUploaded("sertifikat"),
+    },
+  ];
+
+  // Menghitung persentase HANYA berdasarkan 4 dokumen ini (Tiap dokumen = 25%)
+  const uploadedCount = mandatoryDocsStatus.filter(
+    (doc) => doc.isUploaded,
+  ).length;
+  const percentage = Math.round((uploadedCount / 4) * 100);
+
+  // Flag penentu apakah form boleh diakses atau tidak (Wajib 100% / 4 dokumen)
+  const isFormAccessible = percentage === 100;
 
   if (isLoadingCheck) {
     return (
@@ -67,94 +80,136 @@ export default function PermohonanKrk() {
     );
   }
 
-  if (!isEligible) {
-    // Hitung persentase untuk progress bar
-    const percentage = Math.round((totalUploaded / totalRequired) * 100);
-
+  // JIKA BERKAS BELUM 100% -> TAMPILKAN CARD PERINGATAN (FORM DI-HIDE)
+  if (!isFormAccessible) {
     return (
       <MainLayout title="Permohonan | KRK Bengkulu" isBgGray isPaddingY>
         <div className="flex flex-col items-center justify-center min-h-[80vh] px-4">
-          <Card className="max-w-xl w-full shadow-2xl border-none ring-1 ring-gray-200 overflow-hidden">
-            {/* Header Section dengan Background Soft */}
-            <div className="bg-amber-50 border-b border-amber-100 p-8 flex flex-col items-center text-center space-y-4">
-              <div className="h-16 w-16 bg-amber-100 rounded-full flex items-center justify-center ring-4 ring-amber-50">
-                <AlertCircle className="w-8 h-8 text-amber-600" />
+          <div className="max-w-2xl w-full bg-white shadow-xl border border-gray-200 rounded-xl overflow-hidden">
+            {/* Header */}
+            <div className="relative bg-gradient-to-r from-blue-700 via-blue-600 to-blue-700 px-6 py-6 overflow-hidden">
+              <div className="absolute inset-0 opacity-10">
+                <div
+                  className="absolute inset-0"
+                  style={{
+                    backgroundImage: `repeating-linear-gradient(45deg, transparent, transparent 10px, white 10px, white 20px)`,
+                  }}
+                />
               </div>
-
-              <div className="space-y-1">
-                <h2 className="text-2xl font-bold text-gray-900">
-                  Kelengkapan Berkas Dibutuhkan
-                </h2>
-                <p className="text-gray-500 max-w-sm mx-auto">
-                  Mohon maaf, Anda belum bisa melanjutkan proses ini. Profil
-                  Anda belum memenuhi syarat administrasi.
-                </p>
+              <div className="relative flex items-start gap-4">
+                <div className="flex-shrink-0">
+                  <div className="relative">
+                    <div className="absolute inset-0 bg-white/20 rounded-full blur-sm" />
+                    <div className="relative p-3 bg-white/90 backdrop-blur-sm rounded-full shadow-lg">
+                      <AlertTriangle
+                        className="w-6 h-6 text-red-600"
+                        strokeWidth={2}
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <div className="inline-block px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full mb-2">
+                    <span className="text-xs font-bold text-white tracking-wide">
+                      PERHATIAN
+                    </span>
+                  </div>
+                  <h3 className="font-bold text-white text-xl leading-tight mb-2">
+                    Dokumen Persyaratan Belum Lengkap
+                  </h3>
+                  <p className="text-blue-100 text-sm leading-relaxed">
+                    Sistem KRK membutuhkan verifikasi 4 dokumen wajib sebelum
+                    Anda dapat melanjutkan pengajuan permohonan.
+                  </p>
+                </div>
               </div>
             </div>
 
-            <CardContent className="p-8 space-y-6">
-              {/* Progress Section */}
-              <div className="space-y-3">
-                <div className="flex justify-between items-end text-sm">
-                  <span className="font-medium text-gray-700 flex items-center gap-2">
-                    <FolderOpen className="w-4 h-4 text-gray-400" />
-                    Status Dokumen
-                  </span>
-                  <span className="font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md">
-                    {progressString} Terupload
-                  </span>
+            {/* Content */}
+            <div className="relative px-6 py-6 space-y-6">
+              <div className="bg-gray-50 rounded-lg p-5 border border-gray-200">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-blue-600 rounded-lg">
+                      <FileText className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-gray-900">
+                        Status Kelengkapan Berkas
+                      </h4>
+                      <p className="text-xs text-gray-500 mt-0.5">
+                        {percentage}% dokumen telah lengkap
+                      </p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-2xl font-bold text-blue-700 leading-none">
+                      {percentage}%
+                    </div>
+                  </div>
                 </div>
 
-                <Progress
-                  value={percentage}
-                  className="h-3"
-                  indicatorClassName="bg-blue-600"
-                />
+                <div className="relative">
+                  <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-gradient-to-r from-blue-600 to-blue-700 rounded-full transition-all duration-500"
+                      style={{ width: `${percentage}%` }}
+                    />
+                  </div>
+                </div>
 
-                <p className="text-xs text-gray-400 text-right">
-                  {percentage}% Lengkap
-                </p>
+                {/* List 4 Dokumen Wajib */}
+                <div className="mt-6">
+                  <h5 className="text-sm font-semibold text-gray-800 mb-3 border-b border-gray-200 pb-2">
+                    Daftar Dokumen Wajib:
+                  </h5>
+                  <ul className="space-y-3">
+                    {mandatoryDocsStatus.map((doc) => (
+                      <li key={doc.kode} className="flex items-start gap-3">
+                        {doc.isUploaded ? (
+                          <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0" />
+                        ) : (
+                          <XCircle className="w-5 h-5 text-red-400 flex-shrink-0" />
+                        )}
+                        <div>
+                          <span
+                            className={`text-sm ${
+                              doc.isUploaded
+                                ? "text-gray-400 line-through"
+                                : "text-gray-700 font-medium"
+                            }`}
+                          >
+                            {doc.nama}
+                          </span>
+                          {!doc.isUploaded && (
+                            <p className="text-xs text-red-500 mt-0.5">
+                              Belum diunggah
+                            </p>
+                          )}
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </div>
 
-              {/* Info Box */}
-              <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 flex gap-4 items-start">
-                <div className="bg-white p-2 rounded-lg shadow-sm border border-gray-100 shrink-0">
-                  <FileText className="w-5 h-5 text-gray-500" />
-                </div>
-                <div className="space-y-1">
-                  <p className="text-sm font-semibold text-gray-900">
-                    Mengapa ini penting?
-                  </p>
-                  <p className="text-sm text-gray-500 leading-relaxed">
-                    Sistem KRK membutuhkan verifikasi dokumen lengkap (KTP,
-                    Sertifikat, PBB, dll) sebelum Anda dapat mengajukan
-                    pengukuran tanah.
-                  </p>
-                </div>
+              <div className="flex justify-end pt-2">
+                <Button
+                  onClick={() => navigate("/berkas")}
+                  className="w-full sm:w-auto bg-gradient-to-r from-blue-700 to-blue-600 hover:from-blue-800 hover:to-blue-700 text-white shadow-sm font-medium px-8"
+                >
+                  <span>Lengkapi Berkas Sekarang</span>
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
               </div>
-            </CardContent>
-
-            <CardFooter className="p-8 pt-0 flex justify-center">
-              <Button
-                onClick={() => navigate("/berkas")}
-                size="lg"
-                className="w-full bg-blue-600 hover:bg-blue-700 shadow-blue-200 shadow-lg text-base font-medium h-12 gap-2"
-              >
-                Lengkapi Berkas Sekarang
-                <ArrowRight className="w-4 h-4" />
-              </Button>
-            </CardFooter>
-          </Card>
-
-          {/* Footer Text kecil */}
-          <p className="mt-8 text-sm text-gray-400 text-center">
-            Dinas Pekerjaan Umum dan Penataan Ruang <br /> Kota Bengkulu
-          </p>
+            </div>
+          </div>
         </div>
       </MainLayout>
     );
   }
 
+  // JIKA BERKAS UDAH 100% -> TAMPILKAN FORM UTAMA
   return (
     <MainLayout title="Permohonan | KRK Bengkulu" isBgGray isPaddingY>
       <Card className="max-w-7xl mx-auto shadow-lg">

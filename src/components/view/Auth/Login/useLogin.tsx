@@ -64,11 +64,11 @@ const useLogin = () => {
         let targetPath = "/";
 
         if (roles.includes("admin")) {
-          targetPath = "/admin/jenis-layanan";
+          targetPath = "/admin/jenis-kategori-fungsi-bangunan";
         } else if (roles.includes("Operator")) {
           targetPath = "/operator/permohonan-krk";
         } else if (roles.includes("Surveyor Lapangan")) {
-          targetPath = "/jf/disposisi-survei-masuk";
+          targetPath = "/jf/disposisi-masuk";
         } else if (roles.includes("Kepala Dinas")) {
           targetPath = "/kepala-dinas/permohonan-sk-tte";
         } else {

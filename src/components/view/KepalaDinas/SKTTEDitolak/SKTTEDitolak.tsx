@@ -9,6 +9,7 @@ import DataTable from "@/components/commons/DataTable";
 import { useNavigate } from "react-router-dom";
 import usePermohonanSkTTE from "./useSKTTEDitolak";
 import KepalaDinasLayout from "@/components/layouts/KepalaDinas";
+import { getStatusConfig } from "@/constants/status.constant";
 
 const PermohonanSkTTE = () => {
   const { currentPage, currentLimit, handleChangePage, handleLimitChange } =
@@ -43,16 +44,9 @@ const PermohonanSkTTE = () => {
     const paginatedData = filteredResult.slice(startIndex, endIndex);
 
     return paginatedData.map((item: any, index: number) => {
-      let badgeColor = "bg-gray-100 text-gray-700";
-      if (item.status === "PENDING_OPERATOR") {
-        badgeColor =
-          "bg-yellow-100 text-yellow-700 border-yellow-200 hover:bg-yellow-200";
-      } else if (item.status === "APPROVED") {
-        badgeColor =
-          "bg-green-100 text-green-700 border-green-200 hover:bg-green-200";
-      } else if (item.status === "REJECTED") {
-        badgeColor = "bg-red-100 text-red-700 border-red-200 hover:bg-red-200";
-      }
+      const { color: badgeColor, label: statusLabel } = getStatusConfig(
+        item.status,
+      );
 
       return [
         startIndex + index + 1,
@@ -66,6 +60,7 @@ const PermohonanSkTTE = () => {
           hour: "2-digit",
           minute: "2-digit",
         }),
+
         (() => {
           const tanggalDitolak =
             item.tanggal_persetujuan_kadis ||
@@ -73,24 +68,23 @@ const PermohonanSkTTE = () => {
             item.tanggal_verifikasi_operator;
           return tanggalDitolak
             ? new Date(tanggalDitolak).toLocaleDateString("id-ID", {
-              day: "2-digit",
-              month: "short",
-              year: "numeric",
-              hour: "2-digit",
-              minute: "2-digit",
-            })
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+              })
             : "-";
         })(),
-
 
         item.nama_pemilik || item.user?.name || "-",
 
         <Badge
           key={`badge-${item.id}`}
           variant="outline"
-          className={badgeColor}
+          className={`whitespace-nowrap ${badgeColor}`}
         >
-          {item.status}
+          {statusLabel}
         </Badge>,
 
         <DropdownActions
@@ -104,7 +98,7 @@ const PermohonanSkTTE = () => {
                 </span>
               ),
               action: () => {
-                navigate(`/kepala-dinas/permohonan-sk-tte/detail/${item.id}`);
+                navigate(`/kepala-dinas/detail/${item.id}`);
               },
             },
           ]}

@@ -16,7 +16,7 @@ import {
   FileText,
   FileCheck,
   Bell,
-  X, // Tambahkan import icon X
+  X,
 } from "lucide-react";
 import MainLayout from "@/components/layouts/MainLayout/MainLayout";
 import useDataTable from "@/hooks/useDataTable";
@@ -25,13 +25,12 @@ import useRiwayatPermohonan from "./useRiwayatPermohonan";
 import DropdownActions from "@/components/commons/DropdownActions";
 import DataTable from "@/components/commons/DataTable";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { getStatusConfig } from "@/constants/status.constant";
 
 export default function RiwayatPermohonan() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("semua");
   const [jenisFilter, setJenisFilter] = useState("semua");
-
-  // State baru untuk mengontrol visibilitas notifikasi
   const [isAlertVisible, setIsAlertVisible] = useState(true);
 
   const navigate = useNavigate();
@@ -63,19 +62,9 @@ export default function RiwayatPermohonan() {
 
   const totalPages = Math.ceil(filteredResult.length / currentLimit);
 
-  // Cek jika ada SK yang baru terbit (Status APPROVED)
   const hasNewSK = useMemo(() => {
     return filteredResult.some((item: any) => item.status === "APPROVED");
   }, [filteredResult]);
-
-  const getBadgeColor = (status: string) => {
-    if (status === "PENDING_OPERATOR")
-      return "bg-yellow-100 text-yellow-700 border-yellow-200";
-    if (status === "APPROVED")
-      return "bg-green-100 text-green-700 border-green-200";
-    if (status === "REJECTED") return "bg-red-100 text-red-700 border-red-200";
-    return "bg-gray-100 text-gray-700";
-  };
 
   // --- Data Table Rows ---
   const tableRows = useMemo(() => {
@@ -85,7 +74,10 @@ export default function RiwayatPermohonan() {
 
     return paginatedData.map((item: any, index: number) => {
       let menuActions = [];
-      console.log(item.status);
+
+      const { color: badgeColor, label: statusLabel } = getStatusConfig(
+        item.status,
+      );
 
       if (item.status === "APPROVED") {
         menuActions = [
@@ -113,7 +105,7 @@ export default function RiwayatPermohonan() {
 
       return [
         startIndex + index + 1,
-        <div className="flex flex-col">
+        <div className="flex flex-col" key={`no-${item.id}`}>
           <span className="font-medium whitespace-nowrap">
             {item.nomor_permohonan || "-"}
           </span>
@@ -121,7 +113,7 @@ export default function RiwayatPermohonan() {
             PBB: {item.no_pbb || "-"}
           </span>
         </div>,
-        <span className="whitespace-nowrap">
+        <span className="whitespace-nowrap" key={`date-${item.id}`}>
           {item.submitted_at
             ? new Date(item.submitted_at).toLocaleDateString("id-ID", {
                 day: "2-digit",
@@ -132,15 +124,15 @@ export default function RiwayatPermohonan() {
               })
             : "-"}
         </span>,
-        <span className="whitespace-nowrap">
+        <span className="whitespace-nowrap" key={`name-${item.id}`}>
           {item.nama_pemilik || item.user?.name || "-"}
         </span>,
         <Badge
           key={`badge-${item.id}`}
           variant="outline"
-          className={`whitespace-nowrap ${getBadgeColor(item.status)}`}
+          className={`whitespace-nowrap ${badgeColor}`}
         >
-          {item.status}
+          {statusLabel}
         </Badge>,
         <DropdownActions key={`action-${item.id}`} menu={menuActions} />,
       ];
@@ -150,7 +142,6 @@ export default function RiwayatPermohonan() {
   return (
     <MainLayout title="Riwayat Permohonan | KRK Bengkulu" isBgGray isPaddingY>
       <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Notifikasi SK Terbit (Updated) */}
         {hasNewSK && isAlertVisible && (
           <Alert className="mb-6 bg-green-50 border-green-200 text-green-800 pr-10 relative">
             <Bell className="h-4 w-4" />
@@ -159,7 +150,6 @@ export default function RiwayatPermohonan() {
               Selamat! Salah satu atau beberapa permohonan Anda telah disetujui.
               Silakan unduh dokumen SK pada tabel di bawah.
             </AlertDescription>
-            {/* Tombol Close */}
             <button
               onClick={() => setIsAlertVisible(false)}
               className="absolute top-4 right-4 text-green-700 hover:text-green-900 transition-colors p-1 rounded-full hover:bg-green-100"
@@ -170,7 +160,6 @@ export default function RiwayatPermohonan() {
           </Alert>
         )}
 
-        {/* Header & Filter */}
         <div className="mb-6 md:mb-8">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
@@ -189,8 +178,6 @@ export default function RiwayatPermohonan() {
             </div>
           </div>
         </div>
-
-        {/* ... Sisa komponen filter dan table sama seperti sebelumnya ... */}
 
         <Card className="mb-6 border-0 shadow-md bg-white rounded-2xl">
           <CardContent className="p-4 md:p-6">
@@ -225,9 +212,18 @@ export default function RiwayatPermohonan() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="semua">Semua Status</SelectItem>
-                  <SelectItem value="APPROVED">Selesai</SelectItem>
+                  <SelectItem value="APPROVED">Selesai / Approved</SelectItem>
                   <SelectItem value="PENDING_OPERATOR">
-                    Proses Operator
+                    Pending Operator
+                  </SelectItem>
+                  <SelectItem value="PENDING_SURVEYOR">
+                    Pending Surveyor
+                  </SelectItem>
+                  <SelectItem value="PENDING_JABATAN_FUNGSIONAL">
+                    Pending Jab. Fungsional
+                  </SelectItem>
+                  <SelectItem value="PENDING_KADIS">
+                    Pending Kepala Dinas
                   </SelectItem>
                   <SelectItem value="REJECTED">Ditolak</SelectItem>
                 </SelectContent>

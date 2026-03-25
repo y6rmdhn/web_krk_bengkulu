@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Clock } from "lucide-react";
 
@@ -15,24 +14,19 @@ const SidebarInfo = () => {
           <div className="space-y-3">
             {[
               {
-                status: "Diterima",
-                color: "bg-blue-500",
-                desc: "Berkas sedang diverifikasi",
-              },
-              {
-                status: "Proses",
+                status: "Sedang Diproses",
                 color: "bg-yellow-500",
-                desc: "Dalam tahap peninjauan",
+                desc: "Berkas dalam tahap verifikasi dan tinjauan teknis", // Lebih profesional daripada sekadar "peninjauan"
               },
               {
-                status: "Selesai",
+                status: "SK Terbit",
                 color: "bg-green-500",
-                desc: "Sudah dapat diambil",
+                desc: "Dokumen SK telah diterbitkan dan dapat diunduh", // Disesuaikan dengan era digital/TTE
               },
               {
                 status: "Ditolak",
                 color: "bg-red-500",
-                desc: "Perlu perbaikan berkas",
+                desc: "Permohonan tidak disetujui, silakan cek catatan penolakan", // Lebih informatif buat pemohon
               },
             ].map((item, index) => (
               <div
@@ -47,24 +41,6 @@ const SidebarInfo = () => {
               </div>
             ))}
           </div>
-        </CardContent>
-      </Card>
-
-      {/* Help Section */}
-      <Card className="border-0 shadow-lg bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl">
-        <CardContent className="p-6">
-          <h3 className="text-lg font-semibold text-gray-800 mb-3">
-            Butuh Bantuan?
-          </h3>
-          <p className="text-gray-600 text-sm mb-4">
-            Hubungi customer service kami untuk informasi lebih lanjut
-          </p>
-          <Button
-            variant="outline"
-            className="w-full border-blue-200 text-blue-600 hover:bg-blue-50"
-          >
-            Kontak Support
-          </Button>
         </CardContent>
       </Card>
     </div>

@@ -132,7 +132,7 @@ const LocationMap: React.FC<LokasiBangunanCardProps> = ({
                   : "bg-yellow-50 text-yellow-700 border-yellow-200"
               }`}
             >
-              View: {userRole}
+              View
             </span>
           )}
         </CardTitle>

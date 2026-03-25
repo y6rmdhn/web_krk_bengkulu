@@ -1,16 +1,16 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate, useParams } from "react-router-dom";
 import useDetailPermohonan from "./usePermohonanDetail";
-import HeaderSection from "./HeaderSection";
-import DataPemohonCard from "./DataPemohonCard";
-import DataPemilikCard from "./DataPemilikCard";
-import DataBangunanCard from "./DataBangunanCard";
-import BerkasLampiranCard from "./BerkasLampiranCard";
-import AlurPermohonanCard from "./AlurPermohonan";
 import { getStatusColor, getStatusText } from "@/utils/statusUtils";
 import { formatAlamat } from "@/utils/formatUtils";
 import { Loader2, ArrowLeft } from "lucide-react";
 import LocationMap from "@/components/commons/LocationMap";
+import HeaderSection from "@/components/commons/HeaderSection";
+import DataPemohonCard from "@/components/commons/DataPemohonCard";
+import DataPemilikCard from "@/components/commons/DataPemilikCard";
+import DataBangunanCard from "@/components/commons/DataBangunanCard";
+import BerkasLampiranCard from "@/components/commons/BerkasLampiranCard";
+import AlurPermohonanCard from "@/components/commons/AlurPermohonanCard";
 
 const DetailPermohonan = () => {
   const navigate = useNavigate();
