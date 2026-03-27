@@ -73,7 +73,7 @@ const SharedActionButtons = ({
     form.setValue(fieldName, value === "Lainnya" ? "" : value);
   };
 
-  // Efek khusus Jabatan Fungsional untuk mengisi Geom
+  // Efek khusus Jabatan Fungsional untuk mengisi Geom (Koordinat) saja
   useEffect(() => {
     if (role === "JF" && surveyLocation) {
       formAccept.setValue("geom", [
@@ -83,11 +83,26 @@ const SharedActionButtons = ({
     }
   }, [surveyLocation, formAccept, role]);
 
+  // Logic untuk Dinamisasi Wording Tombol & Dialog
+  let buttonAcceptText = "Setujui Permohonan";
+  let dialogAcceptTitle = "Setujui Permohonan";
+  let submitAcceptText = "Setujui";
+
+  if (role === "OPERATOR") {
+    buttonAcceptText = "Verifikasi Lokasi";
+    dialogAcceptTitle = "Verifikasi Lokasi";
+    submitAcceptText = "Terverifikasi";
+  } else if (role === "JF") {
+    buttonAcceptText = "Masukkan Hasil Kajian";
+    dialogAcceptTitle = "Masukkan Hasil Kajian";
+    submitAcceptText = "Simpan Data Kajian";
+  }
+
   return (
     <Card>
       <CardContent className="p-6">
         <div className="flex flex-col gap-3">
-          {/* ================= BUTTON & DIALOG SETUJUI ================= */}
+          {/* ================= BUTTON & DIALOG UTAMA ================= */}
           <Dialog
             open={openDialog === "accept"}
             onOpenChange={(open) => setOpenDialog(open ? "accept" : null)}
@@ -100,7 +115,7 @@ const SharedActionButtons = ({
                 className="w-full bg-green-600 hover:bg-green-700"
               >
                 <CheckCircle className="h-4 w-4 mr-2" />
-                Setujui Permohonan
+                {buttonAcceptText}
                 {role === "OPERATOR" &&
                   !isVerificationComplete &&
                   isFinal &&
@@ -109,11 +124,9 @@ const SharedActionButtons = ({
             </DialogTrigger>
             <DialogContent className={role === "JF" ? "max-w-lg" : ""}>
               <DialogHeader>
-                <DialogTitle>Setujui Permohonan</DialogTitle>
+                <DialogTitle>{dialogAcceptTitle}</DialogTitle>
                 <DialogDescription>
-                  {role === "JF"
-                    ? "Masukkan parameter teknis. Koordinat survei otomatis tersimpan."
-                    : "Apakah Anda yakin ingin menyetujui permohonan ini?"}
+                  Apakah Anda yakin ingin menyelesaikan proses verifikasi ini?
                 </DialogDescription>
               </DialogHeader>
 
@@ -224,10 +237,11 @@ const SharedActionButtons = ({
                     name="catatan"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Catatan (Opsional)</FormLabel>
+                        <FormLabel>Catatan</FormLabel>
                         <FormControl>
                           <Textarea
-                            placeholder="Masukkan catatan persetujuan..."
+                            placeholder="Masukkan catatan..."
+                            className={role === "JF" ? "min-h-[120px]" : ""}
                             {...field}
                           />
                         </FormControl>
@@ -252,7 +266,7 @@ const SharedActionButtons = ({
                       {state.isPendingAccept && (
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       )}{" "}
-                      Setujui
+                      {submitAcceptText}
                     </Button>
                   </DialogFooter>
                 </form>
