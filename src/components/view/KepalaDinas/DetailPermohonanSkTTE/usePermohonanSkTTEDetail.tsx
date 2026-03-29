@@ -14,6 +14,8 @@ const usePermohonanSkTTEDetail = (id: string) => {
     enabled: !!id,
   });
 
+  console.log(data);
+
   const getDetailPermohonanHistory = async (id: string) => {
     const result = await permohonanKrkServices.getDetailPermohonanHistory(id);
 

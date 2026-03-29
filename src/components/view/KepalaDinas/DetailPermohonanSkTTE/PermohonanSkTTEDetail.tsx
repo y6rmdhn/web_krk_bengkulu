@@ -14,6 +14,7 @@ import BerkasLampiranCard from "@/components/commons/BerkasLampiranCard";
 import DataPemohonCard from "@/components/commons/DataPemohonCard";
 import HeaderSection from "@/components/commons/HeaderSection";
 import SharedActionButtons from "@/components/commons/SharedActionButtons";
+import KetentuanPembangunanCard from "@/components/commons/KetentuanPembangunanCard/KetentuanPembangunanCard";
 
 const PermohonanSkTTEDetail = () => {
   const navigate = useNavigate();
@@ -60,7 +61,6 @@ const PermohonanSkTTEDetail = () => {
           <HeaderSection
             data={data}
             onBack={() => navigate(-1)}
-            // onViewSk={() => navigate(`/kepala-dinas/sk-detail/${id}`)}
             getStatusColor={getStatusColor}
             getStatusText={getStatusText}
           />
@@ -73,6 +73,9 @@ const PermohonanSkTTEDetail = () => {
               longitude={longitude}
               userRole="kadis"
             />
+
+            {/* Panggil Card Ketentuan Pembangunan di sini! */}
+            <KetentuanPembangunanCard data={data} />
 
             <DataPemohonCard data={data} formatAlamat={formatAlamat} />
             <DataPemilikCard data={data} formatAlamat={formatAlamat} />
