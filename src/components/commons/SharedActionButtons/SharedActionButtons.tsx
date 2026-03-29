@@ -89,8 +89,8 @@ const SharedActionButtons = ({
   let submitAcceptText = "Setujui";
 
   if (role === "OPERATOR") {
-    buttonAcceptText = "Verifikasi Lokasi";
-    dialogAcceptTitle = "Verifikasi Lokasi";
+    buttonAcceptText = "Verifikasi";
+    dialogAcceptTitle = "Verifikasi";
     submitAcceptText = "Terverifikasi";
   } else if (role === "JF") {
     buttonAcceptText = "Masukkan Hasil Kajian";
@@ -126,7 +126,7 @@ const SharedActionButtons = ({
               <DialogHeader>
                 <DialogTitle>{dialogAcceptTitle}</DialogTitle>
                 <DialogDescription>
-                  Apakah Anda yakin ingin menyelesaikan proses verifikasi ini?
+                  Apakah Anda yakin ingin menyelesaikan proses ini?
                 </DialogDescription>
               </DialogHeader>
 
